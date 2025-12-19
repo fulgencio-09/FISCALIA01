@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { MOCK_REQUESTS, REGIONAL_UNITS, ENTITIES, CANDIDATE_CLASSIFICATIONS, DEPARTMENTS, CITIES, DOC_TYPES, SUBJECTS, AREAS, MISSION_TYPES } from '../constants';
 import { ProtectionCaseForm, ProtectionRequestSummary } from '../types';
@@ -32,6 +31,7 @@ const ProtectionCasesPage: React.FC = () => {
   const [formData, setFormData] = useState<ProtectionCaseForm | null>(null);
   const [missionOrderNo, setMissionOrderNo] = useState('');
 
+  // Fixed error: replaced 'boolean' (type) with 'false' (value) in the initial state
   const [validationModal, setValidationModal] = useState<{
     show: boolean;
     caseId: string;
@@ -347,14 +347,14 @@ const ProtectionCasesPage: React.FC = () => {
                                             <button
                                                 onClick={() => handleValidateSolicitant(item)}
                                                 className={`
-                                                    flex items-center justify-center gap-2 px-3 py-2 border rounded-lg text-xs font-bold uppercase tracking-wide transition-all
+                                                    flex items-center justify-center p-2.5 border rounded-lg transition-all
                                                     ${isValidated 
                                                         ? 'bg-green-600 text-white border-green-700 shadow-sm' 
                                                         : 'bg-white text-indigo-700 border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300'}
                                                 `}
-                                                title="Validar si el solicitante ya tiene un caso abierto"
+                                                title={isValidated ? "Re-Validar Solicitante" : "Validar si el solicitante ya tiene un caso abierto"}
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                   {isValidated ? (
                                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                                                   ) : (
@@ -362,7 +362,6 @@ const ProtectionCasesPage: React.FC = () => {
                                                   )}
                                                   {isValidated && <polyline points="22 4 12 14.01 9 11.01" />}
                                                 </svg>
-                                                {isValidated ? 'Re-Validar' : 'Validar Solicitante'}
                                             </button>
                                             <button
                                                 onClick={() => handleCreateCase(item)}

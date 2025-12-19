@@ -13,8 +13,8 @@ import {
   AREAS,
   MOCK_MISSIONS
 } from '../constants';
-import { FamilyMember, ProtectionMission } from '../types';
-import { InputField, SelectField } from '../components/FormComponents';
+import { FamilyMember, ProtectionMission, ProtectionCaseForm } from '../types';
+import { InputField, SelectField, TextAreaField } from '../components/FormComponents';
 
 const INITIAL_FAMILY_DATA: Record<string, FamilyMember[]> = {
   "CASE-2024-001": [
@@ -47,9 +47,14 @@ const INITIAL_FAMILY_DATA: Record<string, FamilyMember[]> = {
 
 const SavedCasesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeModal, setActiveModal] = useState<{ type: 'MISSION' | 'FAMILY' | 'LIST_FAMILY' | 'LIST_MISSIONS' | 'NONE', caseId: string }>({ type: 'NONE', caseId: '' });
+  const [activeModal, setActiveModal] = useState<{ type: 'MISSION' | 'FAMILY' | 'LIST_FAMILY' | 'LIST_MISSIONS' | 'MISSION_DETAIL' | 'EDIT_MISSION' | 'NONE', caseId: string }>({ type: 'NONE', caseId: '' });
   const [confirmDeactivate, setConfirmDeactivate] = useState<{ show: boolean, memberId: string, caseId: string } | null>(null);
+  
+  // States for dynamic data
   const [allFamilyData, setAllFamilyData] = useState<Record<string, FamilyMember[]>>(INITIAL_FAMILY_DATA);
+  const [missionsList, setMissionsList] = useState<ProtectionMission[]>(MOCK_MISSIONS);
+  const [selectedMission, setSelectedMission] = useState<ProtectionMission | null>(null);
+  
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
 
@@ -72,6 +77,7 @@ const SavedCasesPage: React.FC = () => {
   const closeModal = () => {
     setActiveModal({ type: 'NONE', caseId: '' });
     setEditingMember(null);
+    setSelectedMission(null);
   };
 
   const handleToggleFamilyStatus = () => {
@@ -123,16 +129,39 @@ const SavedCasesPage: React.FC = () => {
     setActiveModal({ type: 'LIST_FAMILY', caseId });
   };
 
+  const handleEditMissionSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedMission) return;
+    const formData = new FormData(e.currentTarget);
+    
+    const updatedMission: ProtectionMission = {
+      ...selectedMission,
+      type: formData.get('type') as string,
+      status: formData.get('status') as any,
+      dueDate: formData.get('dueDate') as string,
+      assignedArea: formData.get('assignedArea') as string,
+    };
+
+    setMissionsList(prev => prev.map(m => m.id === selectedMission.id ? updatedMission : m));
+    showNotification("Misión actualizada exitosamente.");
+    setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId });
+  };
+
   const currentFamilyMembers = useMemo(() => {
     return activeModal.caseId ? (allFamilyData[activeModal.caseId] || []) : [];
   }, [allFamilyData, activeModal.caseId]);
 
   const relatedMissions = useMemo(() => {
-    if (activeModal.type !== 'LIST_MISSIONS' || !activeModal.caseId) return [];
+    if (!activeModal.caseId) return [];
     const currentCase = MOCK_SAVED_CASES.find(c => c.caseId === activeModal.caseId);
     const radicado = currentCase?.radicado || activeModal.caseId;
-    return MOCK_MISSIONS.filter(m => m.caseRadicado === radicado);
-  }, [activeModal.type, activeModal.caseId]);
+    return missionsList.filter(m => m.caseRadicado === radicado);
+  }, [activeModal.caseId, missionsList]);
+
+  const associatedCase = useMemo(() => {
+    if (!activeModal.caseId) return null;
+    return MOCK_SAVED_CASES.find(c => c.caseId === activeModal.caseId) || null;
+  }, [activeModal.caseId]);
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 relative min-h-screen">
@@ -375,6 +404,7 @@ const SavedCasesPage: React.FC = () => {
                                  <th className="px-8 py-5">Fecha Generación</th>
                                  <th className="px-8 py-5">Vencimiento</th>
                                  <th className="px-8 py-5 text-center">Estado</th>
+                                 <th className="px-8 py-5 text-center">Gestión</th>
                               </tr>
                            </thead>
                            <tbody className="bg-white divide-y divide-slate-50">
@@ -390,9 +420,27 @@ const SavedCasesPage: React.FC = () => {
                                        </div>
                                     </td>
                                     <td className="px-8 py-5 text-center">
-                                       <span className="bg-blue-100 text-blue-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter border border-blue-200">
+                                       <span className={`px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-tighter ${m.status === 'PENDIENTE' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
                                           {m.status}
                                        </span>
+                                    </td>
+                                    <td className="px-8 py-5">
+                                       <div className="flex items-center justify-center gap-2">
+                                          <button 
+                                             onClick={() => { setSelectedMission(m); setActiveModal({ type: 'MISSION_DETAIL', caseId: activeModal.caseId }); }}
+                                             className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                             title="Visualizar Misión"
+                                          >
+                                             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                          </button>
+                                          <button 
+                                             onClick={() => { setSelectedMission(m); setActiveModal({ type: 'EDIT_MISSION', caseId: activeModal.caseId }); }}
+                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                             title="Editar Misión"
+                                          >
+                                             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                          </button>
+                                       </div>
                                     </td>
                                  </tr>
                               ))}
@@ -415,6 +463,117 @@ const SavedCasesPage: React.FC = () => {
                     </button>
                  </div>
               </div>
+           </div>
+        </div>
+      )}
+
+      {/* --- MODAL: DETALLE DE MISIÓN (ESTILO DOCUMENTO) --- */}
+      {activeModal.type === 'MISSION_DETAIL' && selectedMission && (
+        <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[2rem] shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+              <div className="bg-slate-800 text-white p-6 flex justify-between items-center sticky top-0 z-10">
+                 <div className="flex items-center gap-4">
+                    <div className="bg-white/10 p-3 rounded-xl">
+                       <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div>
+                       <h3 className="text-lg font-black uppercase tracking-tight">VISTA PREVIA DE MISIÓN</h3>
+                       <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">ORDEN: {selectedMission.missionNo}</p>
+                    </div>
+                 </div>
+                 <button onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId })} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+              
+              <div className="p-10 space-y-8">
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-100">
+                    <div>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Generación</label>
+                        <span className="text-sm font-bold text-slate-800">{selectedMission.creationDate}</span>
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Radicado de Correspondencia</label>
+                        <span className="text-sm font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{selectedMission.caseRadicado}</span>
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Asignado a</label>
+                        <span className="text-sm font-bold text-slate-800">{selectedMission.assignedArea}</span>
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-6">
+                       <div>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Titular</label>
+                          <span className="text-lg font-black text-slate-900 uppercase block">{selectedMission.petitionerName}</span>
+                          <span className="text-xs font-mono text-slate-500">Documento: {selectedMission.petitionerDoc}</span>
+                       </div>
+                       <div>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Tipo de Actuación</label>
+                          <span className="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full uppercase tracking-tighter">{selectedMission.type}</span>
+                       </div>
+                    </div>
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Observaciones</label>
+                       <p className="text-xs text-slate-600 leading-relaxed italic">
+                          {associatedCase?.observations || "Se ordena el despliegue del analista para la verificación de los hechos amenazantes descritos en el expediente oficial."}
+                       </p>
+                    </div>
+                 </div>
+
+                 <div className="pt-8 flex justify-between items-center border-t border-slate-100">
+                    <div>
+                        <label className="text-[10px] font-black text-red-400 uppercase tracking-widest block mb-1">Vencimiento Términos</label>
+                        <span className="text-sm font-black text-red-600 uppercase">PLAZO MÁXIMO: {selectedMission.dueDate}</span>
+                    </div>
+                    <div className="text-right">
+                       <img src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${selectedMission.missionNo}`} alt="QR" className="inline-block border p-1 rounded bg-white" />
+                    </div>
+                 </div>
+
+                 <div className="pt-8 flex justify-end gap-4">
+                    <button 
+                       onClick={() => window.print()}
+                       className="px-8 py-2.5 border border-slate-200 text-slate-600 font-bold rounded-xl text-[10px] uppercase hover:bg-slate-50 transition-all"
+                    >
+                       Imprimir Documento
+                    </button>
+                    <button 
+                       onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId })}
+                       className="px-10 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-[10px] uppercase hover:bg-black transition-all"
+                    >
+                       Cerrar Vista
+                    </button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* --- MODAL: EDICIÓN DE MISIÓN --- */}
+      {activeModal.type === 'EDIT_MISSION' && selectedMission && (
+        <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[2rem] shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-8 bg-blue-600 text-white flex justify-between items-center">
+                 <div>
+                    <h3 className="text-xl font-black uppercase tracking-tight">EDITAR MISIÓN</h3>
+                    <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest">ACTUALIZACIÓN DE ÓRDEN: {selectedMission.missionNo}</p>
+                 </div>
+                 <button onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId })} className="text-white hover:opacity-70"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+              <form className="p-10 space-y-8" onSubmit={handleEditMissionSubmit}>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <SelectField label="Tipo de Actuación" name="type" options={MISSION_TYPES} defaultValue={selectedMission.type} required />
+                    <SelectField label="Estado" name="status" options={['PENDIENTE', 'EN_CURSO', 'FINALIZADA']} defaultValue={selectedMission.status} required />
+                    <InputField label="Vencimiento de Términos" name="dueDate" type="date" defaultValue={selectedMission.dueDate} required />
+                    <SelectField label="Área Asignada" name="assignedArea" options={AREAS} defaultValue={selectedMission.assignedArea} required />
+                 </div>
+                 <div className="flex justify-end gap-4 border-t border-slate-100 pt-8">
+                    <button type="button" onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId })} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
+                    <button type="submit" className="px-10 py-3 bg-blue-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest shadow-lg shadow-blue-100">
+                        Guardar Cambios
+                    </button>
+                 </div>
+              </form>
            </div>
         </div>
       )}

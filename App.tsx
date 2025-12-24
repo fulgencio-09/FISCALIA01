@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import ProtectionFormPage from './pages/ProtectionFormPage';
 import RequestsListPage from './pages/RequestsListPage';
@@ -170,7 +169,7 @@ const App: React.FC = () => {
               <SidebarItem 
                 indent
                 page="list"
-                label="Bandeja de Entrada" 
+                label="Bandeja de Solicitud" 
                 icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>} 
               />
             </div>
@@ -295,7 +294,7 @@ const App: React.FC = () => {
                       onClick={() => { setCurrentPage('list'); setEditingRequest(undefined); setIsReadOnlyMode(false); }}
                       className="w-full bg-white border-2 border-slate-100 text-slate-700 px-8 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 hover:border-slate-200 transition-all active:scale-95 shadow-sm"
                     >
-                      {userRole === 'GESTOR' ? 'Radicar y Consultar' : 'Bandeja de Entrada'}
+                      {userRole === 'GESTOR' ? 'Radicar y Consultar' : 'Bandeja de Solicitud'}
                     </button>
                   </div>
                 </div>

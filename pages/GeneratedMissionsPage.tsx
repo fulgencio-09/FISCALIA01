@@ -1,14 +1,15 @@
 
 import React, { useState, useMemo } from 'react';
-import { MOCK_SAVED_CASES, MOCK_OFFICIALS, REGIONAL_UNITS, MISSION_TYPES, AREAS } from '../constants';
+import { MOCK_SAVED_CASES, MOCK_OFFICIALS, REGIONAL_UNITS } from '../constants';
 import { ProtectionMission, ProtectionCaseForm } from '../types';
 import { InputField, SelectField, TextAreaField, FileUpload } from '../components/FormComponents';
 
 interface GeneratedMissionsPageProps {
-  onSaveSuccess?: (message: string) => void;
+  missions: ProtectionMission[];
+  onSaveSuccess?: (message: string, updatedMission: ProtectionMission) => void;
 }
 
-const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ onSaveSuccess }) => {
+const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions, onSaveSuccess }) => {
   const [view, setView] = useState<'LIST' | 'DETAIL'>('LIST');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMission, setSelectedMission] = useState<ProtectionMission | null>(null);
@@ -21,45 +22,32 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ onSaveSuc
   const [observations, setObservations] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
-  const missionsWithDetails = useMemo(() => {
+  // FILTRO: Solo mostrar misiones PENDIENTES
+  const pendingMissions = useMemo(() => {
     const casesMap = new Map(MOCK_SAVED_CASES.map(c => [c.radicado, c]));
     
-    // Usamos datos de mock para la tabla
-    const missions = [
-      {
-        id: "MT-1",
-        missionNo: "MT-2024-8842",
-        caseRadicado: "FGN-2024-582910",
-        type: "EVALUACIÓN DE RIESGO",
-        petitionerName: "PEDRO PABLO PÉREZ",
-        petitionerDoc: "79123456",
-        assignedArea: "PROTECCIÓN A PERSONAS",
-        status: 'PENDIENTE',
-        dueDate: "2024-06-15",
-        creationDate: "2024-06-01"
-      }
-    ];
-
-    return missions.map(m => {
-      const caseData = casesMap.get(m.caseRadicado);
-      return {
-        ...m,
-        subject: caseData?.subject || "EVALUACIÓN Y TRÁMITE DE PROTECCIÓN",
-        caseId: caseData?.caseId || "N/A"
-      };
-    });
-  }, []);
+    return missions
+      .filter(m => m.status === 'PENDIENTE') // REQUERIMIENTO: Se oculta al reasignar
+      .map(m => {
+        const caseData = casesMap.get(m.caseRadicado);
+        return {
+          ...m,
+          subject: caseData?.subject || "EVALUACIÓN Y TRÁMITE DE PROTECCIÓN",
+          caseId: caseData?.caseId || "N/A"
+        };
+      });
+  }, [missions]);
 
   const filteredMissions = useMemo(() => {
-    if (!searchTerm.trim()) return missionsWithDetails;
+    if (!searchTerm.trim()) return pendingMissions;
     const term = searchTerm.toLowerCase();
-    return missionsWithDetails.filter(m => 
+    return pendingMissions.filter(m => 
       m.missionNo.toLowerCase().includes(term) || 
       m.caseRadicado.toLowerCase().includes(term) ||
       m.caseId.toLowerCase().includes(term) ||
       m.subject.toLowerCase().includes(term)
     );
-  }, [searchTerm, missionsWithDetails]);
+  }, [searchTerm, pendingMissions]);
 
   const handleReassignAction = (mission: any) => {
     const caseData = MOCK_SAVED_CASES.find(c => c.radicado === mission.caseRadicado);
@@ -92,11 +80,22 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ onSaveSuc
       return;
     }
     
-    // Notificación requerida: "Se ha asignado la Misión al funcionario xxxxx de la Regional xxxxx"
+    if (!selectedMission) return;
+
+    // Actualizamos el objeto misión
+    const updatedMission: ProtectionMission = {
+        ...selectedMission,
+        status: 'ASIGNADA', // CAMBIO DE ESTADO
+        assignedOfficial,
+        regional,
+        reassignmentDate,
+        observations
+    };
+
     const successMessage = `Se ha asignado la Misión al funcionario ${assignedOfficial} de la Regional ${regional}`;
     
     if (onSaveSuccess) {
-      onSaveSuccess(successMessage);
+      onSaveSuccess(successMessage, updatedMission);
     }
     
     setView('LIST');
@@ -263,8 +262,8 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ onSaveSuc
     <div className="max-w-7xl mx-auto p-4 md:p-10">
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Misiones de Protección</h1>
-          <p className="text-slate-500 font-medium italic">Control operativo y seguimiento de órdenes de trabajo.</p>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Misiones de Protección (Pendientes)</h1>
+          <p className="text-slate-500 font-medium italic">Bandeja de órdenes de trabajo esperando asignación inicial.</p>
         </div>
         <div className="relative max-w-sm w-full">
           <input 
@@ -292,35 +291,46 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ onSaveSuc
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredMissions.map((m) => (
-                <tr key={m.id} className="hover:bg-slate-50/80 transition-colors group">
-                  <td className="px-8 py-6">
-                    <span className="text-xs font-bold text-slate-500">{m.creationDate}</span>
-                  </td>
-                  <td className="px-8 py-6 font-mono font-black text-blue-700 text-sm">
-                    {m.missionNo}
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="font-black text-slate-900 uppercase text-[11px] leading-tight max-w-[220px]">
-                      {m.subject}
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 font-mono text-xs font-bold text-slate-500">
-                    {m.caseRadicado}
-                  </td>
-                  <td className="px-8 py-6 font-mono text-xs font-black text-indigo-600">
-                    {m.caseId}
-                  </td>
-                  <td className="px-8 py-6 text-center">
-                    <button 
-                        onClick={() => handleReassignAction(m)}
-                        className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 mx-auto"
-                    >
-                        Reasignar Misión
-                    </button>
-                  </td>
+              {filteredMissions.length > 0 ? (
+                filteredMissions.map((m) => (
+                    <tr key={m.id} className="hover:bg-slate-50/80 transition-colors group">
+                    <td className="px-8 py-6">
+                        <span className="text-xs font-bold text-slate-500">{m.creationDate}</span>
+                    </td>
+                    <td className="px-8 py-6 font-mono font-black text-blue-700 text-sm">
+                        {m.missionNo}
+                    </td>
+                    <td className="px-8 py-6">
+                        <div className="font-black text-slate-900 uppercase text-[11px] leading-tight max-w-[220px]">
+                        {m.subject}
+                        </div>
+                    </td>
+                    <td className="px-8 py-6 font-mono text-xs font-bold text-slate-500">
+                        {m.caseRadicado}
+                    </td>
+                    <td className="px-8 py-6 font-mono text-xs font-black text-indigo-600">
+                        {m.caseId}
+                    </td>
+                    <td className="px-8 py-6 text-center">
+                        <button 
+                            onClick={() => handleReassignAction(m)}
+                            className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 mx-auto"
+                        >
+                            Reasignar Misión
+                        </button>
+                    </td>
+                    </tr>
+                ))
+              ) : (
+                <tr>
+                    <td colSpan={6} className="px-8 py-20 text-center">
+                        <div className="flex flex-col items-center gap-4 opacity-40">
+                             <svg width="48" height="48" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                             <p className="text-[11px] font-black uppercase tracking-widest">No hay misiones pendientes de asignación</p>
+                        </div>
+                    </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

@@ -27,7 +27,7 @@ export enum LegalSystem {
   LEY_906 = 'Ley 906 de 2004'
 }
 
-export type UserRole = 'FISCAL' | 'GESTOR';
+export type UserRole = 'FISCAL' | 'GESTOR' | 'LIDER';
 
 export interface FamilyMember {
   id: string;
@@ -123,9 +123,13 @@ export interface ProtectionMission {
   petitionerName: string;
   petitionerDoc: string;
   assignedArea: string;
-  status: 'PENDIENTE' | 'EN_CURSO' | 'FINALIZADA';
+  status: 'PENDIENTE' | 'ASIGNADA' | 'ACTIVA' | 'FINALIZADA' | 'ANULADA';
   dueDate: string;
   creationDate: string;
+  assignedOfficial?: string;
+  regional?: string;
+  reassignmentDate?: string;
+  observations?: string;
 }
 
 export interface ValidationErrors {

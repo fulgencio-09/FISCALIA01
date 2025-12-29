@@ -1,23 +1,27 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ProtectionFormPage from './pages/ProtectionFormPage';
 import RequestsListPage from './pages/RequestsListPage';
 import ProtectionCasesPage from './pages/ProtectionCasesPage';
 import SavedCasesPage from './pages/SavedCasesPage';
 import GeneratedMissionsPage from './pages/GeneratedMissionsPage';
-import { ProtectionRequestForm, UserRole } from './types';
-import { MOCK_FULL_REQUESTS, MOCK_REQUESTS } from './constants';
+import AssignedMissionsPage from './pages/AssignedMissionsPage';
+import { ProtectionRequestForm, UserRole, ProtectionMission } from './types';
+import { MOCK_FULL_REQUESTS, MOCK_REQUESTS, MOCK_MISSIONS } from './constants';
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions' | 'assigned-missions'>('home');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isGestionOpen, setIsGestionOpen] = useState(true);
+  const [isEvaluacionesOpen, setIsEvaluacionesOpen] = useState(true);
   const [isProcesosOpen, setIsProcesosOpen] = useState(true);
   
   const [userRole, setUserRole] = useState<UserRole>('FISCAL');
   
   const [editingRequest, setEditingRequest] = useState<ProtectionRequestForm | undefined>(undefined);
   const [isReadOnlyMode, setIsReadOnlyMode] = useState(false);
+
+  // Global State for Missions (to sync between pages)
+  const [allMissions, setAllMissions] = useState<ProtectionMission[]>(MOCK_MISSIONS);
 
   // Global Toast State
   const [globalToast, setGlobalToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
@@ -35,12 +39,16 @@ const App: React.FC = () => {
     setGlobalToast({ show: true, message });
   };
 
-  const SidebarItem = ({ icon, label, page, indent = false }: { icon: any, label: string, page?: 'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions', indent?: boolean }) => (
+  const handleUpdateMission = (updatedMission: ProtectionMission) => {
+      setAllMissions(prev => prev.map(m => m.id === updatedMission.id ? updatedMission : m));
+  };
+
+  const SidebarItem = ({ icon, label, page, indent = false }: { icon: any, label: string, page?: 'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions' | 'assigned-missions', indent?: boolean }) => (
     <button 
       onClick={() => {
           if (page) {
               setCurrentPage(page);
-              if (['form', 'list', 'home', 'cases', 'saved-cases', 'missions'].includes(page)) {
+              if (['form', 'list', 'home', 'cases', 'saved-cases', 'missions', 'assigned-missions'].includes(page)) {
                   setEditingRequest(undefined);
                   setIsReadOnlyMode(false);
               }
@@ -180,47 +188,60 @@ const App: React.FC = () => {
             </div>
           </div>
           
-          <div className="mt-4 px-2">
-            <button 
-              onClick={() => setIsGestionOpen(!isGestionOpen)}
-              className="w-full flex items-center justify-between px-3 py-3 text-slate-700 hover:bg-slate-50 rounded-lg transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-100 text-blue-600 p-1.5 rounded-md group-hover:bg-blue-600 group-hover:text-white transition-all">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          {/* MÓDULO DE EVALUACIONES (Dinámico por rol GESTOR/LIDER) */}
+          {(userRole === 'GESTOR' || userRole === 'LIDER') && (
+            <div className="mt-4 px-2">
+                <button 
+                onClick={() => setIsEvaluacionesOpen(!isEvaluacionesOpen)}
+                className="w-full flex items-center justify-between px-3 py-3 text-slate-700 hover:bg-slate-50 rounded-lg transition-colors group"
+                >
+                <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 text-blue-600 p-1.5 rounded-md group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <span className="font-bold text-sm">Evaluaciones</span>
                 </div>
-                <span className="font-bold text-sm">Gestión Operativa</span>
-              </div>
-              <svg 
-                className={`transition-transform duration-200 ${isGestionOpen ? 'rotate-180' : ''}`} 
-                xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            
-            <div className={`overflow-hidden transition-all duration-300 ${isGestionOpen ? 'max-h-[500px] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
-              {userRole === 'GESTOR' && (
-                <>
-                  <SidebarItem 
-                    indent
-                    page="cases"
-                    label="Apertura de Casos" 
-                    icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/></svg>} 
-                  />
-                  <SidebarItem 
-                    indent
-                    page="saved-cases"
-                    label="Expedientes" 
-                    icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} 
-                  />
-                  <SidebarItem 
-                    indent
-                    page="missions"
-                    label="Misiones" 
-                    icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} 
-                  />
-                </>
-              )}
+                <svg 
+                    className={`transition-transform duration-200 ${isEvaluacionesOpen ? 'rotate-180' : ''}`} 
+                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                
+                <div className={`overflow-hidden transition-all duration-300 ${isEvaluacionesOpen ? 'max-h-[500px] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                {userRole === 'GESTOR' && (
+                    <>
+                    <SidebarItem 
+                        indent
+                        page="cases"
+                        label="Apertura de Casos" 
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/></svg>} 
+                    />
+                    <SidebarItem 
+                        indent
+                        page="saved-cases"
+                        label="Expedientes" 
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} 
+                    />
+                    </>
+                )}
+                {userRole === 'LIDER' && (
+                    <>
+                    <SidebarItem 
+                        indent
+                        page="missions"
+                        label="Misiones Pendientes" 
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} 
+                    />
+                    <SidebarItem 
+                        indent
+                        page="assigned-missions"
+                        label="Misiones Asignadas" 
+                        icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>} 
+                    />
+                    </>
+                )}
+                </div>
             </div>
-          </div>
+          )}
         </nav>
       </aside>
 
@@ -262,20 +283,21 @@ const App: React.FC = () => {
                 >
                     <option value="FISCAL">Fiscalía Conocimiento</option>
                     <option value="GESTOR">Gestión de Archivo</option>
+                    <option value="LIDER">Líder de Evaluación</option>
                 </select>
              </div>
 
              <div className="flex items-center gap-4 border-l border-slate-200 pl-6">
                  <div className="text-right hidden md:block">
                    <div className="text-xs font-black text-slate-800 uppercase tracking-tight">
-                       {userRole === 'FISCAL' ? 'Fiscalía General' : 'Oficina de Correspondencia'}
+                       {userRole === 'FISCAL' ? 'Fiscalía General' : userRole === 'GESTOR' ? 'Oficina de Correspondencia' : 'Coordinación Evaluación'}
                    </div>
                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                       {userRole === 'FISCAL' ? 'Unidad de Vida' : 'Área de Radicación'}
+                       {userRole === 'FISCAL' ? 'Unidad de Vida' : userRole === 'GESTOR' ? 'Área de Radicación' : 'Protección a Personas'}
                    </div>
                  </div>
-                 <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-black text-white shadow-lg ${userRole === 'FISCAL' ? 'bg-blue-600 shadow-blue-100' : 'bg-slate-800 shadow-slate-100'}`}>
-                   {userRole === 'FISCAL' ? 'FA' : 'GD'}
+                 <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-black text-white shadow-lg ${userRole === 'FISCAL' ? 'bg-blue-600 shadow-blue-100' : userRole === 'GESTOR' ? 'bg-slate-800 shadow-slate-100' : 'bg-indigo-600 shadow-indigo-100'}`}>
+                   {userRole === 'FISCAL' ? 'FA' : userRole === 'GESTOR' ? 'GD' : 'LE'}
                  </div>
              </div>
           </div>
@@ -285,7 +307,7 @@ const App: React.FC = () => {
           {currentPage === 'home' && (
              <div className="p-8 flex flex-col items-center justify-center h-full text-center">
                 <div className="bg-white p-12 rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 max-w-xl animate-in zoom-in-95 duration-500">
-                  <div className={`h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg ${userRole === 'FISCAL' ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-800'}`}>
+                  <div className={`h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg ${userRole === 'FISCAL' ? 'bg-blue-50 text-blue-600' : userRole === 'GESTOR' ? 'bg-slate-100 text-slate-800' : 'bg-indigo-50 text-indigo-600'}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                   </div>
                   <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Sistema de Protección</h2>
@@ -301,11 +323,20 @@ const App: React.FC = () => {
                         </button>
                     )}
                     
+                    {userRole === 'LIDER' && (
+                        <button 
+                          onClick={() => setCurrentPage('missions')}
+                          className="w-full bg-indigo-600 text-white px-8 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+                        >
+                          Gestionar Misiones Pendientes
+                        </button>
+                    )}
+
                     <button 
                       onClick={() => { setCurrentPage('list'); setEditingRequest(undefined); setIsReadOnlyMode(false); }}
                       className="w-full bg-white border-2 border-slate-100 text-slate-700 px-8 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 hover:border-slate-200 transition-all active:scale-95 shadow-sm"
                     >
-                      {userRole === 'GESTOR' ? 'Radicar y Consultar' : 'Bandeja de Solicitud'}
+                      {userRole === 'FISCAL' ? 'Bandeja de Solicitud' : 'Consultar Solicitudes'}
                     </button>
                   </div>
                 </div>
@@ -338,8 +369,21 @@ const App: React.FC = () => {
               <SavedCasesPage />
           )}
 
-          {currentPage === 'missions' && userRole === 'GESTOR' && (
-              <GeneratedMissionsPage onSaveSuccess={showToast} />
+          {currentPage === 'missions' && userRole === 'LIDER' && (
+              <GeneratedMissionsPage 
+                missions={allMissions} 
+                onSaveSuccess={(msg, updatedM) => {
+                    showToast(msg);
+                    handleUpdateMission(updatedM);
+                }} 
+              />
+          )}
+
+          {currentPage === 'assigned-missions' && userRole === 'LIDER' && (
+              <AssignedMissionsPage 
+                 missions={allMissions} 
+                 onUpdateMission={handleUpdateMission}
+              />
           )}
         </div>
       </main>

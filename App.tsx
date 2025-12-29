@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import ProtectionFormPage from './pages/ProtectionFormPage';
 import RequestsListPage from './pages/RequestsListPage';
@@ -29,6 +30,10 @@ const App: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [globalToast.show]);
+
+  const showToast = (message: string) => {
+    setGlobalToast({ show: true, message });
+  };
 
   const SidebarItem = ({ icon, label, page, indent = false }: { icon: any, label: string, page?: 'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions', indent?: boolean }) => (
     <button 
@@ -89,7 +94,7 @@ const App: React.FC = () => {
   };
 
   const handleSaveSuccess = (message: string) => {
-      setGlobalToast({ show: true, message });
+      showToast(message);
       setEditingRequest(undefined);
       setIsReadOnlyMode(false);
       setCurrentPage('list');
@@ -205,6 +210,12 @@ const App: React.FC = () => {
                     page="saved-cases"
                     label="Expedientes" 
                     icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} 
+                  />
+                  <SidebarItem 
+                    indent
+                    page="missions"
+                    label="Misiones" 
+                    icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} 
                   />
                 </>
               )}
@@ -328,7 +339,7 @@ const App: React.FC = () => {
           )}
 
           {currentPage === 'missions' && userRole === 'GESTOR' && (
-              <GeneratedMissionsPage />
+              <GeneratedMissionsPage onSaveSuccess={showToast} />
           )}
         </div>
       </main>

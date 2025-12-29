@@ -25,6 +25,14 @@ export const CANDIDATE_CLASSIFICATIONS = [
   "SERVIDOR", "TESTIGO", "VICTIMA", "INTERVINIENTE"
 ];
 
+/* Added missing mock officials for mission assignment and re-assignment */
+export const MOCK_OFFICIALS = [
+  "CARLOS ANDRÉS RUIZ",
+  "MARÍA FERNANDA LÓPEZ",
+  "JORGE ELIÉCER TRUJILLO",
+  "DIANA MARCELA RATIVA"
+];
+
 export const DEPARTMENTS = [
   "ATLÁNTICO", "ANTIOQUIA", "BOGOTÁ D.C.", "VALLE DEL CAUCA", "NORTE DE SANTANDER", "SANTANDER"
 ];

@@ -1,236 +1,329 @@
 
 import React, { useState, useMemo } from 'react';
-import { MOCK_MISSIONS, MOCK_SAVED_CASES } from '../constants';
+import { MOCK_SAVED_CASES, MOCK_OFFICIALS, REGIONAL_UNITS, MISSION_TYPES, AREAS } from '../constants';
 import { ProtectionMission, ProtectionCaseForm } from '../types';
+import { InputField, SelectField, TextAreaField, FileUpload } from '../components/FormComponents';
 
-const GeneratedMissionsPage: React.FC = () => {
+interface GeneratedMissionsPageProps {
+  onSaveSuccess?: (message: string) => void;
+}
+
+const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ onSaveSuccess }) => {
   const [view, setView] = useState<'LIST' | 'DETAIL'>('LIST');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMission, setSelectedMission] = useState<ProtectionMission | null>(null);
   const [associatedCase, setAssociatedCase] = useState<ProtectionCaseForm | null>(null);
 
-  const filteredMissions = useMemo(() => {
-    if (!searchTerm.trim()) return MOCK_MISSIONS;
-    const term = searchTerm.toLowerCase();
-    return MOCK_MISSIONS.filter(m => 
-      m.missionNo.toLowerCase().includes(term) || 
-      m.petitionerName.toLowerCase().includes(term) ||
-      m.caseRadicado.toLowerCase().includes(term)
-    );
-  }, [searchTerm]);
+  // Form states for re-assignment (Editable fields)
+  const [assignedOfficial, setAssignedOfficial] = useState('');
+  const [regional, setRegional] = useState('');
+  const [reassignmentDate, setReassignmentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [observations, setObservations] = useState('');
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
-  const handleViewMission = (mission: ProtectionMission) => {
-    // Intentar encontrar el caso asociado para obtener detalles completos
+  const missionsWithDetails = useMemo(() => {
+    const casesMap = new Map(MOCK_SAVED_CASES.map(c => [c.radicado, c]));
+    
+    // Usamos datos de mock para la tabla
+    const missions = [
+      {
+        id: "MT-1",
+        missionNo: "MT-2024-8842",
+        caseRadicado: "FGN-2024-582910",
+        type: "EVALUACIÓN DE RIESGO",
+        petitionerName: "PEDRO PABLO PÉREZ",
+        petitionerDoc: "79123456",
+        assignedArea: "PROTECCIÓN A PERSONAS",
+        status: 'PENDIENTE',
+        dueDate: "2024-06-15",
+        creationDate: "2024-06-01"
+      }
+    ];
+
+    return missions.map(m => {
+      const caseData = casesMap.get(m.caseRadicado);
+      return {
+        ...m,
+        subject: caseData?.subject || "EVALUACIÓN Y TRÁMITE DE PROTECCIÓN",
+        caseId: caseData?.caseId || "N/A"
+      };
+    });
+  }, []);
+
+  const filteredMissions = useMemo(() => {
+    if (!searchTerm.trim()) return missionsWithDetails;
+    const term = searchTerm.toLowerCase();
+    return missionsWithDetails.filter(m => 
+      m.missionNo.toLowerCase().includes(term) || 
+      m.caseRadicado.toLowerCase().includes(term) ||
+      m.caseId.toLowerCase().includes(term) ||
+      m.subject.toLowerCase().includes(term)
+    );
+  }, [searchTerm, missionsWithDetails]);
+
+  const handleReassignAction = (mission: any) => {
     const caseData = MOCK_SAVED_CASES.find(c => c.radicado === mission.caseRadicado);
     setSelectedMission(mission);
     setAssociatedCase(caseData || null);
+    
+    // Reset editable fields
+    setAssignedOfficial('');
+    setRegional('');
+    setReassignmentDate(new Date().toISOString().split('T')[0]);
+    setObservations('');
+    setAttachedFiles([]);
+    
     setView('DETAIL');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleBackToList = () => {
-    setView('LIST');
-    setSelectedMission(null);
-    setAssociatedCase(null);
+  const handleFileChange = (files: File[]) => {
+    setAttachedFiles(prev => [...prev, ...files]);
   };
 
-  if (view === 'DETAIL' && selectedMission) {
+  const handleRemoveFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSaveReassignment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regional || !assignedOfficial) {
+      alert("Regional y Funcionario son campos obligatorios.");
+      return;
+    }
+    
+    // Notificación requerida: "Se ha asignado la Misión al funcionario xxxxx de la Regional xxxxx"
+    const successMessage = `Se ha asignado la Misión al funcionario ${assignedOfficial} de la Regional ${regional}`;
+    
+    if (onSaveSuccess) {
+      onSaveSuccess(successMessage);
+    }
+    
+    setView('LIST');
+  };
+
+  if (view === 'DETAIL' && selectedMission && associatedCase) {
     return (
-      <div className="max-w-4xl mx-auto p-4 md:p-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
+      <div className="max-w-5xl mx-auto p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div className="mb-6 flex justify-between items-center print:hidden">
             <button 
-                onClick={handleBackToList}
-                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold text-sm transition-colors"
+                onClick={() => setView('LIST')}
+                className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-colors"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                VOLVER AL LISTADO
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Regresar a la Bandeja
             </button>
             <button 
                 onClick={() => window.print()}
-                className="flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm"
+                className="bg-white border border-slate-300 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                IMPRIMIR MISIÓN
+                Imprimir Documento
             </button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden print:shadow-none print:border-slate-300">
-            {/* Header Documento (Same as ProtectionCasesPage) */}
-            <div className="bg-slate-800 text-white p-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-4">
-                    <div className="bg-white/10 p-3 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
+        <form onSubmit={handleSaveReassignment} className="bg-white border-2 border-slate-900 shadow-2xl overflow-hidden print:border-none print:shadow-none mb-20">
+            {/* Header Oficial FGN */}
+            <div className="p-8 border-b-2 border-slate-900 flex justify-between items-center bg-slate-50/50">
+                <div className="flex items-center gap-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-14" />
                     <div>
-                        <h2 className="text-xl font-black uppercase tracking-tighter">Misión de Trabajo</h2>
-                        <p className="text-slate-400 text-xs font-bold uppercase">Sistema de Gestión de Protección - FGN</p>
+                        <h2 className="text-sm font-black uppercase tracking-tight">Fiscalía General de la Nación</h2>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase">Dirección de Protección y Asistencia</p>
                     </div>
                 </div>
-                <div className="text-right">
-                    <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Orden No.</span>
-                    <span className="text-2xl font-mono font-black text-blue-400">{selectedMission.missionNo}</span>
+                <div className="text-right border-l-2 border-slate-900 pl-8">
+                    <span className="text-[9px] font-black text-slate-400 block tracking-widest uppercase">Misión No.</span>
+                    <span className="text-xl font-mono font-black text-blue-700">{selectedMission.missionNo}</span>
                 </div>
             </div>
 
-            <div className="p-8 md:p-12 space-y-8">
-                {/* Metadata */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-100">
-                    <div>
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Fecha de Generación</label>
-                        <span className="text-sm font-bold text-slate-800">{selectedMission.creationDate}</span>
-                    </div>
-                    <div>
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Radicado de Correspondencia</label>
-                        <span className="text-sm font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{selectedMission.caseRadicado}</span>
-                    </div>
-                    <div>
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Estado Actual</label>
-                        <span className="text-sm font-black text-blue-600 uppercase tracking-tight">{selectedMission.status}</span>
-                    </div>
-                </div>
-
-                {/* Main Content */}
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                        <div className="space-y-4">
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Entidad Remitente</label>
-                                <span className="text-sm font-semibold text-slate-700">{associatedCase?.remittingEntity || "FISCALÍA GENERAL DE LA NACIÓN"}</span>
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Ciudad de Origen</label>
-                                <span className="text-sm font-semibold text-slate-700">{associatedCase?.requestCity || "No registrada"}</span>
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Tipo de Actuación</label>
-                                <span className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded uppercase tracking-tighter">{selectedMission.type}</span>
-                            </div>
-                        </div>
-
-                        <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 space-y-4">
-                            <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 border-b border-slate-200 pb-2">Datos del Sujeto a Proteger</h4>
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Nombre Completo</label>
-                                <span className="text-base font-bold text-slate-900">{selectedMission.petitionerName}</span>
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Identificación</label>
-                                <span className="text-sm font-mono font-bold text-slate-700">No. {selectedMission.petitionerDoc}</span>
-                            </div>
+            <div className="p-10 md:p-14 space-y-12">
+                
+                {/* SECCIÓN I: INFORMACIÓN PRECARGADA (Solo Lectura) */}
+                <section>
+                    <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        I. Datos del Expediente y Misión (Precargados)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <InputField label="Numero de Misión" value={selectedMission.missionNo} disabled className="bg-slate-50" />
+                        <InputField label="Numero de caso" value={associatedCase.caseId || ''} disabled className="bg-slate-50" />
+                        <InputField label="Numero de Radicado" value={associatedCase.radicado} disabled className="bg-slate-50" />
+                        
+                        <InputField label="Fecha de generación Misión de Trabajo" value={selectedMission.creationDate} disabled className="bg-slate-50" />
+                        <InputField label="Fecha de Inicio de Misión de Trabajo" value={associatedCase.missionStartDate} disabled className="bg-slate-50" />
+                        <InputField label="Fecha de vencimiento de términos" value={selectedMission.dueDate} disabled className="bg-slate-50 text-red-600 font-bold" />
+                        
+                        <div className="md:col-span-3">
+                             <InputField label="Tipo de Misión" value={selectedMission.type} disabled className="bg-slate-50 uppercase font-bold" />
                         </div>
                     </div>
+                </section>
 
-                    <div className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                         <div>
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Unidad Administrativa Asignada</label>
-                            <span className="text-sm font-bold text-slate-800 uppercase">{selectedMission.assignedArea}</span>
-                         </div>
-                         <div>
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Asunto de Misión</label>
-                            <span className="text-sm font-bold text-slate-800 uppercase tracking-tighter">{associatedCase?.subject || "EVALUACIÓN Y TRÁMITE DE PROTECCIÓN"}</span>
-                         </div>
-                    </div>
-
-                    <div className="pt-4">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Instrucciones de Campo / Observaciones</label>
-                        <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-600 italic leading-relaxed">
-                            {associatedCase?.observations || "Se ordena el despliegue del analista para la verificación de los hechos amenazantes descritos en el expediente oficial y la recolección de pruebas de riesgo inminente."}
+                <section>
+                    <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        II. Identificación del Titular (Precargados)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <InputField label="Primer Nombre del Titular" value={associatedCase.firstName} disabled className="bg-slate-50" />
+                        <InputField label="Segundo Nombre del Titular" value={associatedCase.secondName} disabled className="bg-slate-50" />
+                        <InputField label="Primer Apellido del Titular" value={associatedCase.firstSurname} disabled className="bg-slate-50" />
+                        <InputField label="Segundo Apellido del Titular" value={associatedCase.secondSurname} disabled className="bg-slate-50" />
+                        
+                        <div className="md:col-span-2 lg:col-span-2">
+                            <InputField label="Tipo de Documento" value={associatedCase.docType} disabled className="bg-slate-50" />
+                        </div>
+                        <div className="md:col-span-2 lg:col-span-2">
+                            <InputField label="Numero de Documento" value={associatedCase.docNumber} disabled className="bg-slate-50 font-mono" />
                         </div>
                     </div>
+                </section>
 
-                    <div className="pt-8 flex justify-between items-center border-t border-slate-100 mt-8">
-                        <div>
-                            <label className="text-[10px] font-black text-red-400 uppercase tracking-widest block mb-1">Vencimiento Términos Legales</label>
-                            <div className="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                <span className="text-sm font-black text-red-600 uppercase">PLAZO MÁXIMO: {selectedMission.dueDate}</span>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                             <div className="flex flex-col items-end">
-                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${selectedMission.missionNo}`} alt="QR Validation" className="border p-1 rounded bg-white" />
-                                <span className="text-[8px] font-bold text-slate-400 mt-1 uppercase">Validación Digital</span>
-                             </div>
-                        </div>
+                {/* SECCIÓN III: DATOS A DILIGENCIAR (Editables) */}
+                <section className="bg-blue-50/40 p-10 rounded-[2.5rem] border-2 border-blue-200">
+                    <h3 className="text-[11px] font-black uppercase text-blue-900 mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        III. Gestión de Reasignación de Misión
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <SelectField 
+                            label="Regional" 
+                            required 
+                            options={REGIONAL_UNITS} 
+                            value={regional} 
+                            onChange={e => setRegional(e.target.value)} 
+                        />
+                        <SelectField 
+                            label="Funcionario" 
+                            required 
+                            options={MOCK_OFFICIALS} 
+                            value={assignedOfficial} 
+                            onChange={e => setAssignedOfficial(e.target.value)} 
+                        />
+                        <InputField 
+                            label="Fecha de reasignación de misión" 
+                            type="date" 
+                            value={reassignmentDate} 
+                            onChange={e => setReassignmentDate(e.target.value)} 
+                        />
+                    </div>
+                    <div className="mt-8">
+                        <TextAreaField 
+                            label="Observaciones" 
+                            required 
+                            value={observations} 
+                            onChange={e => setObservations(e.target.value)} 
+                            placeholder="Ingrese los motivos de la reasignación o instrucciones adicionales..."
+                            className="min-h-[120px]"
+                        />
+                    </div>
+                    <div className="mt-8">
+                        <FileUpload 
+                            label="Adjuntar Documentos"
+                            files={attachedFiles}
+                            onFilesSelected={handleFileChange}
+                            onRemoveFile={handleRemoveFile}
+                        />
+                    </div>
+                </section>
+
+                <div className="pt-10 flex justify-between items-end border-t-2 border-slate-100">
+                    <div className="w-64 border-t border-slate-300 pt-2 text-center">
+                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-8 italic">Firma Digital del Responsable</p>
+                         <p className="text-[10px] font-black uppercase text-slate-900">{assignedOfficial || "________________________"}</p>
+                    </div>
+                    <div className="text-right">
+                         <img src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${selectedMission.missionNo}`} alt="QR" className="inline-block border-2 border-slate-900 p-1 rounded bg-white shadow-sm" />
                     </div>
                 </div>
             </div>
-            
-            <div className="bg-slate-50 p-6 border-t border-slate-200 text-center">
-                <p className="text-slate-400 text-[9px] uppercase tracking-[0.3em] font-black">Documento Oficial - Reserva Legal - Uso Exclusivo FGN</p>
+
+            <div className="bg-slate-900 p-8 flex justify-end gap-4 print:hidden">
+                <button 
+                    type="button" 
+                    onClick={() => setView('LIST')}
+                    className="px-10 py-3 bg-white/10 text-white font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-white/20 transition-all"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    type="submit" 
+                    className="px-14 py-3 bg-blue-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+                >
+                    Confirmar Reasignación
+                </button>
             </div>
-        </div>
+        </form>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8">
-      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="max-w-7xl mx-auto p-4 md:p-10">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Misiones Generadas</h1>
-          <p className="text-slate-500 text-sm mt-1">Control y seguimiento de órdenes de trabajo emitidas.</p>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Misiones de Protección</h1>
+          <p className="text-slate-500 font-medium italic">Control operativo y seguimiento de órdenes de trabajo.</p>
         </div>
-        
         <div className="relative max-w-sm w-full">
           <input 
             type="text" 
-            placeholder="Buscar por misión, nombre o radicado..." 
+            placeholder="Filtrar misiones..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all"
           />
-          <svg className="absolute left-3 top-2.5 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg className="absolute left-3.5 top-3.5 text-slate-400" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200 font-bold">
-            <tr>
-              <th className="px-6 py-3">No. Misión</th>
-              <th className="px-6 py-3">Radicado Caso</th>
-              <th className="px-6 py-3">Tipo de Misión</th>
-              <th className="px-6 py-3">Solicitante</th>
-              <th className="px-6 py-3">Vencimiento</th>
-              <th className="px-6 py-3 text-center">Estado</th>
-              <th className="px-6 py-3 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredMissions.map((m) => (
-              <tr key={m.id} className="border-b hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 font-mono font-bold text-slate-900">{m.missionNo}</td>
-                <td className="px-6 py-4 text-xs font-mono">{m.caseRadicado}</td>
-                <td className="px-6 py-4 font-medium text-slate-700">{m.type}</td>
-                <td className="px-6 py-4">
-                  <div className="font-semibold text-slate-800">{m.petitionerName}</div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">ID: {m.petitionerDoc}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-1.5 text-xs text-red-600 font-bold">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    {m.dueDate}
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <span className="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
-                    {m.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <button 
-                    onClick={() => handleViewMission(m)}
-                    className="p-1.5 hover:bg-slate-100 rounded text-indigo-600 transition-colors border border-transparent hover:border-indigo-100" 
-                    title="Ver detalle de misión"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
-                </td>
+      <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50/50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <tr>
+                <th className="px-8 py-6">Fecha Generación</th>
+                <th className="px-8 py-6">Número Misión</th>
+                <th className="px-8 py-6">Asunto</th>
+                <th className="px-8 py-6">No. Radicado</th>
+                <th className="px-8 py-6">No. Caso</th>
+                <th className="px-8 py-6 text-center">Gestión</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredMissions.map((m) => (
+                <tr key={m.id} className="hover:bg-slate-50/80 transition-colors group">
+                  <td className="px-8 py-6">
+                    <span className="text-xs font-bold text-slate-500">{m.creationDate}</span>
+                  </td>
+                  <td className="px-8 py-6 font-mono font-black text-blue-700 text-sm">
+                    {m.missionNo}
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="font-black text-slate-900 uppercase text-[11px] leading-tight max-w-[220px]">
+                      {m.subject}
+                    </div>
+                  </td>
+                  <td className="px-8 py-6 font-mono text-xs font-bold text-slate-500">
+                    {m.caseRadicado}
+                  </td>
+                  <td className="px-8 py-6 font-mono text-xs font-black text-indigo-600">
+                    {m.caseId}
+                  </td>
+                  <td className="px-8 py-6 text-center">
+                    <button 
+                        onClick={() => handleReassignAction(m)}
+                        className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 mx-auto"
+                    >
+                        Reasignar Misión
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

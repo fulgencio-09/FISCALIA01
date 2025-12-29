@@ -1,20 +1,29 @@
 
 import React, { useState, useMemo } from 'react';
-import { MOCK_SAVED_CASES, MOCK_OFFICIALS, REGIONAL_UNITS } from '../constants';
+import { MOCK_SAVED_CASES, REGIONAL_UNITS } from '../constants';
 import { ProtectionMission, ProtectionCaseForm } from '../types';
-import { InputField, SelectField, TextAreaField } from '../components/FormComponents';
+import { InputField, SelectField } from '../components/FormComponents';
 
 interface AssignedMissionsPageProps {
   missions: ProtectionMission[];
   onUpdateMission: (mission: ProtectionMission) => void;
 }
 
-const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions, onUpdateMission }) => {
-  const [view, setView] = useState<'LIST' | 'EDIT' | 'DETAIL'>('LIST');
-  const [searchTerm, setSearchTerm] = useState('');
+const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions }) => {
+  const [view, setView] = useState<'LIST' | 'DETAIL'>('LIST');
   const [selectedMission, setSelectedMission] = useState<ProtectionMission | null>(null);
+  const [associatedCase, setAssociatedCase] = useState<ProtectionCaseForm | null>(null);
 
-  // FILTRO: Misiones NO PENDIENTES
+  // Estados para Filtros Avanzados
+  const [searchTerm, setSearchTerm] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [regionalFilter, setRegionalFilter] = useState('');
+  const [caseSearch, setCaseSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Por defecto de más antigua a más nueva
+
+  // Preparación de la lista base (unión con datos del caso)
   const assignedMissionsList = useMemo(() => {
     const casesMap = new Map(MOCK_SAVED_CASES.map(c => [c.radicado, c]));
     return missions
@@ -29,37 +38,53 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions, o
       });
   }, [missions]);
 
+  // Lógica de Filtrado y Ordenamiento
   const filteredMissions = useMemo(() => {
-    if (!searchTerm.trim()) return assignedMissionsList;
-    const term = searchTerm.toLowerCase();
-    return assignedMissionsList.filter(m => 
-      m.missionNo.toLowerCase().includes(term) || 
-      m.caseRadicado.toLowerCase().includes(term) ||
-      m.subject.toLowerCase().includes(term)
-    );
-  }, [searchTerm, assignedMissionsList]);
+    let result = [...assignedMissionsList];
 
-  const handleAnular = (id: string) => {
-    if (window.confirm("¿Está seguro de que desea anular esta misión? Esta acción no se puede deshacer.")) {
-        const mission = missions.find(m => m.id === id);
-        if (mission) {
-            onUpdateMission({ ...mission, status: 'ANULADA' });
-        }
+    // Búsqueda General (No. Misión, Radicado, Asunto)
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(m => 
+        m.missionNo.toLowerCase().includes(term) || 
+        m.caseRadicado.toLowerCase().includes(term) ||
+        m.subject.toLowerCase().includes(term)
+      );
     }
-  };
 
-  const handleEdit = (mission: ProtectionMission) => {
-    setSelectedMission(mission);
-    setView('EDIT');
-  };
-
-  const handleUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedMission) {
-        onUpdateMission(selectedMission);
-        setView('LIST');
+    // Búsqueda por No. de Caso
+    if (caseSearch.trim()) {
+      const term = caseSearch.toLowerCase();
+      result = result.filter(m => m.caseId.toLowerCase().includes(term));
     }
-  };
+
+    // Filtro por Rango de Fechas (sobre creationDate)
+    if (startDate) {
+      result = result.filter(m => m.creationDate >= startDate);
+    }
+    if (endDate) {
+      result = result.filter(m => m.creationDate <= endDate);
+    }
+
+    // Filtro por Regional
+    if (regionalFilter) {
+      result = result.filter(m => m.regional === regionalFilter);
+    }
+
+    // Filtro por Estado
+    if (statusFilter) {
+      result = result.filter(m => m.status === statusFilter);
+    }
+
+    // Ordenamiento Cronológico (Más antiguas primero o viceversa)
+    result.sort((a, b) => {
+      const timeA = new Date(a.creationDate).getTime();
+      const timeB = new Date(b.creationDate).getTime();
+      return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+    });
+
+    return result;
+  }, [assignedMissionsList, searchTerm, startDate, endDate, regionalFilter, caseSearch, statusFilter, sortOrder]);
 
   const StatusBadge = ({ status }: { status: ProtectionMission['status'] }) => {
     const styles = {
@@ -76,72 +101,198 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions, o
     );
   };
 
-  if (view === 'EDIT' && selectedMission) {
-      return (
-          <div className="max-w-4xl mx-auto p-10 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="bg-white rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden">
-                  <div className="p-8 bg-blue-600 text-white flex justify-between items-center">
-                      <h2 className="text-xl font-black uppercase">Editar Misión: {selectedMission.missionNo}</h2>
-                      <button onClick={() => setView('LIST')} className="hover:opacity-70"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                  </div>
-                  <form onSubmit={handleUpdate} className="p-10 space-y-8">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          <SelectField 
-                            label="Funcionario" 
-                            options={MOCK_OFFICIALS} 
-                            value={selectedMission.assignedOfficial || ''} 
-                            onChange={e => setSelectedMission({...selectedMission, assignedOfficial: e.target.value})}
-                          />
-                          <SelectField 
-                            label="Regional" 
-                            options={REGIONAL_UNITS} 
-                            value={selectedMission.regional || ''} 
-                            onChange={e => setSelectedMission({...selectedMission, regional: e.target.value})}
-                          />
-                          <SelectField 
-                            label="Estado de la Misión" 
-                            options={['ACTIVA', 'ASIGNADA', 'FINALIZADA', 'ANULADA']} 
-                            value={selectedMission.status} 
-                            onChange={e => setSelectedMission({...selectedMission, status: e.target.value as any})}
-                          />
-                          <InputField 
-                            label="Fecha de Vencimiento" 
-                            type="date" 
-                            value={selectedMission.dueDate} 
-                            onChange={e => setSelectedMission({...selectedMission, dueDate: e.target.value})}
-                          />
-                      </div>
-                      <TextAreaField 
-                        label="Observaciones de Gestión" 
-                        value={selectedMission.observations || ''} 
-                        onChange={e => setSelectedMission({...selectedMission, observations: e.target.value})}
-                      />
-                      <div className="flex justify-end gap-4 pt-8 border-t border-slate-100">
-                          <button type="button" onClick={() => setView('LIST')} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400 hover:text-slate-600">Cancelar</button>
-                          <button type="submit" className="px-10 py-3 bg-blue-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest shadow-lg shadow-blue-100">Actualizar Misión</button>
-                      </div>
-                  </form>
-              </div>
-          </div>
-      );
+  const handleView = (mission: any) => {
+    const caseData = MOCK_SAVED_CASES.find(c => c.radicado === mission.caseRadicado);
+    setSelectedMission(mission);
+    setAssociatedCase(caseData || null);
+    setView('DETAIL');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setStartDate('');
+    setEndDate('');
+    setRegionalFilter('');
+    setCaseSearch('');
+    setStatusFilter('');
+    setSortOrder('asc');
+  };
+
+  if (view === 'DETAIL' && selectedMission && associatedCase) {
+    return (
+      <div className="max-w-5xl mx-auto p-4 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="mb-6 flex justify-between items-center print:hidden">
+            <button 
+                onClick={() => setView('LIST')}
+                className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-colors"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Regresar al Listado
+            </button>
+            <button 
+                onClick={() => window.print()}
+                className="bg-white border border-slate-300 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm"
+            >
+                Imprimir Misión
+            </button>
+        </div>
+
+        <div className="bg-white border-2 border-slate-900 shadow-2xl overflow-hidden print:border-none print:shadow-none mb-10">
+            <div className="p-8 border-b-2 border-slate-900 flex justify-between items-center bg-slate-50/50">
+                <div className="flex items-center gap-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-16" />
+                    <div>
+                        <h2 className="text-base font-black uppercase tracking-tight">Fiscalía General de la Nación</h2>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Dirección de Protección y Asistencia</p>
+                    </div>
+                </div>
+                <div className="text-right border-l-2 border-slate-900 pl-8">
+                    <span className="text-[10px] font-black text-slate-400 block tracking-widest uppercase mb-1">Orden de Misión</span>
+                    <span className="text-2xl font-mono font-black text-blue-700">{selectedMission.missionNo}</span>
+                </div>
+            </div>
+
+            <div className="p-10 md:p-14 space-y-12">
+                <section>
+                    <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        I. Identificación de la Misión y Estado
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <InputField label="Número de Radicado" value={selectedMission.caseRadicado} disabled className="bg-slate-50 font-mono" />
+                        <InputField label="Número de Caso" value={associatedCase.caseId || 'N/A'} disabled className="bg-slate-50 font-mono" />
+                        <div className="flex flex-col">
+                            <label className="text-sm font-medium text-slate-700 mb-1">Estado de Gestión</label>
+                            <div className="h-10 flex items-center">
+                                <StatusBadge status={selectedMission.status} />
+                            </div>
+                        </div>
+                        <InputField label="Fecha de Generación" value={selectedMission.creationDate} disabled className="bg-slate-50" />
+                        <InputField label="Asignado a Área" value={selectedMission.assignedArea} disabled className="bg-slate-50 uppercase" />
+                        <InputField label="Vencimiento de Términos" value={selectedMission.dueDate} disabled className="bg-slate-50 text-red-600 font-bold" />
+                    </div>
+                </section>
+
+                <section>
+                    <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        II. Datos del Ciudadano Titular
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="lg:col-span-2">
+                            <InputField label="Nombre Completo del Titular" value={`${associatedCase.firstName} ${associatedCase.secondName || ''} ${associatedCase.firstSurname} ${associatedCase.secondSurname || ''}`} disabled className="bg-slate-50 font-bold uppercase" />
+                        </div>
+                        <InputField label="Tipo Documento" value={associatedCase.docType} disabled className="bg-slate-50" />
+                        <InputField label="No. Documento" value={associatedCase.docNumber} disabled className="bg-slate-50 font-mono" />
+                    </div>
+                </section>
+
+                <section className="bg-blue-50/40 p-10 rounded-[2.5rem] border-2 border-blue-100">
+                    <h3 className="text-[11px] font-black uppercase text-blue-900 mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        III. Información de Asignación y Operativa
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <InputField label="Funcionario Responsable" value={selectedMission.assignedOfficial || 'PENDIENTE DE ASIGNACIÓN'} disabled className="bg-white font-bold text-blue-900" />
+                        <InputField label="Regional / Unidad" value={selectedMission.regional || 'N/A'} disabled className="bg-white font-bold" />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Instrucciones y Observaciones Generales</label>
+                        <div className="p-5 bg-white rounded-2xl border border-blue-100 text-sm text-slate-600 italic leading-relaxed shadow-sm">
+                            {selectedMission.observations || "No se registran observaciones adicionales para esta misión de trabajo."}
+                        </div>
+                    </div>
+                </section>
+
+                <div className="pt-10 flex justify-between items-end border-t-2 border-slate-100">
+                    <div className="w-64 border-t border-slate-300 pt-2 text-center">
+                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-8 italic">Validación Digital de Autoridad</p>
+                         <p className="text-[10px] font-black uppercase text-slate-900">{selectedMission.assignedOfficial || "SISTEMA DE GESTIÓN"}</p>
+                    </div>
+                    <div className="text-right">
+                         <img src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${selectedMission.missionNo}`} alt="QR" className="inline-block border-2 border-slate-900 p-1 rounded bg-white shadow-sm" />
+                         <p className="text-[8px] font-black text-slate-400 mt-2 uppercase">Verificación Electrónica</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-slate-900 p-8 flex justify-end print:hidden">
+                <button 
+                    onClick={() => setView('LIST')}
+                    className="px-14 py-3 bg-white text-slate-900 font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-slate-100 transition-all shadow-xl active:scale-95"
+                >
+                    Cerrar Visualización
+                </button>
+            </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-10">
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Misiones Asignadas</h1>
-          <p className="text-slate-500 font-medium italic">Seguimiento y control de misiones en ejecución y finalizadas.</p>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Visualizar Misiones</h1>
+          <p className="text-slate-500 font-medium italic">Consulta de misiones en ejecución y finalizadas bajo custodia de la Dirección de Protección.</p>
         </div>
-        <div className="relative max-w-sm w-full">
-          <input 
-            type="text" 
-            placeholder="Buscar por número o radicado..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all"
+        <button 
+          onClick={resetFilters}
+          className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-2"
+        >
+          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restablecer Filtros
+        </button>
+      </div>
+
+      {/* Panel de Filtros Avanzados */}
+      <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-100/50 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="md:col-span-2 lg:col-span-1">
+            <InputField 
+              label="Búsqueda General" 
+              placeholder="No. Misión, Radicado..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <InputField 
+            label="Número de Caso" 
+            placeholder="EJ: CASE-2024-001" 
+            value={caseSearch}
+            onChange={(e) => setCaseSearch(e.target.value)}
           />
-          <svg className="absolute left-3.5 top-3.5 text-slate-400" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <SelectField 
+            label="Regional" 
+            options={REGIONAL_UNITS} 
+            value={regionalFilter}
+            onChange={(e) => setRegionalFilter(e.target.value)}
+          />
+          <SelectField 
+            label="Estado" 
+            options={['ACTIVA', 'ASIGNADA', 'FINALIZADA', 'ANULADA']} 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          />
+          <InputField 
+            label="Desde" 
+            type="date" 
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <InputField 
+            label="Hasta" 
+            type="date" 
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          <SelectField 
+            label="Orden Cronológico" 
+            options={['Desde la más antigua', 'Desde la más reciente']} 
+            value={sortOrder === 'asc' ? 'Desde la más antigua' : 'Desde la más reciente'}
+            onChange={(e) => setSortOrder(e.target.value === 'Desde la más antigua' ? 'asc' : 'desc')}
+          />
         </div>
       </div>
 
@@ -156,7 +307,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions, o
                 <th className="px-8 py-6">Radicado</th>
                 <th className="px-8 py-6">No. Caso</th>
                 <th className="px-8 py-6 text-center">Estado</th>
-                <th className="px-8 py-6 text-center">Opciones</th>
+                <th className="px-8 py-6 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -172,14 +323,14 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions, o
                         <StatusBadge status={m.status} />
                     </td>
                     <td className="px-8 py-6">
-                        <div className="flex items-center justify-center gap-2">
-                             <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors" title="Visualizar"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                             <button onClick={() => handleAnular(m.id)} className="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Anular"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button>
+                        <div className="flex items-center justify-center">
                              <button 
-                                onClick={() => handleEdit(m)}
-                                className="bg-slate-900 text-white px-4 py-1.5 rounded-lg font-black uppercase text-[8px] tracking-widest hover:bg-black transition-all"
+                                onClick={() => handleView(m)}
+                                className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-blue-600 hover:text-white transition-all border border-blue-100 shadow-sm"
+                                title="Visualizar Misión"
                              >
-                                Editar
+                                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                Visualizar
                              </button>
                         </div>
                     </td>
@@ -188,7 +339,10 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions, o
               ) : (
                 <tr>
                     <td colSpan={7} className="px-8 py-20 text-center opacity-30">
-                        <p className="text-[10px] font-black uppercase tracking-widest">No hay misiones asignadas registradas</p>
+                        <div className="flex flex-col items-center gap-4">
+                            <svg width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <p className="text-[10px] font-black uppercase tracking-widest">No se encontraron misiones con los criterios seleccionados</p>
+                        </div>
                     </td>
                 </tr>
               )}

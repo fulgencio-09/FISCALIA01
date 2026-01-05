@@ -42,13 +42,14 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
   const filteredMissions = useMemo(() => {
     let result = [...assignedMissionsList];
 
-    // Búsqueda General (No. Misión, Radicado, Asunto)
+    // Búsqueda General (No. Misión, Radicado, Asunto, Funcionario)
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       result = result.filter(m => 
         m.missionNo.toLowerCase().includes(term) || 
         m.caseRadicado.toLowerCase().includes(term) ||
-        m.subject.toLowerCase().includes(term)
+        m.subject.toLowerCase().includes(term) ||
+        (m.assignedOfficial && m.assignedOfficial.toLowerCase().includes(term))
       );
     }
 
@@ -306,6 +307,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                 <th className="px-8 py-6">Asunto</th>
                 <th className="px-8 py-6">Radicado</th>
                 <th className="px-8 py-6">No. Caso</th>
+                <th className="px-8 py-6">Funcionario Responsable</th>
                 <th className="px-8 py-6 text-center">Estado</th>
                 <th className="px-8 py-6 text-center">Acciones</th>
               </tr>
@@ -319,6 +321,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                     <td className="px-8 py-6 text-[11px] font-black text-slate-900 uppercase leading-tight max-w-[180px]">{m.subject}</td>
                     <td className="px-8 py-6 font-mono text-xs font-bold text-slate-500">{m.caseRadicado}</td>
                     <td className="px-8 py-6 font-mono text-xs font-black text-indigo-600">{m.caseId}</td>
+                    <td className="px-8 py-6 font-bold text-slate-700 text-[10px] uppercase">{m.assignedOfficial || 'POR ASIGNAR'}</td>
                     <td className="px-8 py-6 text-center">
                         <StatusBadge status={m.status} />
                     </td>
@@ -338,7 +341,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                 ))
               ) : (
                 <tr>
-                    <td colSpan={7} className="px-8 py-20 text-center opacity-30">
+                    <td colSpan={8} className="px-8 py-20 text-center opacity-30">
                         <div className="flex flex-col items-center gap-4">
                             <svg width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                             <p className="text-[10px] font-black uppercase tracking-widest">No se encontraron misiones con los criterios seleccionados</p>

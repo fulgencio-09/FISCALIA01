@@ -13,6 +13,41 @@ export const CITIES = [
   "Cúcuta", "Bucaramanga", "Pereira", "Santa Marta", "Ibagué"
 ];
 
+export const COLOMBIA_GEO: Record<string, string[]> = {
+  "AMAZONAS": ["Leticia", "El Encanto", "La Chorrera", "Puerto Alegría"],
+  "ANTIOQUIA": ["Medellín", "Bello", "Itagüí", "Envigado", "Apartadó", "Rionegro", "Turbo"],
+  "ARAUCA": ["Arauca", "Arauquita", "Saravena", "Tame"],
+  "ATLÁNTICO": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga", "Puerto Colombia"],
+  "BOLÍVAR": ["Cartagena de Indias", "Magangué", "Turbaco", "El Carmen de Bolívar"],
+  "BOYACÁ": ["Tunja", "Sogamoso", "Duitama", "Chiquinquirá"],
+  "CALDAS": ["Manizales", "La Dorada", "Riosucio", "Villamaría"],
+  "CAQUETÁ": ["Florencia", "San Vicente del Caguán", "Cartagena del Chairá"],
+  "CASANARE": ["Yopal", "Aguazul", "Villanueva", "Paz de Ariporo"],
+  "CAUCA": ["Popayán", "Santander de Quilichao", "Puerto Tejada"],
+  "CESAR": ["Valledupar", "Aguachica", "Agustín Codazzi"],
+  "CHOCÓ": ["Quibdó", "Istmina", "Condoto"],
+  "CÓRDOBA": ["Montería", "Cereté", "Sahagún", "Lorica"],
+  "CUNDINAMARCA": ["Bogotá D.C.", "Soacha", "Fusagasugá", "Facatativá", "Chía", "Girardot"],
+  "GUAINÍA": ["Inírida"],
+  "GUAVIARE": ["San José del Guaviare"],
+  "HUILA": ["Neiva", "Pitalito", "Garzón"],
+  "LA GUAJIRA": ["Riohacha", "Maicao", "Uribia"],
+  "MAGDALENA": ["Santa Marta", "Ciénaga", "Fundación"],
+  "META": ["Villavicencio", "Acacías", "Granada"],
+  "NARIÑO": ["Pasto", "Tumaco", "Ipiales"],
+  "NORTE DE SANTANDER": ["Cúcuta", "Ocaña", "Villa del Rosario"],
+  "PUTUMAYO": ["Mocoa", "Puerto Asís", "Orito"],
+  "QUINDÍO": ["Armenia", "Calarcá", "La Tebaida"],
+  "RISARALDA": ["Pereira", "Dosquebradas", "Santa Rosa de Cabal"],
+  "SAN ANDRÉS Y PROVIDENCIA": ["San Andrés", "Providencia"],
+  "SANTANDER": ["Bucaramanga", "Floridablanca", "Girón", "Barrancabermeja"],
+  "SUCRE": ["Sincelejo", "Corozal"],
+  "TOLIMA": ["Ibagué", "Espinal", "Melgar"],
+  "VALLE DEL CAUCA": ["Cali", "Buenaventura", "Palmira", "Tuluá", "Buga", "Cartago"],
+  "VAUPÉS": ["Mitú"],
+  "VICHADA": ["Puerto Carreño"]
+};
+
 export const REGIONAL_UNITS = [
   "REGIONAL BARRANQUILLA", "REGIONAL BOGOTÁ", "REGIONAL CALI", "REGIONAL MEDELLÍN", "REGIONAL CÚCUTA", "NIVEL CENTRAL"
 ];
@@ -25,7 +60,6 @@ export const CANDIDATE_CLASSIFICATIONS = [
   "SERVIDOR", "TESTIGO", "VICTIMA", "INTERVINIENTE"
 ];
 
-/* Added missing mock officials for mission assignment and re-assignment */
 export const MOCK_OFFICIALS = [
   "CARLOS ANDRÉS RUIZ",
   "MARÍA FERNANDA LÓPEZ",
@@ -33,9 +67,7 @@ export const MOCK_OFFICIALS = [
   "DIANA MARCELA RATIVA"
 ];
 
-export const DEPARTMENTS = [
-  "ATLÁNTICO", "ANTIOQUIA", "BOGOTÁ D.C.", "VALLE DEL CAUCA", "NORTE DE SANTANDER", "SANTANDER"
-];
+export const DEPARTMENTS = Object.keys(COLOMBIA_GEO);
 
 export const GENDER_IDENTITIES = [
   "MASCULINO", "FEMENINO", "TRANSGÉNERO", "NO BINARIO", "OTRO"

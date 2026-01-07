@@ -243,9 +243,7 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
         ];
         break;
       case 4: // Attachments
-        if (formData.attachments.length === 0) {
-          newErrors['attachments'] = 'Debe adjuntar al menos un documento de soporte.';
-        }
+        // Section 6 is no longer required as per user request
         break;
     }
 
@@ -305,8 +303,8 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
         
         if (onSaveSuccess) {
            const message = isEditing 
-            ? `La solicitud con NUNC ${formData.nunc} ha sido actualizada exitosamente.`
-            : `La solicitud con NUNC ${formData.nunc} ha sido registrada exitosamente.`;
+            ? `La solicitud con NUNC ${formData.nunc} ha sido guardada exitosamente.`
+            : `La solicitud con NUNC ${formData.nunc} ha sido guardada exitosamente. El sistema ha registrado la información satisfactoriamente.`;
            onSaveSuccess(message);
         }
       }, 1500);
@@ -658,6 +656,7 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
                 onRemoveFile={handleRemoveFile} 
                 error={errors.attachments}
                 readOnly={readOnly}
+                required={false}
               />
             </FormSection>
           </div>
@@ -701,7 +700,7 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
                    ) : (
                      <>
                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                       {isEditing ? "Actualizar Solicitud" : "Registrar Solicitud"}
+                       {isEditing ? "Actualizar Solicitud" : "Guardar Solicitud"}
                      </>
                    )}
                  </button>

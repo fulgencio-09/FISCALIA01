@@ -97,9 +97,10 @@ interface FileUploadProps {
   onRemoveFile: (index: number) => void;
   error?: string;
   readOnly?: boolean;
+  required?: boolean;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ label, files, onFilesSelected, onRemoveFile, error, readOnly = false }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ label, files, onFilesSelected, onRemoveFile, error, readOnly = false, required = false }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +135,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, files, onFilesSel
   return (
     <div className="col-span-1 md:col-span-3">
        <label className="text-sm font-medium text-slate-700 mb-1 block">
-          {label || "Documentos de Soporte (Múltiples)"} { !readOnly && <span className="text-red-500">*</span>}
+          {label || "Documentos de Soporte (Múltiples)"} { required && !readOnly && <span className="text-red-500">*</span>}
        </label>
        
        {!readOnly && (

@@ -1,5 +1,6 @@
+
 import React, { useState, useMemo } from 'react';
-import { MOCK_REQUESTS, REGIONAL_UNITS, ENTITIES, CANDIDATE_CLASSIFICATIONS, DEPARTMENTS, CITIES, DOC_TYPES, SUBJECTS, AREAS, MISSION_TYPES } from '../constants';
+import { MOCK_REQUESTS, REGIONAL_UNITS, ENTITIES, CANDIDATE_CLASSIFICATIONS, DEPARTMENTS, CITIES, DOC_TYPES, SUBJECTS, AREAS, MISSION_TYPES, ORIGINS } from '../constants';
 import { ProtectionCaseForm, ProtectionRequestSummary } from '../types';
 import { InputField, SelectField, TextAreaField, FileUpload } from '../components/FormComponents';
 
@@ -31,7 +32,6 @@ const ProtectionCasesPage: React.FC = () => {
   const [formData, setFormData] = useState<ProtectionCaseForm | null>(null);
   const [missionOrderNo, setMissionOrderNo] = useState('');
 
-  // Fixed error: replaced 'boolean' (type) with 'false' (value) in the initial state
   const [validationModal, setValidationModal] = useState<{
     show: boolean;
     caseId: string;
@@ -54,7 +54,6 @@ const ProtectionCasesPage: React.FC = () => {
     secondName: '',
     firstSurname: '',
     secondSurname: '',
-    subject: '',
     assignedArea: '',
     missionStartDate: new Date().toISOString().split('T')[0],
     missionType: '',
@@ -65,7 +64,6 @@ const ProtectionCasesPage: React.FC = () => {
     attachments: []
   };
 
-  // Filter Logic
   const filteredRequests = useMemo(() => {
     if (!searchTerm.trim()) return radicatedRequests;
     
@@ -152,8 +150,7 @@ const ProtectionCasesPage: React.FC = () => {
 
   const handleSave = (e: React.FormEvent) => {
       e.preventDefault();
-      // Generar un número de misión aleatorio
-      const randomNo = `MT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const randomNo = Math.floor(100000 + Math.random() * 900000).toString();
       setMissionOrderNo(randomNo);
       setView('SUMMARY');
   };
@@ -191,7 +188,6 @@ const ProtectionCasesPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8">
-       {/* Toast Notification */}
        {toast.show && (
         <div className="fixed top-5 right-5 z-50 animate-[slideIn_0.3s_ease-out]">
             <div className={`
@@ -217,7 +213,6 @@ const ProtectionCasesPage: React.FC = () => {
         </div>
       )}
 
-      {/* Validation Modal */}
       {validationModal.show && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
               <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
@@ -266,7 +261,6 @@ const ProtectionCasesPage: React.FC = () => {
                     </p>
                 </div>
                 
-                {/* Search Bar - Top Right Alignment */}
                 <div className="flex items-center gap-0 shadow-sm border border-slate-200 rounded-lg overflow-hidden bg-white max-w-md w-full md:w-auto self-end">
                     <div className="bg-slate-50 border-r border-slate-200">
                         <select 
@@ -396,7 +390,6 @@ const ProtectionCasesPage: React.FC = () => {
             </div>
         </>
       ) : view === 'CREATE' ? (
-        /* FORM VIEW */
         <div className="bg-white rounded-xl shadow-lg border border-slate-200">
             <div className="p-6 border-b border-slate-200 bg-slate-50 rounded-t-xl flex justify-between items-center">
                <div>
@@ -408,7 +401,6 @@ const ProtectionCasesPage: React.FC = () => {
                </div>
             </div>
 
-            {/* TAB HEADER */}
             <div className="flex border-b border-slate-200 overflow-x-auto bg-white sticky top-0 z-10">
                 <TabButton id="CORRESPONDENCE" label="1. Correspondencia" />
                 <TabButton id="TITULAR" label="2. Información Titular" />
@@ -416,256 +408,175 @@ const ProtectionCasesPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSave} className="p-6 md:p-8 min-h-[400px]">
-               
-               {/* --- TAB 1: CORRESPONDENCE --- */}
                {activeTab === 'CORRESPONDENCE' && (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                     <InputField label="Número de Radicado" value={formData?.radicado} disabled className="bg-slate-50 text-slate-500" />
                     <InputField label="Fecha de Radicado" value={formData?.radicationDate} disabled className="bg-slate-50 text-slate-500" />
-
-                    <SelectField 
-                        label="Unidad Regional Destino" required options={REGIONAL_UNITS} 
-                        value={formData?.destinationUnit} onChange={e => updateField('destinationUnit', e.target.value)} 
-                    />
-                    <SelectField 
-                        label="Entidad Remitente" required options={ENTITIES} 
-                        value={formData?.remittingEntity} onChange={e => updateField('remittingEntity', e.target.value)} 
-                    />
-
-                    <SelectField 
-                        label="Clasificación del Candidato" required options={CANDIDATE_CLASSIFICATIONS} 
-                        value={formData?.candidateClassification} onChange={e => updateField('candidateClassification', e.target.value)} 
-                    />
-                    <InputField 
-                        label="Procedencia" value={formData?.origin} onChange={e => updateField('origin', e.target.value)} 
-                    />
-
-                    <div className="md:col-span-2">
-                      <InputField 
-                          label="Nombre del Remitente" value={formData?.remitterName} onChange={e => updateField('remitterName', e.target.value)} 
-                      />
-                    </div>
-
-                    <SelectField 
-                        label="Departamento de Solicitud" required options={DEPARTMENTS} 
-                        value={formData?.requestDepartment} onChange={e => updateField('requestDepartment', e.target.value)} 
-                    />
-                    <SelectField 
-                        label="Ciudad de Solicitud" required options={CITIES} 
-                        value={formData?.requestCity} onChange={e => updateField('requestCity', e.target.value)} 
-                    />
+                    <SelectField label="Unidad Regional Destino" required options={REGIONAL_UNITS} value={formData?.destinationUnit} onChange={e => updateField('destinationUnit', e.target.value)} />
+                    <SelectField label="Entidad Remitente" required options={ENTITIES} value={formData?.remittingEntity} onChange={e => updateField('remittingEntity', e.target.value)} />
+                    <SelectField label="Clasificación del Candidato" required options={CANDIDATE_CLASSIFICATIONS} value={formData?.candidateClassification} onChange={e => updateField('candidateClassification', e.target.value)} />
+                    <SelectField label="Procedencia" required options={ORIGINS} value={formData?.origin} onChange={e => updateField('origin', e.target.value)} />
+                    <div className="md:col-span-2"><InputField label="Nombre del Remitente" value={formData?.remitterName} onChange={e => updateField('remitterName', e.target.value)} /></div>
+                    <SelectField label="Departamento de Solicitud" required options={DEPARTMENTS} value={formData?.requestDepartment} onChange={e => updateField('requestDepartment', e.target.value)} />
+                    <SelectField label="Ciudad de Solicitud" required options={CITIES} value={formData?.requestCity} onChange={e => updateField('requestCity', e.target.value)} />
                  </div>
                )}
 
-               {/* --- TAB 2: TITULAR --- */}
                {activeTab === 'TITULAR' && (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                    <SelectField 
-                        label="Tipo de Documento" required options={DOC_TYPES} 
-                        value={formData?.docType} onChange={e => updateField('docType', e.target.value)} 
-                    />
-                    <InputField 
-                        label="Número de Documento" required value={formData?.docNumber} onChange={e => updateField('docNumber', e.target.value)} 
-                    />
-
-                    <InputField 
-                        label="Primer Nombre del Titular" required value={formData?.firstName} onChange={e => updateField('firstName', e.target.value)} 
-                    />
-                    <InputField 
-                        label="Segundo Nombre del Titular" value={formData?.secondName} onChange={e => updateField('secondName', e.target.value)} 
-                    />
-                    
-                    <InputField 
-                        label="Primer Apellido del Titular" required value={formData?.firstSurname} onChange={e => updateField('firstSurname', e.target.value)} 
-                    />
-                    <InputField 
-                        label="Segundo Apellido del Titular" value={formData?.secondSurname} onChange={e => updateField('secondSurname', e.target.value)} 
-                    />
+                    <SelectField label="Tipo de Documento" required options={DOC_TYPES} value={formData?.docType} onChange={e => updateField('docType', e.target.value)} />
+                    <InputField label="Número de Documento" required value={formData?.docNumber} onChange={e => updateField('docNumber', e.target.value)} />
+                    <InputField label="Primer Nombre del Titular" required value={formData?.firstName} onChange={e => updateField('firstName', e.target.value)} />
+                    <InputField label="Segundo Nombre del Titular" value={formData?.secondName} onChange={e => updateField('secondName', e.target.value)} />
+                    <InputField label="Primer Apellido del Titular" required value={formData?.firstSurname} onChange={e => updateField('firstSurname', e.target.value)} />
+                    <InputField label="Segundo Apellido del Titular" value={formData?.secondSurname} onChange={e => updateField('secondSurname', e.target.value)} />
                  </div>
                )}
 
-               {/* --- TAB 3: ASSIGNMENT --- */}
                {activeTab === 'ASSIGNMENT' && (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                    <SelectField 
-                        label="Asunto" required options={SUBJECTS} 
-                        value={formData?.subject} onChange={e => updateField('subject', e.target.value)} 
-                    />
-                    <SelectField 
-                        label="Área Asignada" required options={AREAS} 
-                        value={formData?.assignedArea} onChange={e => updateField('assignedArea', e.target.value)} 
-                    />
-
-                    <InputField 
-                        label="Fecha de Inicio Misión" type="date" required value={formData?.missionStartDate} onChange={e => updateField('missionStartDate', e.target.value)} 
-                    />
-                    <SelectField 
-                        label="Tipo de Misión" required options={MISSION_TYPES} 
-                        value={formData?.missionType} onChange={e => updateField('missionType', e.target.value)} 
-                    />
-
-                    <InputField 
-                        label="Términos Vencen" type="date" value={formData?.dueDate} onChange={e => updateField('dueDate', e.target.value)} 
-                    />
-                    <div className="hidden md:block"></div>
-
-                    <div className="md:col-span-2">
-                        <TextAreaField 
-                            label="Observaciones" 
-                            value={formData?.observations} onChange={e => updateField('observations', e.target.value)} 
-                            className="min-h-[120px]"
-                        />
-                    </div>
-
-                    <div className="md:col-span-2 mt-4">
-                        <FileUpload 
-                            label="Adjuntar soportes"
-                            files={formData?.attachments || []}
-                            onFilesSelected={handleFileSelect}
-                            onRemoveFile={handleRemoveFile}
-                        />
-                    </div>
-
+                    <SelectField label="Área Asignada" required options={AREAS} value={formData?.assignedArea} onChange={e => updateField('assignedArea', e.target.value)} />
+                    <InputField label="Fecha de Inicio Misión" type="date" required value={formData?.missionStartDate} onChange={e => updateField('missionStartDate', e.target.value)} />
+                    <SelectField label="Tipo de Misión" required options={MISSION_TYPES} value={formData?.missionType} onChange={e => updateField('missionType', e.target.value)} />
+                    <InputField label="Términos Vencen" type="date" value={formData?.dueDate} onChange={e => updateField('dueDate', e.target.value)} />
+                    <div className="md:col-span-2"><TextAreaField label="Observaciones" value={formData?.observations} onChange={e => updateField('observations', e.target.value)} className="min-h-[120px]" /></div>
+                    <div className="md:col-span-2 mt-4"><FileUpload label="Adjuntar soportes" files={formData?.attachments || []} onFilesSelected={handleFileSelect} onRemoveFile={handleRemoveFile} /></div>
                     <div className="md:col-span-2 mt-8 flex flex-wrap gap-4 pt-4 border-t border-slate-100 justify-end">
-                        <button 
-                            type="submit" 
-                            className="px-8 py-2.5 bg-slate-800 text-white font-bold rounded shadow-md hover:bg-slate-900 transition-all uppercase tracking-wide text-xs active:scale-95"
-                        >
-                            GUARDAR CASO
-                        </button>
-                        <button 
-                            type="button" 
-                            onClick={handleCancel}
-                            className="px-8 py-2.5 bg-white text-slate-700 border border-slate-300 font-bold rounded shadow-sm hover:bg-slate-50 transition-all uppercase tracking-wide text-xs active:scale-95"
-                        >
-                            REGRESAR AL LISTADO
-                        </button>
+                        <button type="submit" className="px-8 py-2.5 bg-slate-800 text-white font-bold rounded shadow-md hover:bg-slate-900 transition-all uppercase tracking-wide text-xs active:scale-95">GUARDAR CASO</button>
+                        <button type="button" onClick={handleCancel} className="px-8 py-2.5 bg-white text-slate-700 border border-slate-300 font-bold rounded shadow-sm hover:bg-slate-50 transition-all uppercase tracking-wide text-xs active:scale-95">REGRESAR AL LISTADO</button>
                     </div>
                  </div>
                )}
-
             </form>
         </div>
       ) : (
-        /* SUMMARY VIEW (OFFICIAL DOCUMENT STYLE) */
-        <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
-            <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden print:shadow-none print:border-slate-300">
-                {/* Header Documento */}
-                <div className="bg-slate-800 text-white p-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-white/10 p-3 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-black uppercase tracking-tighter">Misión de Trabajo Creada</h2>
-                            <p className="text-slate-400 text-xs font-bold uppercase">Sistema de Gestión de Protección - FGN</p>
-                        </div>
+        /* SUMMARY VIEW (OFFICIAL FGN / SIDPA FORMAT) */
+        <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500 print:max-w-none print:p-0">
+            <div className="bg-white p-10 shadow-2xl border border-slate-200 print:shadow-none print:border-none print:p-0 font-sans text-slate-900">
+                {/* Header Oficial 3 Columnas */}
+                <div className="border border-slate-900 grid grid-cols-[1fr,2fr,1.2fr] mb-10 print:mb-8">
+                    <div className="border-r border-slate-900 p-4 flex items-center justify-center bg-white">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-14" />
                     </div>
-                    <div className="text-right">
-                        <span className="block text-xs font-bold text-slate-400 uppercase">Orden No.</span>
-                        <span className="text-2xl font-mono font-black text-blue-400">{missionOrderNo}</span>
+                    <div className="border-r border-slate-900 flex flex-col text-center divide-y divide-slate-900">
+                        <div className="p-2 text-[10px] font-bold uppercase flex-1 flex items-center justify-center">SUBPROCESO PROTECCIÓN Y ASISTENCIA</div>
+                        <div className="p-2 text-sm font-black uppercase flex-1 flex items-center justify-center">MISIÓN DE TRABAJO</div>
                     </div>
-                </div>
-
-                <div className="p-8 md:p-12 space-y-8">
-                    {/* Sección Superior: Metadata */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-100">
-                        <div>
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Fecha de Creación</label>
-                            <span className="text-sm font-bold text-slate-800">{new Date().toLocaleDateString('es-CO')}</span>
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Radicado de Correspondencia</label>
-                            <span className="text-sm font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{formData?.radicado}</span>
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Asignado a</label>
-                            <span className="text-sm font-bold text-slate-800">ANALISTA DE SEGURIDAD PROTECTIVA</span>
-                        </div>
-                    </div>
-
-                    {/* Cuerpo del Informe */}
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">A Solicitud de</label>
-                                    <span className="text-sm font-semibold text-slate-700">{formData?.remittingEntity}</span>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Ciudad de Solicitud</label>
-                                    <span className="text-sm font-semibold text-slate-700">{formData?.requestCity}</span>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Para Efectuar</label>
-                                    <span className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{formData?.missionType}</span>
-                                </div>
-                            </div>
-
-                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 space-y-4">
-                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 border-b border-slate-200 pb-2">Información del Titular</h4>
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Nombre Completo</label>
-                                    <span className="text-base font-bold text-slate-900">{formData?.firstName} {formData?.firstSurname}</span>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">{formData?.docType}</label>
-                                    <span className="text-sm font-mono font-bold text-slate-700">No. {formData?.docNumber}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                             <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Sección o Área Asignada</label>
-                                <span className="text-sm font-bold text-slate-800 uppercase">{formData?.assignedArea}</span>
-                             </div>
-                             <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Instrucciones / Asunto</label>
-                                <span className="text-sm font-bold text-slate-800">{formData?.subject}</span>
-                             </div>
-                        </div>
-
-                        <div className="pt-4">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Observaciones de la Misión</label>
-                            <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-600 italic leading-relaxed">
-                                {formData?.observations || "Sin observaciones adicionales registradas."}
-                            </div>
-                        </div>
-
-                        <div className="pt-8 flex justify-between items-center border-t border-slate-100 mt-8">
-                            <div>
-                                <label className="text-[10px] font-black text-red-400 uppercase tracking-widest block mb-1">Plazo de Entrega</label>
-                                <div className="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    <span className="text-sm font-black text-red-600">LOS TÉRMINOS VENCEN EL: {formData?.dueDate || "N/A"}</span>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=VALID_MISSION" alt="QR Validation" className="inline-block border p-1 rounded bg-white" />
-                            </div>
-                        </div>
+                    <div className="p-0 text-[8px] font-bold uppercase divide-y divide-slate-900">
+                        <div className="p-2">CÓDIGO: FGN-MS01-F-03</div>
+                        <div className="p-2">VERSIÓN: 01</div>
+                        <div className="p-2 text-right">PÁGINA 1 DE 1</div>
                     </div>
                 </div>
 
-                {/* Footer Acciones Summary */}
-                <div className="bg-slate-50 p-6 flex justify-end gap-4 border-t border-slate-200 print:hidden">
-                    <button 
-                        onClick={() => window.print()}
-                        className="px-6 py-2 bg-white text-slate-700 border border-slate-300 font-bold rounded hover:bg-slate-100 transition-all text-xs uppercase"
-                    >
-                        Imprimir Misión
-                    </button>
-                    <button 
-                        onClick={handleFinishSummary}
-                        className="px-10 py-2 bg-blue-600 text-white font-bold rounded shadow-lg hover:bg-blue-700 transition-all text-xs uppercase active:scale-95"
-                    >
-                        Finalizar y Volver al Listado
-                    </button>
+                {/* Cuerpo del Formato */}
+                <div className="space-y-4 text-xs">
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">FECHA:</span>
+                        <span>{new Date().toISOString().replace('T', ' ').split('.')[0]}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">MISIÓN DE TRABAJO No.:</span>
+                        <span className="font-bold">{missionOrderNo}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4 items-start">
+                        <span className="font-bold uppercase leading-tight">RADICADO DE<br/>CORRESPONDENCIA:</span>
+                        <div>
+                           <span className="font-bold">{formData?.radicado}</span>
+                           <span className="block text-[10px] italic text-slate-500 mt-0.5">Al contestar cíte este número</span>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">CASO NÚMERO:</span>
+                        <span>{formData?.caseId || "EN TRÁMITE"}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">ASIGNADO A:</span>
+                        <span className="uppercase">PERFIL ANALISTA DE PROTECCIÓN</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">A SOLICITUD DE:</span>
+                        <span className="uppercase">{formData?.remittingEntity}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">CIUDAD DE SOLICITUD:</span>
+                        <span className="uppercase">{formData?.requestCity}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">TIPO DE MISIÓN:</span>
+                        <span className="uppercase">{formData?.missionType}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">NOMBRES:</span>
+                        <span className="uppercase">{formData?.firstName} {formData?.secondName}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">PRIMER APELLIDO:</span>
+                        <span className="uppercase">{formData?.firstSurname}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">SEGUNDO APELLIDO:</span>
+                        <span className="uppercase">{formData?.secondSurname || ""}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold leading-tight">TIPO DE DOCUMENTO DE<br/>IDENTIDAD:</span>
+                        <span className="uppercase">{formData?.docType}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold uppercase leading-tight">DOCUMENTO DE IDENTIDAD No.:</span>
+                        <span className="font-bold">{formData?.docNumber}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">UNIDAD ASIGNADA:</span>
+                        <span className="uppercase">{formData?.assignedArea}</span>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-slate-200">
+                        <span className="font-bold uppercase mb-4 block">INSTRUCCIONES:</span>
+                        <ol className="list-decimal pl-5 space-y-2 uppercase text-[11px]">
+                            <li>ENTREVISTAR AL CANDIDATO Y A LOS ADULTOS INTEGRANTES DE SU NÚCLEO FAMILIAR, SOLICITARLES ANTECEDENTES.</li>
+                            <li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL DE CONOCIMIENTO.</li>
+                            <li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li>
+                            <li>RENDIR INFORME EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO.</li>
+                        </ol>
+                    </div>
+
+                    <div className="mt-8 pt-4">
+                        <span className="font-bold uppercase block mb-2">OBSERVACIONES:</span>
+                        <div className="p-4 border border-slate-300 min-h-[80px] bg-white">
+                            {formData?.observations || "SIN OBSERVACIONES ADICIONALES."}
+                        </div>
+                    </div>
+
+                    <div className="mt-8 pt-8">
+                        <span className="font-black text-sm">LOS TÉRMINOS VENCEN: {formData?.dueDate || "2026-01-24"}</span>
+                    </div>
+
+                    {/* Firma - Solo visible en impresión o resumen final */}
+                    <div className="mt-20 pt-10 grid grid-cols-2 gap-20">
+                        <div className="text-center">
+                            <div className="border-b border-slate-900 w-full mb-2 h-10"></div>
+                            <span className="font-bold uppercase text-[10px]">FIRMA FUNCIONARIO ASIGNADO</span>
+                        </div>
+                        <div className="text-right flex flex-col items-end gap-2">
+                             <img src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${missionOrderNo}`} alt="QR" className="border p-1" />
+                             <span className="text-[8px] text-slate-400">Verificación SIDPA</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer del Sistema */}
+                <div className="mt-20 border border-slate-900 grid grid-cols-[3fr,1fr,1fr] text-[8px] font-bold text-center divide-x divide-slate-900 print:mt-10">
+                    <div className="p-2">Documento no normalizado en el Sistema de Gestión Integral</div>
+                    <div className="p-2">Versión 01</div>
+                    <div className="p-2">2023-02-01</div>
+                </div>
+
+                <div className="mt-10 pt-6 border-t border-slate-100 flex justify-end gap-4 print:hidden">
+                    <button onClick={() => window.print()} className="px-6 py-2 bg-white text-slate-700 border border-slate-300 font-bold rounded hover:bg-slate-100 transition-all text-xs uppercase">Imprimir Misión</button>
+                    <button onClick={handleFinishSummary} className="px-10 py-2 bg-blue-600 text-white font-bold rounded shadow-lg hover:bg-blue-700 transition-all text-xs uppercase active:scale-95">Finalizar y Volver al Listado</button>
                 </div>
             </div>
-            
-            <p className="text-center text-slate-400 text-[10px] mt-4 uppercase tracking-[0.3em] font-bold">Documento Generado Digitalmente - No requiere firma manuscrita</p>
         </div>
       )}
     </div>

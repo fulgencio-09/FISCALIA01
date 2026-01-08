@@ -48,6 +48,21 @@ const ENFOQUES_GENERO = [
 const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel, onSaveSuccess }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Función para calcular la edad exacta
+  const calculateAge = (birthDateString: string): string => {
+    if (!birthDateString) return '';
+    const today = new Date();
+    const birthDate = new Date(birthDateString);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age >= 0 ? age.toString() : '0';
+  };
+
   // Obtener datos extendidos del caso para auto-llenado
   const extendedData = useMemo(() => {
     if (!mission) return null;
@@ -208,7 +223,16 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
   }, [extendedData, mission]);
 
   const updateField = (field: keyof TechnicalInterviewForm, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+        const next = { ...prev, [field]: value };
+        
+        // Si cambia la fecha de nacimiento, recalcular edad inmediatamente
+        if (field === 'birthDate') {
+            next.age = calculateAge(value);
+        }
+        
+        return next;
+    });
   };
 
   const addFamilyMember = () => {
@@ -360,7 +384,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                 <section>
                     <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
                         <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                        Datos Complementarios (Candidatos  A PROTECCIÓN)
+                        Datos Complementarios (Candidatos A PROTECCIÓN)
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                         <InputField label="Lugar Nacimiento" value={formData.birthPlace} onChange={e => updateField('birthPlace', e.target.value)} />
@@ -383,7 +407,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                         />
 
                         <InputField label="Fecha Nacimiento" type="date" value={formData.birthDate} onChange={e => updateField('birthDate', e.target.value)} />
-                        <InputField label="Edad" type="number" value={formData.age} onChange={e => updateField('age', e.target.value)} />
+                        <InputField label="Edad (Cálculo Automático)" type="number" value={formData.age} disabled className="bg-blue-50 font-black text-blue-700" />
                         <SelectField label="Sexo" options={['Masculino', 'Femenino', 'Otro']} value={formData.sex} onChange={e => updateField('sex', e.target.value)} />
                         <SelectField label="Zona" options={['URBANA', 'RURAL']} value={formData.zone} onChange={e => updateField('zone', e.target.value)} />
                         
@@ -454,7 +478,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                 <section>
                     <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 3. Caracterización Personal</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                        <SelectField label="Calidad en Investigación" options={['Victima', 'Testigo', 'Perito', 'Fiscal', 'Empleado FGN', 'Otro', 'Ninguna']} value={formData.personQuality} onChange={e => updateField('personQuality', e.target.value)} />
+                        <SelectField label="Calidad de la persona dentro de la investigación" options={['Victima', 'Testigo', 'Perito', 'Fiscal', 'Empleado FGN', 'Otro', 'Ninguna']} value={formData.personQuality} onChange={e => updateField('personQuality', e.target.value)} />
                         <SelectField label="Estado Civil" options={['Soltero/a', 'Casado/a', 'Unión de hecho', 'Divorciado/a', 'Viudo/a']} value={formData.civilStatus} onChange={e => updateField('civilStatus', e.target.value)} />
                         <InputField label="Personas a Cargo" type="number" value={formData.dependentsCount} onChange={e => updateField('dependentsCount', e.target.value)} />
                     </div>

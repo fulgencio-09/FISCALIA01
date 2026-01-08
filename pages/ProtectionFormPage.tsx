@@ -638,10 +638,10 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
                <InputField label="Email" type="email" value={formData.policeEmail} onChange={e => updateField('policeEmail', e.target.value)} error={errors.policeEmail} disabled={readOnly} />
             </FormSection>
              <FormSection title="Sección 5: Información Asistente del Fiscal (opcional)">
-               <InputField label="Nombre Asistente" value={formData.assistantName} onChange={e => updateField('assistantName', e.target.value)} error={errors.assistantName} disabled />
-               <InputField label="Email" type="email" value={formData.assistantEmail} onChange={e => updateField('assistantEmail', e.target.value)} error={errors.assistantEmail} disabled />
-               <InputField label="Teléfono" value={formData.assistantPhone} onChange={e => updateField('assistantPhone', e.target.value)} error={errors.assistantPhone} disabled />
-               <InputField label="Celular" value={formData.assistantCell} onChange={e => updateField('assistantCell', e.target.value)} error={errors.assistantCell} disabled />
+               <InputField label="Nombre Asistente" value={formData.assistantName} onChange={e => updateField('assistantName', e.target.value)} error={errors.assistantName} disabled={readOnly} />
+               <InputField label="Email" type="email" value={formData.assistantEmail} onChange={e => updateField('assistantEmail', e.target.value)} error={errors.assistantEmail} disabled={readOnly} />
+               <InputField label="Teléfono" value={formData.assistantPhone} onChange={e => updateField('assistantPhone', e.target.value)} error={errors.assistantPhone} disabled={readOnly} />
+               <InputField label="Celular" value={formData.assistantCell} onChange={e => updateField('assistantCell', e.target.value)} error={errors.assistantCell} disabled={readOnly} />
             </FormSection>
           </div>
         )}

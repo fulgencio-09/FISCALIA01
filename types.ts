@@ -212,7 +212,7 @@ export interface ProtectionCaseForm {
   secondName: string;
   firstSurname: string;
   secondSurname: string;
-  subject: string;
+  subject?: string;
   assignedArea: string;
   missionStartDate: string;
   missionType: string;

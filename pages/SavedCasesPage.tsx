@@ -15,7 +15,7 @@ import {
   MOCK_MISSIONS
 } from '../constants';
 import { FamilyMember, ProtectionMission, ProtectionCaseForm } from '../types';
-import { InputField, SelectField, TextAreaField } from '../components/FormComponents';
+import { InputField, SelectField, TextAreaField, FileUpload } from '../components/FormComponents';
 
 const INITIAL_FAMILY_DATA: Record<string, FamilyMember[]> = {
   "CASE-2024-001": [
@@ -56,6 +56,7 @@ const SavedCasesPage: React.FC = () => {
   const [allFamilyData, setAllFamilyData] = useState<Record<string, FamilyMember[]>>(INITIAL_FAMILY_DATA);
   const [missionsList, setMissionsList] = useState<ProtectionMission[]>(MOCK_MISSIONS);
   const [selectedMission, setSelectedMission] = useState<ProtectionMission | null>(null);
+  const [editAttachments, setEditAttachments] = useState<File[]>([]);
   
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
@@ -80,6 +81,7 @@ const SavedCasesPage: React.FC = () => {
     setActiveModal({ type: 'NONE', caseId: '' });
     setEditingMember(null);
     setSelectedMission(null);
+    setEditAttachments([]);
   };
 
   const handleToggleFamilyStatus = () => {
@@ -158,6 +160,7 @@ const SavedCasesPage: React.FC = () => {
       missionType: formData.get('missionType') as string,
       dueDate: formData.get('dueDate') as string,
       observations: (formData.get('observations') as string).toUpperCase(),
+      attachments: editAttachments // Sync edit attachments
     };
 
     setAllSavedCases(prev => prev.map(c => c.caseId === associatedCase.caseId ? updatedCase : c));
@@ -180,6 +183,14 @@ const SavedCasesPage: React.FC = () => {
     setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId });
   };
 
+  const handleEditFilesSelected = (files: File[]) => {
+    setEditAttachments(prev => [...prev, ...files]);
+  };
+
+  const handleRemoveEditFile = (index: number) => {
+    setEditAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
   const currentFamilyMembers = useMemo(() => {
     return activeModal.caseId ? (allFamilyData[activeModal.caseId] || []) : [];
   }, [allFamilyData, activeModal.caseId]);
@@ -195,6 +206,15 @@ const SavedCasesPage: React.FC = () => {
     if (!activeModal.caseId) return null;
     return allSavedCases.find(c => c.caseId === activeModal.caseId) || null;
   }, [activeModal.caseId, allSavedCases]);
+
+  const handleOpenEditMission = (m: ProtectionMission) => {
+    setSelectedMission(m);
+    const currentCase = allSavedCases.find(c => c.radicado === m.caseRadicado);
+    if (currentCase) {
+        setEditAttachments(currentCase.attachments || []);
+    }
+    setActiveModal({ type: 'EDIT_MISSION', caseId: currentCase?.caseId || '' });
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 relative min-h-screen">
@@ -408,7 +428,7 @@ const SavedCasesPage: React.FC = () => {
                                     <td className="px-8 py-5">
                                        <div className="flex items-center justify-center gap-2">
                                           <button onClick={() => { setSelectedMission(m); setActiveModal({ type: 'MISSION_DETAIL', caseId: activeModal.caseId }); }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="Visualizar Misión"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                                          <button onClick={() => { setSelectedMission(m); setActiveModal({ type: 'EDIT_MISSION', caseId: activeModal.caseId }); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Editar Misión"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                          <button onClick={() => handleOpenEditMission(m)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Editar Misión"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                                        </div>
                                     </td>
                                  </tr>
@@ -423,7 +443,7 @@ const SavedCasesPage: React.FC = () => {
                     </div>
                  )}
                  <div className="mt-10 flex justify-end">
-                    <button onClick={closeModal} className="px-12 py-3.5 bg-[#101420] text-white font-black rounded-2xl uppercase text-[10px] tracking-[0.2em] transition-all hover:bg-black active:scale-95 shadow-xl">Cerrar</button>
+                    <button onClick={closeModal} className="px-12 py-3.5 bg-[#101420] text-white font-black rounded-xl uppercase text-[10px] tracking-[0.2em] transition-all hover:bg-black active:scale-95 shadow-xl">Cerrar</button>
                  </div>
               </div>
            </div>
@@ -532,6 +552,19 @@ const SavedCasesPage: React.FC = () => {
                            <TextAreaField label="Observaciones" name="observations" defaultValue={associatedCase.observations} className="min-h-[100px]" />
                         </div>
                     </div>
+                 </div>
+
+                 {/* Sección 4: Anexos (No requeridos, Max 30MB) */}
+                 <div>
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 border-b border-slate-100 pb-2">IV. ANEXOS Y SOPORTES (MÁX 30MB)</h4>
+                    <FileUpload 
+                        label="Adjuntar nuevos anexos o soportes"
+                        files={editAttachments}
+                        onFilesSelected={handleEditFilesSelected}
+                        onRemoveFile={handleRemoveEditFile}
+                        maxSizeMB={30}
+                        required={false}
+                    />
                  </div>
 
                  <div className="flex justify-end gap-4 border-t border-slate-100 pt-8 flex-shrink-0">

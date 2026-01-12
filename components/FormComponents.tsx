@@ -98,9 +98,19 @@ interface FileUploadProps {
   error?: string;
   readOnly?: boolean;
   required?: boolean;
+  maxSizeMB?: number;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ label, files, onFilesSelected, onRemoveFile, error, readOnly = false, required = false }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ 
+  label, 
+  files, 
+  onFilesSelected, 
+  onRemoveFile, 
+  error, 
+  readOnly = false, 
+  required = false,
+  maxSizeMB = CONFIG.MAX_FILE_SIZE_MB
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,8 +128,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, files, onFilesSel
 
         // Validate Size
         const sizeMB = file.size / (1024 * 1024);
-        if (sizeMB > CONFIG.MAX_FILE_SIZE_MB) {
-          alert(`El archivo ${file.name} excede el tamaño máximo de ${CONFIG.MAX_FILE_SIZE_MB}MB.`);
+        if (sizeMB > maxSizeMB) {
+          alert(`El archivo ${file.name} excede el tamaño máximo de ${maxSizeMB}MB.`);
           continue;
         }
 
@@ -157,7 +167,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, files, onFilesSel
               Seleccionar Archivos
             </button>
             <p className="text-slate-500 text-sm mt-2">
-              Formatos permitidos: {CONFIG.ALLOWED_EXTENSIONS.join(', ')}. Max: {CONFIG.MAX_FILE_SIZE_MB}MB.
+              Formatos permitidos: {CONFIG.ALLOWED_EXTENSIONS.join(', ')}. Max: {maxSizeMB}MB.
             </p>
          </div>
        )}

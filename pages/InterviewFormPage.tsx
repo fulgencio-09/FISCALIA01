@@ -395,9 +395,10 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                             value={formData.birthDepartment} 
                             onChange={e => {
                                 updateField('birthDepartment', e.target.value);
-                                updateField('birthMunicipality', ''); // Reset muni
+                                updateField('birthMunicipality', ''); // Limpiar municipio al cambiar depto
                             }} 
                         />
+                        
                         <SelectField 
                             label="Munc Nacimiento" 
                             options={COLOMBIA_GEO[formData.birthDepartment] || []} 
@@ -412,16 +413,16 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                         <SelectField label="Zona" options={['URBANA', 'RURAL']} value={formData.zone} onChange={e => updateField('zone', e.target.value)} />
                         
                     </div>
-                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-  <div className="md:col-span-4">
-    <SelectField
-      label="¿Se ha registrado en el Registro Único de Migrantes Venezolanos - RUMV? Sólo en el caso de migrantes venezolanos"
-      options={['SI', 'NO']}
-      value={formData.ruvRegistered}
-      onChange={e => updateField('ruvRegistered', e.target.value)}
-    />
-  </div>
-</div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                      <div className="md:col-span-4">
+                        <SelectField
+                          label="¿Se ha registrado en el Registro Único de Migrantes Venezolanos - RUMV? Sólo en el caso de migrantes venezolanos"
+                          options={['SI', 'NO']}
+                          value={formData.ruvRegistered}
+                          onChange={e => updateField('ruvRegistered', e.target.value)}
+                        />
+                      </div>
+                    </div>
 
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -432,9 +433,10 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                             value={formData.residenceDepartment} 
                             onChange={e => {
                                 updateField('residenceDepartment', e.target.value);
-                                updateField('residenceMunicipality', '');
+                                updateField('residenceMunicipality', ''); 
                             }} 
                         />
+                        
                         <SelectField 
                             label="Municipio Residencia" 
                             options={COLOMBIA_GEO[formData.residenceDepartment] || []} 
@@ -453,6 +455,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                 updateField('correspondenceMunicipality', '');
                             }} 
                         />
+                        
                         <SelectField 
                             label="Municipio Correspondencia" 
                             options={COLOMBIA_GEO[formData.correspondenceDepartment] || []} 
@@ -760,7 +763,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <TextAreaField label="Vulnerabilidad Población Diferencial" value={formData.vulnerabilityDifferentialPop} onChange={e => updateField('vulnerabilityDifferentialPop', e.target.value)} className="h-32" />
                         <TextAreaField label="Vulnerabilidad Género" value={formData.vulnerabilityGender} onChange={e => updateField('vulnerabilityGender', e.target.value)} className="h-32" />
-                        <TextAreaField label="Vulnerabilidad Entorno Familiar" value={formData.vulnerabilityFamilyEnvironment} onChange={e => updateField('vulnerabilityFamilyEnvironment', e.target.value)} className="h-32" />
+                        <TextAreaField label="Vulnerability Entorno Familiar" value={formData.vulnerabilityFamilyEnvironment} onChange={e => updateField('vulnerabilityFamilyEnvironment', e.target.value)} className="h-32" />
                     </div>
                 </section>
 

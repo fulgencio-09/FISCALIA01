@@ -826,7 +826,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                     <InputField label="¿Qué sustancias?" value={formData.substancesDetails} onChange={e => updateField('substancesDetails', e.target.value)} disabled={formData.consumesSubstances !== 'SI'} />
                                     <InputField label="Tiempo de consumo" value={formData.consumptionTime} onChange={e => updateField('consumptionTime', e.target.value)} disabled={formData.consumesSubstances !== 'SI'} />
                                 </div>
-                               
+
                                 {/* CONSUMO FAMILIAR */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50 p-6 border-l-4 border-emerald-600">
                                     <div>
@@ -839,7 +839,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                     <InputField label="¿Quién?" value={formData.familyConsumesWho} onChange={e => updateField('familyConsumesWho', e.target.value)} disabled={formData.familyConsumesSubstances !== 'SI'} />
                                     <InputField label="¿Qué sustancias?" value={formData.familySubstancesDetails} onChange={e => updateField('familySubstancesDetails', e.target.value)} disabled={formData.familyConsumesSubstances !== 'SI'} />
                                 </div>
-                                 {/* TRATAMIENTO TITULAR - INDEPENDIENTE */}
+                                {/* TRATAMIENTO TITULAR - INDEPENDIENTE */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50 p-6 border-l-4 border-indigo-400">
                                     <div className="md:col-span-3">
                                         <label className="text-[10px] font-black uppercase mb-3 block tracking-widest">¿Ha estado en tratamiento por consumo de sustancias psicoactivas?</label>
@@ -859,10 +859,10 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                         </div>
                                     </div>
                                     <div className="md:col-span-2">
-                                        <InputField 
-                                            label="Especifique ¿Quién?" 
-                                            value={formData.familyInTreatmentWho} 
-                                            onChange={e => updateField('familyInTreatmentWho', e.target.value)} 
+                                        <InputField
+                                            label="Especifique ¿Quién?"
+                                            value={formData.familyInTreatmentWho}
+                                            onChange={e => updateField('familyInTreatmentWho', e.target.value)}
                                             disabled={formData.familyInTreatmentSubstances !== 'SI'}
                                         />
                                     </div>
@@ -877,37 +877,244 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                     <div className="space-y-12 animate-in slide-in-from-right-8 duration-300">
                         <section>
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 7. Intervención Procesal e Identificación de Amenaza</h3>
-                            <TextAreaField label="Intervención procesal que pueda generar amenazas" value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} className="h-40 mb-8" />
-                            <TextAreaField label="Amenazas recibidas y riesgos identificados (Tiempos, modos, lugares)" value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} className="h-40" />
+                            <TextAreaField label="El evaluado deberá manifestar la calidad que presenta (testigo, víctima o funcionario), su intervención procesal, señalando número de radicados, despacho de conocimiento y fecha de sus intervenciones procesales. " value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} className="h-40 mb-8" />
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2  pb-2 mb-8"> Amenazas recibidas por el evaluado o su familia y riesgos identificados</h3>
+                            <TextAreaField label="Hechos que se señalan como constitutivos de amenaza o riesgo en contra del evaluado o de su familia. Especificar circunstancias de tiempo, modo y lugar; tipo de amenaza (verbal, escrita, telefónica, a través de terceros, etc.); si reconoce e identifica al actor de estas y cuál es su posible motivación. " value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} className="h-40" />
                         </section>
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-8 rounded-2xl border border-slate-200">
-                            <div>
-                                <label className="text-[10px] font-black uppercase block mb-3">¿Tiene sentencias condenatorias?</label>
-                                <div className="flex gap-4">
-                                    <button type="button" onClick={() => updateField('hasConvictions', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.hasConvictions === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                    <button type="button" onClick={() => updateField('hasConvictions', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.hasConvictions === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black uppercase block mb-3">¿Beneficiario subrogado penal?</label>
-                                <div className="flex gap-4">
-                                    <button type="button" onClick={() => updateField('isSubstituteBeneficiary', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.isSubstituteBeneficiary === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                    <button type="button" onClick={() => updateField('isSubstituteBeneficiary', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.isSubstituteBeneficiary === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                </div>
-                            </div>
-                        </section>
+                        <section className="grid grid-cols-1 gap-8 bg-slate-50 p-8 rounded-2xl border border-slate-200 md:col-span-6">
+
+  <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 pb-2">
+    Condenas en su contra y beneficios
+  </h3>
+
+  {/* Pregunta 1 */}
+  <div>
+    <label className="text-[10px] font-black uppercase block mb-3">
+      ¿Tiene sentencias condenatorias en su contra?
+    </label>
+
+    <div className="flex gap-4 mb-6">
+      <button
+        type="button"
+        onClick={() => updateField('hasConvictions', 'SI')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.hasConvictions === 'SI'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        SI
+      </button>
+
+      <button
+        type="button"
+        onClick={() => updateField('hasConvictions', 'NO')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.hasConvictions === 'NO'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        NO
+      </button>
+    </div>
+  </div>
+
+  {/* Pregunta 2 */}
+  <div>
+    <label className="text-[10px] font-black uppercase block mb-3">
+      ¿Es beneficiario de un subrogado penal o mecanismo sustituto de la pena privativa de la libertad?
+    </label>
+
+    <div className="flex gap-4 mb-6">
+      <button
+        type="button"
+        onClick={() => updateField('isSubstituteBeneficiary', 'SI')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.isSubstituteBeneficiary === 'SI'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        SI
+      </button>
+
+      <button
+        type="button"
+        onClick={() => updateField('isSubstituteBeneficiary', 'NO')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.isSubstituteBeneficiary === 'NO'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        NO
+      </button>
+    </div>
+  </div>
+
+</section>
+
+                      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-8 rounded-2xl border border-slate-200">
+
+  {/* Título */}
+  <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 pb-2 md:col-span-2">
+    Antecedentes de evaluaciones
+  </h3>
+
+  {/* Descripción */}
+  <p className="text-[12px] md:col-span-2">
+    Identificar si el candidato ha sido evaluado por el Programa de Protección y Asistencia u otro programa.
+  </p>
+
+  {/* Bloque 1 */}
+  <div className="space-y-4">
+    <label className="text-[10px] font-black uppercase block">
+      ¿Ha sido evaluado por un programa de protección?
+    </label>
+
+    <div className="flex gap-4">
+      <button
+        type="button"
+        onClick={() => updateField('hasConvictions', 'SI')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.hasConvictions === 'SI'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        SI
+      </button>
+
+      <button
+        type="button"
+        onClick={() => updateField('hasConvictions', 'NO')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.hasConvictions === 'NO'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        NO
+      </button>
+    </div>
+
+    <InputField
+      label="Especifique ¿Quién?"
+      value={formData.familyInTreatmentWho}
+      onChange={e => updateField('familyInTreatmentWho', e.target.value)}
+      disabled={formData.hasConvictions !== 'SI'}
+    />
+  </div>
+
+  {/* Bloque 2 */}
+  <div className="space-y-4">
+    <label className="text-[10px] font-black uppercase block">
+      ¿Tiene medidas de protección actualmente?
+    </label>
+
+    <div className="flex gap-4">
+      <button
+        type="button"
+        onClick={() => updateField('isSubstituteBeneficiary', 'SI')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.isSubstituteBeneficiary === 'SI'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        SI
+      </button>
+
+      <button
+        type="button"
+        onClick={() => updateField('isSubstituteBeneficiary', 'NO')}
+        className={`px-4 py-1 text-[9px] font-black border ${
+          formData.isSubstituteBeneficiary === 'NO'
+            ? 'bg-indigo-600 text-white'
+            : 'bg-white'
+        }`}
+      >
+        NO
+      </button>
+    </div>
+
+    <InputField
+      label="Especifique ¿Quién?"
+      value={formData.familyInTreatmentWho}
+      onChange={e => updateField('familyInTreatmentWho', e.target.value)}
+      disabled={formData.isSubstituteBeneficiary !== 'SI'}
+    />
+  </div>
+
+</section>
+
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Vulnerabilidades</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                                <SelectField label="Aplica normas autoprotección?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.appliesSecurityNorms} onChange={e => updateField('appliesSecurityNorms', e.target.value)} />
-                                <SelectField label="Permanece en zona de riesgo?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.remainsInRiskZone} onChange={e => updateField('remainsInRiskZone', e.target.value)} />
-                                <SelectField label="Existen org. ilegales en sector?" options={['SI', 'NO']} value={formData.illegalOrgsInSector} onChange={e => updateField('illegalOrgsInSector', e.target.value)} />
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-2">Vulnerabilidades</h3>
+                            <p className=" text-[12px] col-span-3 md:col-span-6 mb-8" >Identificar factores de vulnerabilidad asociados a sus comportamientos, permanencia en zona de riesgo, lugar de residencia y de trabajo, desplazamientos, factores inherentes a su condición como su pertenencia a comunidades étnicas o poblaciones diferenciales y/o de género. Consultar instructivo del instrumento técnico de valoración de riesgo. </p>
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                                <div className="md:col-span-3 mb-6">
+                                    <SelectField label="¿El evaluado aplica normas de autoprotección y seguridad? " options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.appliesSecurityNorms} onChange={e => updateField('appliesSecurityNorms', e.target.value)} />
+                                </div>
+                                <div className="md:col-span-6">
+
+                                    <TextAreaField
+                                        label="Especifique ¿Quién?"
+                                        value={formData.familyInTreatmentWho}
+                                        onChange={e => updateField('familyInTreatmentWho', e.target.value)}
+                                        disabled={formData.appliesSecurityNorms !== 'SI'}
+                                    />
+                                </div>
+                                <div className="md:col-span-3 mb-6">
+                                    <SelectField label="¿El evaluado permanece en zona de riesgo? " options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.remainsInRiskZone} onChange={e => updateField('remainsInRiskZone', e.target.value)} />
+                                </div>
+                                <div className="md:col-span-6">
+                                    <TextAreaField
+                                        label="Especifique ¿Cual?"
+                                        value={formData.familyInTreatmentWho}
+                                        onChange={e => updateField('familyInTreatmentWho', e.target.value)}
+                                        disabled={formData.remainsInRiskZone !== 'SI'}
+                                    />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <TextAreaField label="Características físicas vivienda que generan vulnerabilidad" value={formData.housePhysicalDescription} onChange={e => updateField('housePhysicalDescription', e.target.value)} className="h-24" />
-                                <TextAreaField label="Vulnerability asociada al entorno de trabajo" value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} className="h-24" />
+                            <div className="grid grid-cols-1 gap-8 mb-8 md:col-span-6">
+
+                                <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2">
+                                    Vulnerabilidad en zona de residencia
+                                </h3>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                    <SelectField
+                                        label="¿La residencia cuenta con medios tecnológicos de seguridad?"
+                                        options={['SI', 'NO']}
+                                        value={formData.appliesSecurityNorms}
+                                        onChange={e => updateField('appliesSecurityNorms', e.target.value)}
+                                    />
+
+                                    <SelectField
+                                        label="¿Existen organizaciones ilegales en el sector de residencia?"
+                                        options={['SI', 'NO']}
+                                        value={formData.remainsInRiskZone}
+                                        onChange={e => updateField('remainsInRiskZone', e.target.value)}
+                                    />
+
+                                    <SelectField
+                                        label="¿Existen puntos de apoyo de la fuerza pública cercanos al lugar de residencia?"
+                                        options={['SI', 'NO']}
+                                        value={formData.illegalOrgsInSector}
+                                        onChange={e => updateField('illegalOrgsInSector', e.target.value)}
+                                    />
+
+                                </div>
+
                             </div>
-                            <TextAreaField label="Vulnerabilidad en desplazamientos cotidianos" value={formData.dailyMobilityVulnerability} onChange={e => updateField('dailyMobilityVulnerability', e.target.value)} className="h-24" />
+
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-8 mb-16">
+                                <TextAreaField label="Descripción de características físicas de la vivienda que puedan generar vulnerabilidad " value={formData.housePhysicalDescription} onChange={e => updateField('housePhysicalDescription', e.target.value)} className="h-24 mb-10" />
+                                <TextAreaField label="Vulnerabilidad asociada al entorno en donde el evaluado desarrolla actividades de trabajo " value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} className="h-24" />
+                            </div>
+                            <TextAreaField label="Vulnerabilidad en los desplazamientos cotidianos " value={formData.dailyMobilityVulnerability} onChange={e => updateField('dailyMobilityVulnerability', e.target.value)} className="h-24" />
                         </section>
                     </div>
                 )}
@@ -917,6 +1124,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                     <div className="space-y-12 animate-in slide-in-from-right-8 duration-300">
                         <section>
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 8. Factores Diferenciales y de Riesgo</h3>
+                              <p className=" text-[12px] col-span-3 md:col-span-6 mb-8" >Marque con una casilla si el(la) candidato(a) a protección o algún miembro de su núcleo familiar pertenece o se reconoce en algunas de estas poblaciones con enfoques diferenciales o de género:  </p>
                             <div className="overflow-x-auto border-2 border-slate-900 rounded-2xl overflow-hidden mb-8">
                                 <table className="w-full text-left">
                                     <thead className="bg-slate-900 text-white text-[8px] font-black uppercase tracking-widest">

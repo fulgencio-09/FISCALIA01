@@ -158,6 +158,7 @@ export interface TechnicalInterviewForm {
   familyMentalHospitalized: 'SI' | 'NO' | '';
   uninterruptibleMeds: string;
   whoInTreatment: string;
+  whoInTreatmentDetail: string;
   
   // Consumo
   consumesSubstances: 'SI' | 'NO' | '';

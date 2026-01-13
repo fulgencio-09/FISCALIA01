@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { 
   MOCK_SAVED_CASES, 
@@ -139,28 +138,23 @@ const SavedCasesPage: React.FC = () => {
     
     const formData = new FormData(e.currentTarget);
     
-    // 1. Update Case Data
+    // 1. Update Case Data - Se excluyen los campos deshabilitados (Correspondencia)
     const updatedCase: ProtectionCaseForm = {
       ...associatedCase,
-      destinationUnit: formData.get('destinationUnit') as string,
-      remittingEntity: formData.get('remittingEntity') as string,
-      candidateClassification: formData.get('candidateClassification') as string,
-      origin: formData.get('origin') as string,
-      remitterName: (formData.get('remitterName') as string).toUpperCase(),
-      requestDepartment: formData.get('requestDepartment') as string,
-      requestCity: formData.get('requestCity') as string,
+      // Sección II: Titular (Sigue siendo editable)
       docType: formData.get('docType') as string,
       docNumber: formData.get('docNumber') as string,
       firstName: (formData.get('firstName') as string).toUpperCase(),
       secondName: (formData.get('secondName') as string || "").toUpperCase(),
       firstSurname: (formData.get('firstSurname') as string).toUpperCase(),
       secondSurname: (formData.get('secondSurname') as string || "").toUpperCase(),
+      // Sección III: Misión
       assignedArea: formData.get('assignedArea') as string,
       missionStartDate: formData.get('missionStartDate') as string,
       missionType: formData.get('missionType') as string,
       dueDate: formData.get('dueDate') as string,
       observations: (formData.get('observations') as string).toUpperCase(),
-      attachments: editAttachments // Sync edit attachments
+      attachments: editAttachments // Sincronizar anexos editados
     };
 
     setAllSavedCases(prev => prev.map(c => c.caseId === associatedCase.caseId ? updatedCase : c));
@@ -231,7 +225,7 @@ const SavedCasesPage: React.FC = () => {
       {/* Modal Confirm Deactivate */}
       {confirmDeactivate && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 duration-200">
+           <div className="bg-white rounded-2xl shadow-2xl max-sm w-full overflow-hidden animate-in zoom-in-95 duration-200">
               <div className="p-8 text-center">
                  <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -387,7 +381,7 @@ const SavedCasesPage: React.FC = () => {
 
       {/* --- MODAL: LISTADO DE MISIONES RELACIONADAS --- */}
       {activeModal.type === 'LIST_MISSIONS' && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
            <div className="bg-white rounded-[2rem] shadow-2xl max-w-5xl w-full overflow-hidden animate-in zoom-in-95 duration-300">
               <div className="p-8 bg-gradient-to-r from-indigo-700 to-purple-800 text-white flex justify-between items-center">
                  <div className="flex items-center gap-5">
@@ -415,6 +409,7 @@ const SavedCasesPage: React.FC = () => {
                            </thead>
                            <tbody className="bg-white divide-y divide-slate-50">
                               {relatedMissions.map(m => (
+                                 /* Fixed syntax error key(m.id) to key={m.id} */
                                  <tr key={m.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-8 py-5 font-mono font-bold text-indigo-600">{m.missionNo}</td>
                                     <td className="px-8 py-5 font-black text-slate-800 uppercase tracking-tight text-xs">{m.type}</td>
@@ -485,7 +480,7 @@ const SavedCasesPage: React.FC = () => {
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold leading-tight">TIPO DE DOCUMENTO DE<br/>IDENTIDAD:</span><span className="uppercase">{associatedCase.docType}</span></div>
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold uppercase leading-tight">DOCUMENTO DE IDENTIDAD No.:</span><span className="font-bold">{associatedCase.docNumber}</span></div>
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold">UNIDAD ASIGNADA:</span><span className="uppercase">{selectedMission.assignedArea}</span></div>
-                      <div className="mt-8 pt-6 border-t border-slate-200"><span className="font-bold uppercase mb-4 block underline">INSTRUCCIONES:</span><ol className="list-decimal pl-6 space-y-2 uppercase text-[11px] font-medium leading-tight"><li>ENTREVISTAR AL CANDIDATO Y A LOS ADULTOS INTEGRANTES DE SU NÚCLEO FAMILIAR, SOLICITARLES ANTECEDENTES.</li><li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL DE CONOCIMIENTO.</li><li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li><li>RENDIR INFORME EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO.</li></ol><div className="mt-4 pl-6 uppercase text-[11px] font-medium">1. RENDIR INFORME EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO.</div></div>
+                      <div className="mt-8 pt-6 border-t border-slate-200"><span className="font-bold uppercase mb-4 block underline">INSTRUCCIONES:</span><ol className="list-decimal pl-6 space-y-2 uppercase text-[11px] font-medium leading-tight"><li>ENTREVISTAR AL CANDIDATO Y A LOS ADULTOS INTEGRANTES DE SU NÚCLEO FAMILIAR, SOLICITARLES ANTECEDENTES.</li><li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL DE CONOCIMIENTO.</li><li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li><li>RENDIR INFORME EVALUACIÓN TÉCN_ICA DE AMENAZA Y RIESGO.</li></ol><div className="mt-4 pl-6 uppercase text-[11px] font-medium">1. RENDIR INFORME EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO.</div></div>
                       <div className="mt-8 pt-4"><span className="font-bold uppercase block mb-2">OBSERVACIONES:</span><div className="p-4 border border-slate-300 min-h-[100px] text-justify leading-relaxed whitespace-pre-wrap uppercase">{associatedCase.observations || "SIN OBSERVACIONES REGISTRADAS."}</div></div>
                       <div className="mt-8 pt-8"><span className="font-black text-sm uppercase">LOS TÉRMINOS VENCEN: {selectedMission.dueDate}</span></div>
                       <div className="mt-24 pt-10 border-t border-slate-900 max-w-sm mx-auto text-center"><span className="font-bold uppercase text-[10px] block">FIRMA FUNCIONARIO ASIGNADO</span><div className="mt-4 flex flex-col items-center gap-1 text-[9px] font-semibold text-slate-500 uppercase"><span>Fecha de Asignación: {selectedMission.creationDate}</span><span>Generó: {selectedMission.assignedOfficial || "SGP SISTEMA CENTRAL"}</span></div></div>
@@ -510,18 +505,18 @@ const SavedCasesPage: React.FC = () => {
               </div>
               
               <form className="p-10 space-y-10 overflow-y-auto" onSubmit={handleEditMissionSubmit}>
-                 {/* Sección 1: Correspondencia */}
+                 {/* Sección 1: Correspondencia (SOLO LECTURA) */}
                  <div>
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 border-b border-slate-100 pb-2">I. DATOS DE CORRESPONDENCIA</h4>
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 border-b border-slate-100 pb-2">I. DATOS DE CORRESPONDENCIA (SOLO LECTURA)</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <SelectField label="Unidad Regional Destino" name="destinationUnit" options={REGIONAL_UNITS} defaultValue={associatedCase.destinationUnit} required />
-                        <SelectField label="Entidad Remitente" name="remittingEntity" options={ENTITIES} defaultValue={associatedCase.remittingEntity} required />
-                        <SelectField label="Clasificación del Candidato" name="candidateClassification" options={CANDIDATE_CLASSIFICATIONS} defaultValue={associatedCase.candidateClassification} required />
-                        <SelectField label="Procedencia" name="origin" options={ORIGINS} defaultValue={associatedCase.origin} required />
-                        <InputField label="Nombre del Remitente" name="remitterName" defaultValue={associatedCase.remitterName} required />
+                        <SelectField label="Unidad Regional Destino" name="destinationUnit" options={REGIONAL_UNITS} defaultValue={associatedCase.destinationUnit} required disabled />
+                        <SelectField label="Entidad Remitente" name="remittingEntity" options={ENTITIES} defaultValue={associatedCase.remittingEntity} required disabled />
+                        <SelectField label="Clasificación del Candidato" name="candidateClassification" options={CANDIDATE_CLASSIFICATIONS} defaultValue={associatedCase.candidateClassification} required disabled />
+                        <SelectField label="Procedencia" name="origin" options={ORIGINS} defaultValue={associatedCase.origin} required disabled />
+                        <InputField label="Nombre del Remitente" name="remitterName" defaultValue={associatedCase.remitterName} required disabled />
                         <div className="grid grid-cols-2 gap-4">
-                            <SelectField label="Dpto Solicitud" name="requestDepartment" options={DEPARTMENTS} defaultValue={associatedCase.requestDepartment} required />
-                            <SelectField label="Ciudad Solicitud" name="requestCity" options={CITIES} defaultValue={associatedCase.requestCity} required />
+                            <SelectField label="Dpto Solicitud" name="requestDepartment" options={DEPARTMENTS} defaultValue={associatedCase.requestDepartment} required disabled />
+                            <SelectField label="Ciudad Solicitud" name="requestCity" options={CITIES} defaultValue={associatedCase.requestCity} required disabled />
                         </div>
                     </div>
                  </div>

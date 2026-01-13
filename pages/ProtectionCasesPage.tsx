@@ -12,6 +12,7 @@ const MOCK_EXISTING_CASES: Record<string, string> = {
 const ProtectionCasesPage: React.FC = () => {
   const [view, setView] = useState<'LIST' | 'CREATE' | 'SUMMARY'>('LIST');
   const [activeTab, setActiveTab] = useState<'CORRESPONDENCE' | 'TITULAR' | 'ASSIGNMENT'>('CORRESPONDENCE');
+  const [isExistingCaseAssociation, setIsExistingCaseAssociation] = useState(false);
   
   // Search States
   const [searchTerm, setSearchTerm] = useState('');
@@ -77,7 +78,7 @@ const ProtectionCasesPage: React.FC = () => {
     });
   }, [radicatedRequests, searchTerm, searchCriteria]);
 
-  const handleCreateCase = (item: ProtectionRequestSummary) => {
+  const handleCreateCase = (item: ProtectionRequestSummary, isExisting: boolean = false) => {
     const nameParts = item.fullName.split(' ');
     const firstName = nameParts[0] || '';
     const secondName = nameParts.length > 3 ? nameParts[1] : (nameParts.length === 3 ? nameParts[1] : '');
@@ -94,8 +95,12 @@ const ProtectionCasesPage: React.FC = () => {
         secondName,
         firstSurname,
         secondSurname,
+        // Si es existente, se asume que el ID ya viene del modal o de la búsqueda
+        caseId: isExisting ? (MOCK_EXISTING_CASES[item.docNumber] || '') : ''
     });
-    setActiveTab('CORRESPONDENCE');
+
+    setIsExistingCaseAssociation(isExisting);
+    setActiveTab(isExisting ? 'TITULAR' : 'CORRESPONDENCE');
     setView('CREATE');
   };
 
@@ -233,7 +238,7 @@ const ProtectionCasesPage: React.FC = () => {
                   <div className="p-6 bg-slate-50 border-t border-slate-100 flex flex-col gap-2">
                       <button 
                         onClick={() => {
-                            if (validationModal.request) handleCreateCase(validationModal.request);
+                            if (validationModal.request) handleCreateCase(validationModal.request, true);
                             setValidationModal({ show: false, caseId: '', request: null });
                         }}
                         className="w-full py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm uppercase tracking-wide text-xs"
@@ -394,21 +399,30 @@ const ProtectionCasesPage: React.FC = () => {
             <div className="p-6 border-b border-slate-200 bg-slate-50 rounded-t-xl flex justify-between items-center">
                <div>
                   <h2 className="text-xl font-bold text-slate-800">Generación de Misión / Caso</h2>
-                  <p className="text-sm text-slate-500">Formalización del caso de protección y asignación de misión inicial.</p>
+                  <p className="text-sm text-slate-500">
+                    {isExistingCaseAssociation 
+                      ? "Asociando solicitud a expediente existente." 
+                      : "Formalización del caso de protección y asignación de misión inicial."}
+                  </p>
                </div>
-               <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-md font-mono font-bold text-sm border border-blue-200">
-                   RAD: {formData?.radicado}
+               <div className="flex flex-col items-end gap-2">
+                  <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-md font-mono font-bold text-sm border border-blue-200">
+                      RAD: {formData?.radicado}
+                  </div>
+                  <div className="px-4 py-1 bg-slate-100 text-slate-600 rounded-md font-bold text-[10px] border border-slate-200 uppercase">
+                      FECHA RAD: {formData?.radicationDate}
+                  </div>
                </div>
             </div>
 
             <div className="flex border-b border-slate-200 overflow-x-auto bg-white sticky top-0 z-10">
-                <TabButton id="CORRESPONDENCE" label="1. Correspondencia" />
-                <TabButton id="TITULAR" label="2. Información Titular" />
-                <TabButton id="ASSIGNMENT" label="3. Asignación y Misión" />
+                {!isExistingCaseAssociation && <TabButton id="CORRESPONDENCE" label="1. Correspondencia" />}
+                <TabButton id="TITULAR" label={`${isExistingCaseAssociation ? '1' : '2'}. Información Titular`} />
+                <TabButton id="ASSIGNMENT" label={`${isExistingCaseAssociation ? '2' : '3'}. Asignación y Misión`} />
             </div>
 
             <form onSubmit={handleSave} className="p-6 md:p-8 min-h-[400px]">
-               {activeTab === 'CORRESPONDENCE' && (
+               {activeTab === 'CORRESPONDENCE' && !isExistingCaseAssociation && (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                     <InputField label="Número de Radicado" value={formData?.radicado} disabled className="bg-slate-50 text-slate-500" />
                     <InputField label="Fecha de Radicado" value={formData?.radicationDate} disabled className="bg-slate-50 text-slate-500" />
@@ -424,6 +438,12 @@ const ProtectionCasesPage: React.FC = () => {
 
                {activeTab === 'TITULAR' && (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                    {isExistingCaseAssociation && (
+                        <div className="md:col-span-2 bg-amber-50 p-4 rounded-lg border border-amber-100 flex items-center gap-3 mb-4">
+                            <svg className="text-amber-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <p className="text-amber-800 text-sm font-bold uppercase tracking-tight">Solicitud vinculada al Caso: {formData?.caseId}</p>
+                        </div>
+                    )}
                     <SelectField label="Tipo de Documento" required options={DOC_TYPES} value={formData?.docType} onChange={e => updateField('docType', e.target.value)} />
                     <InputField label="Número de Documento" required value={formData?.docNumber} onChange={e => updateField('docNumber', e.target.value)} />
                     <InputField label="Primer Nombre del Titular" required value={formData?.firstName} onChange={e => updateField('firstName', e.target.value)} />

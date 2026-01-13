@@ -175,7 +175,9 @@ export interface TechnicalInterviewForm {
   proceduralIntervention: string;
   threatsReceived: string;
   hasConvictions: 'SI' | 'NO' | '';
+  hasConvictionsDetails: string;
   isSubstituteBeneficiary: 'SI' | 'NO' | '';
+  isSubstituteBeneficiaryDetails: string;
   previouslyEvaluated: 'SI' | 'NO' | '';
   previouslyEvaluatedWhich: string;
   hasCurrentMeasures: 'SI' | 'NO' | '';

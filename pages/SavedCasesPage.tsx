@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { 
   MOCK_SAVED_CASES, 
@@ -59,6 +60,8 @@ const SavedCasesPage: React.FC = () => {
   
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
+
+  const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
 
   const filteredCases = useMemo(() => {
     if (!searchTerm.trim()) return allSavedCases;
@@ -409,7 +412,6 @@ const SavedCasesPage: React.FC = () => {
                            </thead>
                            <tbody className="bg-white divide-y divide-slate-50">
                               {relatedMissions.map(m => (
-                                 /* Fixed syntax error key(m.id) to key={m.id} */
                                  <tr key={m.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-8 py-5 font-mono font-bold text-indigo-600">{m.missionNo}</td>
                                     <td className="px-8 py-5 font-black text-slate-800 uppercase tracking-tight text-xs">{m.type}</td>
@@ -451,8 +453,8 @@ const SavedCasesPage: React.FC = () => {
            <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] overflow-y-auto print:max-h-none print:shadow-none print:rounded-none">
               <div className="bg-slate-100 p-4 flex justify-between items-center border-b border-slate-200 print:hidden sticky top-0 z-20">
                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-600 text-white rounded-lg"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-                    <h3 className="text-sm font-black uppercase tracking-tight text-slate-700">VISTA PREVIA DE MISIÓN</h3>
+                    <img src={LOGO_URL} alt="FGN Header" className="h-10" />
+                    <h3 className="text-sm font-black uppercase tracking-tight text-slate-700">SIDPA 3.0 - VISTA PREVIA</h3>
                  </div>
                  <div className="flex items-center gap-3">
                     <button onClick={() => window.print()} className="px-6 py-2 bg-white border border-slate-300 text-slate-700 font-bold rounded-lg text-[10px] uppercase hover:bg-slate-50 transition-all flex items-center gap-2"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6v-8z"/></svg>Imprimir Documento</button>
@@ -461,7 +463,7 @@ const SavedCasesPage: React.FC = () => {
               </div>
               <div className="p-10 font-sans text-slate-900 bg-white print:p-0">
                   <div className="border border-slate-900 grid grid-cols-[1fr,2fr,1.2fr] mb-10">
-                      <div className="border-r border-slate-900 p-4 flex items-center justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-14" /></div>
+                      <div className="border-r border-slate-900 p-4 flex items-center justify-center"><img src={LOGO_URL} alt="FGN" className="h-16 w-auto" /></div>
                       <div className="border-r border-slate-900 flex flex-col text-center divide-y divide-slate-900"><div className="p-2 text-[10px] font-bold uppercase flex-1 flex items-center justify-center">SUBPROCESO PROTECCIÓN Y ASISTENCIA</div><div className="p-2 text-sm font-black uppercase flex-1 flex items-center justify-center">MISIÓN DE TRABAJO</div></div>
                       <div className="p-0 text-[8px] font-bold uppercase divide-y divide-slate-900"><div className="p-2">CÓDIGO: FGN-MS01-F-03</div><div className="p-2">VERSIÓN: 01</div><div className="p-2 text-right tracking-tighter">PÁGINA 1 DE 1</div></div>
                   </div>
@@ -480,10 +482,10 @@ const SavedCasesPage: React.FC = () => {
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold leading-tight">TIPO DE DOCUMENTO DE<br/>IDENTIDAD:</span><span className="uppercase">{associatedCase.docType}</span></div>
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold uppercase leading-tight">DOCUMENTO DE IDENTIDAD No.:</span><span className="font-bold">{associatedCase.docNumber}</span></div>
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold">UNIDAD ASIGNADA:</span><span className="uppercase">{selectedMission.assignedArea}</span></div>
-                      <div className="mt-8 pt-6 border-t border-slate-200"><span className="font-bold uppercase mb-4 block underline">INSTRUCCIONES:</span><ol className="list-decimal pl-6 space-y-2 uppercase text-[11px] font-medium leading-tight"><li>ENTREVISTAR AL CANDIDATO Y A LOS ADULTOS INTEGRANTES DE SU NÚCLEO FAMILIAR, SOLICITARLES ANTECEDENTES.</li><li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL DE CONOCIMIENTO.</li><li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li><li>RENDIR INFORME EVALUACIÓN TÉCN_ICA DE AMENAZA Y RIESGO.</li></ol><div className="mt-4 pl-6 uppercase text-[11px] font-medium">1. RENDIR INFORME EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO.</div></div>
+                      <div className="mt-8 pt-6 border-t border-slate-200"><span className="font-bold uppercase mb-4 block underline">INSTRUCCIONES:</span><ol className="list-decimal pl-6 space-y-2 uppercase text-[11px] font-medium leading-tight"><li>ENTREVISTAR AL CANDIDATO Y A LOS ADULTOS INTEGRANTES DE SU NÚCLEO FAMILIAR, SOLICITARLES ANTECEDENTES.</li><li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL DE CONOCIMIENTO.</li><li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li><li>RENDIR INFORME EVALUACIÓN TÉCN_ICA DE AMENAZA Y RIESGO.</li></ol></div>
                       <div className="mt-8 pt-4"><span className="font-bold uppercase block mb-2">OBSERVACIONES:</span><div className="p-4 border border-slate-300 min-h-[100px] text-justify leading-relaxed whitespace-pre-wrap uppercase">{associatedCase.observations || "SIN OBSERVACIONES REGISTRADAS."}</div></div>
                       <div className="mt-8 pt-8"><span className="font-black text-sm uppercase">LOS TÉRMINOS VENCEN: {selectedMission.dueDate}</span></div>
-                      <div className="mt-24 pt-10 border-t border-slate-900 max-w-sm mx-auto text-center"><span className="font-bold uppercase text-[10px] block">FIRMA FUNCIONARIO ASIGNADO</span><div className="mt-4 flex flex-col items-center gap-1 text-[9px] font-semibold text-slate-500 uppercase"><span>Fecha de Asignación: {selectedMission.creationDate}</span><span>Generó: {selectedMission.assignedOfficial || "SGP SISTEMA CENTRAL"}</span></div></div>
+                      <div className="mt-24 pt-10 border-t border-slate-900 max-w-sm mx-auto text-center"><span className="font-bold uppercase text-[10px] block">FIRMA FUNCIONARIO ASIGNADO</span><div className="mt-4 flex flex-col items-center gap-1 text-[9px] font-semibold text-slate-500 uppercase"><span>Fecha de Asignación: {selectedMission.creationDate}</span><span>Generó: {selectedMission.assignedOfficial || "SIDPA 3.0 SISTEMA CENTRAL"}</span></div></div>
                       <div className="mt-20 border border-slate-900 grid grid-cols-[3fr,1fr,1fr] text-[8px] font-bold text-center divide-x divide-slate-900 print:mt-10"><div className="p-2 uppercase">Documento no normalizado en el Sistema de Gestión Integral</div><div className="p-2">Versión 01</div><div className="p-2">2023-02-01</div></div>
                   </div>
               </div>

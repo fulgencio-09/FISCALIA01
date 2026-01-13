@@ -124,7 +124,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
             {/* Header Oficial FGN */}
             <div className="p-8 border-b-2 border-slate-900 flex justify-between items-center bg-slate-50/50">
                 <div className="flex items-center gap-6">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-14" />
+                    <img src="https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg" alt="FGN" className="h-14" />
                     <div>
                         <h2 className="text-sm font-black uppercase tracking-tight">Fiscalía General de la Nación</h2>
                         <p className="text-[9px] font-bold text-slate-400 uppercase">Dirección de Protección y Asistencia</p>

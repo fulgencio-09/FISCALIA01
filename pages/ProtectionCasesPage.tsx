@@ -39,6 +39,8 @@ const ProtectionCasesPage: React.FC = () => {
     request: ProtectionRequestSummary | null;
   }>({ show: false, caseId: '', request: null });
 
+  const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
+
   const initialFormState: ProtectionCaseForm = {
     radicado: '',
     radicationDate: '',
@@ -223,7 +225,7 @@ const ProtectionCasesPage: React.FC = () => {
               <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
                   <div className="p-6 bg-amber-50 border-b border-amber-100 flex items-center gap-4">
                       <div className="p-3 bg-amber-100 rounded-full text-amber-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" cy="12" r="0"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                       </div>
                       <h3 className="text-lg font-bold text-amber-900">Validación de Solicitante</h3>
                   </div>
@@ -473,10 +475,10 @@ const ProtectionCasesPage: React.FC = () => {
         /* SUMMARY VIEW (OFFICIAL FGN / SIDPA FORMAT) */
         <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500 print:max-w-none print:p-0">
             <div className="bg-white p-10 shadow-2xl border border-slate-200 print:shadow-none print:border-none print:p-0 font-sans text-slate-900">
-                {/* Header Oficial 3 Columnas */}
+                {/* Header Oficial 3 Columnas con Logo Real */}
                 <div className="border border-slate-900 grid grid-cols-[1fr,2fr,1.2fr] mb-10 print:mb-8">
                     <div className="border-r border-slate-900 p-4 flex items-center justify-center bg-white">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-14" />
+                        <img src={LOGO_URL} alt="Logo FGN" className="h-20 w-auto" />
                     </div>
                     <div className="border-r border-slate-900 flex flex-col text-center divide-y divide-slate-900">
                         <div className="p-2 text-[10px] font-bold uppercase flex-1 flex items-center justify-center">SUBPROCESO PROTECCIÓN Y ASISTENCIA</div>

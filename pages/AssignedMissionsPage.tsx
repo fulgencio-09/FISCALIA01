@@ -106,7 +106,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
             {/* Header Oficial SIDPA */}
             <div className="border border-slate-900 grid grid-cols-[1fr,2fr,1.2fr] mb-10">
                 <div className="border-r border-slate-900 p-4 flex items-center justify-center bg-white">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-14" />
+                    <img src="https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg" alt="FGN" className="h-14" />
                 </div>
                 <div className="border-r border-slate-900 flex flex-col text-center divide-y divide-slate-900">
                     <div className="p-2 text-[10px] font-bold uppercase flex-1 flex items-center justify-center">SUBPROCESO PROTECCIÓN Y ASISTENCIA</div>

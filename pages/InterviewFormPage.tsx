@@ -48,6 +48,9 @@ const ENFOQUES_GENERO = [
 const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel, onSaveSuccess }) => {
     const [currentStep, setCurrentStep] = useState(0);
 
+    // URL del Logo Institucional
+    const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
+
     // Función para calcular la edad exacta
     const calculateAge = (birthDateString: string): string => {
         if (!birthDateString) return '';
@@ -372,19 +375,27 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-10 animate-in fade-in duration-500">
 
-            {/* Header Simplificado */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg mb-8 border border-slate-100 flex flex-col md:flex-row items-center gap-6 print:shadow-none print:border-slate-300">
-                <div className="flex-shrink-0">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png" alt="FGN" className="h-16 md:h-20" />
+            {/* Header Oficial SIDPA con Logo FGN */}
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl mb-10 border border-slate-100 flex flex-col md:flex-row items-center gap-10 print:shadow-none print:border-slate-300 print:rounded-none">
+                <div className="flex-shrink-0 bg-slate-50 p-4 rounded-3xl border border-slate-200 shadow-inner">
+                    <img src={LOGO_URL} alt="Fiscalía General de la Nación" className="h-20 md:h-24 drop-shadow-md" />
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-sm md:text-lg font-black uppercase text-slate-900 leading-tight">
-                        ENTREVISTA PARA LA EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO A TESTIGOS, VICTIMAS E INTERVINIENTES EN EL PROCESO PENAL
+                    <div className="mb-2">
+                        <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Fiscalía General de la Nación</span>
+                    </div>
+                    <h1 className="text-xl md:text-2xl font-black uppercase text-slate-900 leading-none tracking-tighter">
+                        Entrevista Técnica de Amenaza y Riesgo
                     </h1>
-                    <div className="mt-2 flex flex-wrap justify-center md:justify-start gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        <span>Página {currentStep + 1} de 8</span>
+                    <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest border-t border-slate-100 pt-4">
+                        <div className="flex items-center gap-2">
+                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                             <span>SISTEMA SIDPA 3.0</span>
+                        </div>
                         <span className="hidden md:inline">•</span>
-                        <span>Evaluador: {formData.assignedEvaluator}</span>
+                        <span>PÁGINA {currentStep + 1} / 8</span>
+                        <span className="hidden md:inline">•</span>
+                        <span className="text-slate-600">EVALUADOR: {formData.assignedEvaluator}</span>
                     </div>
                 </div>
             </div>
@@ -402,7 +413,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                 ))}
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); onSaveSuccess("Entrevista guardada exitosamente."); }} className="bg-white rounded-3xl shadow-2xl p-8 md:p-14 mb-20 border border-slate-100 print:border-none print:shadow-none">
+            <form onSubmit={(e) => { e.preventDefault(); onSaveSuccess("Entrevista guardada exitosamente."); }} className="bg-white rounded-[3rem] shadow-2xl p-8 md:p-14 mb-20 border border-slate-100 print:border-none print:shadow-none">
 
                 {/* PASO 1: DATOS GENERALES Y CONTROL */}
                 {currentStep === 0 && (
@@ -899,7 +910,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 7. Intervención Procesal e Identificación de Amenaza</h3>
                             <TextAreaField label="Calidad procesal, intervención, radicados, despachos y fechas de intervenciones." value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} className="h-40 mb-8" />
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 pb-2 mb-8">Amenazas recibidas y riesgos identificados</h3>
-                            <TextAreaField label="Hechos constitutivos de amenaza o riesgo. Circunstancias de tiempo, modo y lugar; tipo de amenaza; identificación del actor y motivación." value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} className="h-40" />
+                            <TextAreaField label="Hechos constitutivos de amenaza oriesgo. Circunstancias de tiempo, modo y lugar; tipo de amenaza; identificación del actor y motivación." value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} className="h-40" />
                         </section>
 
                         <section className="space-y-10">

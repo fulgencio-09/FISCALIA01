@@ -26,6 +26,8 @@ const App: React.FC = () => {
   const [allMissions, setAllMissions] = useState<ProtectionMission[]>(MOCK_MISSIONS);
   const [globalToast, setGlobalToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
 
+  const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
+
   useEffect(() => {
     if (globalToast.show) {
       const timer = setTimeout(() => {
@@ -94,10 +96,13 @@ const App: React.FC = () => {
       )}
 
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto print:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="h-16 flex items-center px-6 border-b border-slate-200">
-           <div className="flex items-center gap-2 text-blue-700 font-bold text-xl">
-             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-             <span className="tracking-tighter">SGP DIGITAL</span>
+        <div className="h-24 flex items-center px-6 border-b border-slate-200 bg-slate-50/50">
+           <div className="flex items-center gap-4">
+             <img src={LOGO_URL} alt="Logo FGN" className="h-12 w-auto drop-shadow-sm" />
+             <div className="flex flex-col">
+                <span className="text-blue-900 font-black text-xl leading-none tracking-tighter">SIDPA</span>
+                <span className="text-slate-400 font-bold text-[10px] tracking-[0.2em] uppercase mt-0.5">Versión 3.0</span>
+             </div>
            </div>
         </div>
 
@@ -156,39 +161,43 @@ const App: React.FC = () => {
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 print:hidden">
-          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 rounded-md hover:bg-slate-100 lg:hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          </button>
-          <div className="flex-1 px-4">
-             <div className="hidden lg:flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
-                <span>Fiscalía General de la Nación</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                <span className="text-slate-600">Sistema de Gestión de Protección</span>
-             </div>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 rounded-md hover:bg-slate-100 lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div className="hidden lg:flex items-center gap-4">
+                <img src={LOGO_URL} alt="FGN Header" className="h-8" />
+                <div className="h-6 w-px bg-slate-200"></div>
+                <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                    <span>Fiscalía General de la Nación</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    <span className="text-blue-600">SIDPA 3.0</span>
+                </div>
+            </div>
           </div>
           <div className="flex items-center gap-6">
-             <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 shadow-inner">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Acceso:</label>
+             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Perfil de Acceso:</label>
                 <select 
                     value={userRole}
                     onChange={(e) => {
                         setUserRole(e.target.value as UserRole);
                         setCurrentPage('home');
                     }}
-                    className="bg-transparent text-xs font-black text-slate-700 outline-none cursor-pointer uppercase"
+                    className="bg-transparent text-[11px] font-black text-slate-700 outline-none cursor-pointer uppercase"
                 >
-                    <option value="FISCAL">Fiscal</option>
-                    <option value="GESTOR">Gestor Documental</option>
-                    <option value="LIDER">Líder</option>
+                    <option value="FISCAL">Fiscalía</option>
+                    <option value="GESTOR">Gestión Documental</option>
+                    <option value="LIDER">Liderazgo Evaluación</option>
                 </select>
              </div>
              <div className="flex items-center gap-4 border-l border-slate-200 pl-6">
                  <div className="text-right hidden md:block">
-                   <div className="text-xs font-black text-slate-800 uppercase tracking-tight">{userRole === 'FISCAL' ? 'Fiscalía General' : userRole === 'GESTOR' ? 'Oficina de Correspondencia' : 'Coordinación Evaluación'}</div>
-                   <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{userRole === 'FISCAL' ? 'Unidad de Vida' : userRole === 'GESTOR' ? 'Área de Radicación' : 'Protección a Personas'}</div>
+                   <div className="text-xs font-black text-slate-800 uppercase tracking-tight">{userRole === 'FISCAL' ? 'Unidad de Conocimiento' : userRole === 'GESTOR' ? 'Oficina de Radicación' : 'Coordinación Nacional'}</div>
+                   <div className="text-[9px] text-blue-600 font-black uppercase tracking-widest">{userRole === 'FISCAL' ? 'Protección' : userRole === 'GESTOR' ? 'Correspondencia' : 'Evaluación Técnica'}</div>
                  </div>
-                 <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-black text-white shadow-lg ${userRole === 'FISCAL' ? 'bg-blue-600' : userRole === 'GESTOR' ? 'bg-slate-800' : 'bg-indigo-600'}`}>
-                   {userRole === 'FISCAL' ? 'FA' : userRole === 'GESTOR' ? 'GD' : 'LE'}
+                 <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-black text-white shadow-md ${userRole === 'FISCAL' ? 'bg-blue-600' : userRole === 'GESTOR' ? 'bg-slate-800' : 'bg-indigo-600'}`}>
+                   {userRole === 'FISCAL' ? 'F' : userRole === 'GESTOR' ? 'GD' : 'L'}
                  </div>
              </div>
           </div>
@@ -197,20 +206,33 @@ const App: React.FC = () => {
         <div className="flex-1 overflow-auto bg-slate-50">
           {currentPage === 'home' && (
              <div className="p-8 flex flex-col items-center justify-center h-full text-center">
-                <div className="bg-white p-12 rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 max-w-xl animate-in zoom-in-95 duration-500">
-                  <div className={`h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg ${userRole === 'FISCAL' ? 'bg-blue-50 text-blue-600' : userRole === 'GESTOR' ? 'bg-slate-100 text-slate-800' : 'bg-indigo-50 text-indigo-600'}`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div className="bg-white p-12 rounded-[2.5rem] shadow-2xl shadow-slate-200 border border-slate-100 max-w-2xl animate-in zoom-in-95 duration-500">
+                  <div className={`h-32 w-32 rounded-[2rem] flex items-center justify-center mx-auto mb-10 shadow-xl border-4 border-white ${userRole === 'FISCAL' ? 'bg-blue-50' : userRole === 'GESTOR' ? 'bg-slate-50' : 'bg-indigo-50'}`}>
+                    <img src={LOGO_URL} alt="Logo" className="h-20 drop-shadow-md" />
                   </div>
-                  <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Sistema de Protección</h2>
-                  <p className="text-slate-500 mb-10 leading-relaxed font-medium">Plataforma centralizada para la gestión de solicitudes, radicación y expedición de misiones de protección.</p>
-                  <div className="grid grid-cols-1 gap-4">
-                    {userRole === 'FISCAL' && (
-                        <button onClick={() => setCurrentPage('form')} className="w-full bg-blue-600 text-white px-8 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95">Iniciar Solicitud de Medida</button>
+                  <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter uppercase">SIDPA 3.0</h2>
+                  <p className="text-slate-500 mb-12 leading-relaxed font-medium text-lg">Sistema Institucional de la Fiscalía General de la Nación para la Gestión Digital de Medidas de Protección y Asistencia.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {userRole === 'FISCAL' ? (
+                        <button onClick={() => setCurrentPage('form')} className="bg-blue-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                           Nueva Solicitud
+                        </button>
+                    ) : userRole === 'LIDER' ? (
+                        <button onClick={() => setCurrentPage('missions')} className="bg-indigo-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                           Gestionar Misiones
+                        </button>
+                    ) : (
+                        <button onClick={() => setCurrentPage('cases')} className="bg-slate-800 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+                           Apertura de Casos
+                        </button>
                     )}
-                    {userRole === 'LIDER' && (
-                        <button onClick={() => setCurrentPage('missions')} className="w-full bg-indigo-600 text-white px-8 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-lg active:scale-95">Gestionar Misiones Pendientes</button>
-                    )}
-                    <button onClick={() => setCurrentPage('list')} className="w-full bg-white border-2 border-slate-100 text-slate-700 px-8 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 hover:border-slate-200 transition-all active:scale-95 shadow-sm">{userRole === 'FISCAL' ? 'Bandeja de Solicitud' : 'Consultar Solicitudes'}</button>
+                    <button onClick={() => setCurrentPage('list')} className="bg-white border-2 border-slate-100 text-slate-700 px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm flex items-center justify-center gap-3">
+                       <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                       {userRole === 'FISCAL' ? 'Mis Solicitudes' : 'Consultar Base'}
+                    </button>
                   </div>
                 </div>
              </div>

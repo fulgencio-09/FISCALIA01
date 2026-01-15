@@ -186,9 +186,9 @@ const App: React.FC = () => {
                     }}
                     className="bg-transparent text-[11px] font-black text-slate-700 outline-none cursor-pointer uppercase"
                 >
-                    <option value="FISCAL">Fiscalía</option>
-                    <option value="GESTOR">Gestión Documental</option>
-                    <option value="LIDER">Liderazgo Evaluación</option>
+                    <option value="FISCAL">Fiscal</option>
+                    <option value="GESTOR">Gestor Documental</option>
+                    <option value="LIDER">Lider</option>
                 </select>
              </div>
              <div className="flex items-center gap-4 border-l border-slate-200 pl-6">

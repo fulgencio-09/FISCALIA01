@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ProtectionMission, TechnicalInterviewForm, FamilyMember, Pet } from '../types';
 import { InputField, SelectField, TextAreaField } from '../components/FormComponents';
-import { COLOMBIA_GEO, MOCK_FULL_REQUESTS, MOCK_SAVED_CASES, REGIONAL_UNITS, DOC_TYPES } from '../constants';
+import { COLOMBIA_GEO, MOCK_FULL_REQUESTS, MOCK_SAVED_CASES, REGIONAL_UNITS, DOC_TYPES, PROFESSIONS } from '../constants';
 
 interface InterviewFormPageProps {
     mission?: ProtectionMission;
@@ -49,7 +49,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
     const [currentStep, setCurrentStep] = useState(0);
 
     // URL del Logo Institucional
-    const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
+    const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png";
 
     // Función para calcular la edad exacta
     const calculateAge = (birthDateString: string): string => {
@@ -487,8 +487,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                 <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
                                 Datos Complementarios (Candidatos A PROTECCIÓN)
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                                <InputField label="Lugar Nacimiento" value={formData.birthPlace} onChange={e => updateField('birthPlace', e.target.value)} />
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">                              
                                 <SelectField
                                     label="Depto Nacimiento"
                                     options={departments}
@@ -579,7 +578,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                                 <SelectField label="Nivel Educativo" options={['Primaria', 'Secundaria', 'Técnico', 'Profesional', 'Postgrado']} value={formData.educationLevel} onChange={e => updateField('educationLevel', e.target.value)} />
                                 <InputField label="Ocupación" value={formData.occupation} onChange={e => updateField('occupation', e.target.value)} />
-                                <InputField label="Profesión" value={formData.profession} onChange={e => updateField('profession', e.target.value)} />
+                                <SelectField label="Profesión" options={PROFESSIONS} value={formData.profession} onChange={e => updateField('profession', e.target.value)} />
                                 <InputField label="Ingresos Mensuales" value={formData.monthlyIncome} onChange={e => updateField('monthlyIncome', e.target.value)} />
                             </div>
                             <TextAreaField label="Observaciones Caracterización" value={formData.observationsGeneral} onChange={e => updateField('observationsGeneral', e.target.value)} className="h-32" />

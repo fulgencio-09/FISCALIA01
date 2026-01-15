@@ -1,6 +1,20 @@
 
 import React, { useState, useMemo } from 'react';
-import { MOCK_REQUESTS, REGIONAL_UNITS, ENTITIES, CANDIDATE_CLASSIFICATIONS, DEPARTMENTS, CITIES, DOC_TYPES, SUBJECTS, AREAS, MISSION_TYPES, ORIGINS } from '../constants';
+import { 
+  MOCK_REQUESTS, 
+  REGIONAL_UNITS, 
+  ENTITIES, 
+  CANDIDATE_CLASSIFICATIONS, 
+  DEPARTMENTS, 
+  CITIES, 
+  DOC_TYPES, 
+  SUBJECTS, 
+  AREAS, 
+  MISSION_TYPES, 
+  ORIGINS,
+  APPLICANT_ROLES_NEW,
+  APPLICANT_ROLES_EXISTING
+} from '../constants';
 import { ProtectionCaseForm, ProtectionRequestSummary } from '../types';
 import { InputField, SelectField, TextAreaField, FileUpload } from '../components/FormComponents';
 
@@ -39,7 +53,7 @@ const ProtectionCasesPage: React.FC = () => {
     request: ProtectionRequestSummary | null;
   }>({ show: false, caseId: '', request: null });
 
-  const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
+  const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png";
 
   const initialFormState: ProtectionCaseForm = {
     radicado: '',
@@ -57,6 +71,7 @@ const ProtectionCasesPage: React.FC = () => {
     secondName: '',
     firstSurname: '',
     secondSurname: '',
+    applicantRole: '',
     assignedArea: '',
     missionStartDate: new Date().toISOString().split('T')[0],
     missionType: '',
@@ -80,24 +95,19 @@ const ProtectionCasesPage: React.FC = () => {
     });
   }, [radicatedRequests, searchTerm, searchCriteria]);
 
+  // Handle Create Case action
   const handleCreateCase = (item: ProtectionRequestSummary, isExisting: boolean = false) => {
-    const nameParts = item.fullName.split(' ');
-    const firstName = nameParts[0] || '';
-    const secondName = nameParts.length > 3 ? nameParts[1] : (nameParts.length === 3 ? nameParts[1] : '');
-    const firstSurname = nameParts.length > 2 ? nameParts[nameParts.length - 2] : (nameParts.length === 2 ? nameParts[1] : '');
-    const secondSurname = nameParts.length > 2 ? nameParts[nameParts.length - 1] : '';
-
     setFormData({
         ...initialFormState,
         radicado: item.radicado,
         radicationDate: item.radicationDate?.split(' ')[0] || '',
         docType: item.docType,
         docNumber: item.docNumber,
-        firstName,
-        secondName,
-        firstSurname,
-        secondSurname,
-        // Si es existente, se asume que el ID ya viene del modal o de la búsqueda
+        firstName: item.firstName,
+        secondName: item.secondName,
+        firstSurname: item.firstSurname,
+        secondSurname: item.secondSurname,
+        applicantRole: isExisting ? '' : 'TITULAR', // Default for new cases
         caseId: isExisting ? (MOCK_EXISTING_CASES[item.docNumber] || '') : ''
     });
 
@@ -106,6 +116,7 @@ const ProtectionCasesPage: React.FC = () => {
     setView('CREATE');
   };
 
+  // Validate if a solicitant already has an existing case
   const handleValidateSolicitant = (item: ProtectionRequestSummary) => {
     const existingCaseId = MOCK_EXISTING_CASES[item.docNumber];
     
@@ -122,10 +133,11 @@ const ProtectionCasesPage: React.FC = () => {
         });
     } else {
         setValidatedRequestIds(prev => new Set(prev).add(item.id));
+        const fullName = `${item.firstName} ${item.secondName || ''} ${item.firstSurname} ${item.secondSurname || ''}`.trim().replace(/\s+/g, ' ');
         setToast({
             show: true,
             type: 'success',
-            message: `Verificación Exitosa: No se encontraron casos previos para ${item.fullName}. El botón "Crear Caso" ha sido habilitado.`
+            message: `Verificación Exitosa: No se encontraron casos previos para ${fullName}. El botón "Crear Caso" ha sido habilitado.`
         });
         setTimeout(() => setToast(prev => ({ ...prev, show: false })), 5000);
     }
@@ -319,6 +331,7 @@ const ProtectionCasesPage: React.FC = () => {
                     {filteredRequests.length > 0 ? (
                         filteredRequests.map((item) => {
                             const isValidated = validatedRequestIds.has(item.id);
+                            const fullName = `${item.firstName} ${item.secondName || ''} ${item.firstSurname} ${item.secondSurname || ''}`.trim().replace(/\s+/g, ' ');
 
                             return (
                                 <tr key={item.id} className="bg-white border-b border-slate-100 hover:bg-slate-50 transition-colors group">
@@ -326,7 +339,7 @@ const ProtectionCasesPage: React.FC = () => {
                                     <td className="px-6 py-4 font-mono">{item.docNumber}</td>
                                     <td className="px-6 py-4 font-semibold text-slate-900">
                                         <div className="flex items-center gap-2">
-                                            {item.fullName}
+                                            {fullName}
                                             {isValidated && (
                                                 <div className="flex items-center gap-1 bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px] font-black uppercase border border-green-200 animate-in zoom-in">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -446,6 +459,18 @@ const ProtectionCasesPage: React.FC = () => {
                             <p className="text-amber-800 text-sm font-bold uppercase tracking-tight">Solicitud vinculada al Caso: {formData?.caseId}</p>
                         </div>
                     )}
+                    
+                    {/* NUEVO CAMPO: Calidad del Solicitante */}
+                    <div className="md:col-span-2">
+                        <SelectField 
+                            label="Calidad del Solicitante" 
+                            required 
+                            options={isExistingCaseAssociation ? APPLICANT_ROLES_EXISTING : APPLICANT_ROLES_NEW} 
+                            value={formData?.applicantRole} 
+                            onChange={e => updateField('applicantRole', e.target.value)} 
+                        />
+                    </div>
+
                     <SelectField label="Tipo de Documento" required options={DOC_TYPES} value={formData?.docType} onChange={e => updateField('docType', e.target.value)} />
                     <InputField label="Número de Documento" required value={formData?.docNumber} onChange={e => updateField('docNumber', e.target.value)} />
                     <InputField label="Primer Nombre del Titular" required value={formData?.firstName} onChange={e => updateField('firstName', e.target.value)} />
@@ -511,6 +536,10 @@ const ProtectionCasesPage: React.FC = () => {
                     <div className="grid grid-cols-[200px,1fr] gap-x-4">
                         <span className="font-bold">CASO NÚMERO:</span>
                         <span>{formData?.caseId || "EN TRÁMITE"}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">CALIDAD SOLICITANTE:</span>
+                        <span className="uppercase font-bold text-blue-700">{formData?.applicantRole}</span>
                     </div>
                     <div className="grid grid-cols-[200px,1fr] gap-x-4">
                         <span className="font-bold">ASIGNADO A:</span>

@@ -248,7 +248,7 @@ const SavedCasesPage: React.FC = () => {
 
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Expedientes en Custodia</h1>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Casos Existentes</h1>
           <p className="text-slate-500 text-sm font-medium">Administración de expedientes digitalizados y gestión de misiones oficiales.</p>
         </div>
         <div className="relative max-w-sm w-full">
@@ -270,6 +270,7 @@ const SavedCasesPage: React.FC = () => {
               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Radicado</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">No. Caso</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Titular</th>
+              <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Calidad Solicitante</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Unidad</th>
               <th className="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Acciones de Gestión</th>
             </tr>
@@ -282,6 +283,19 @@ const SavedCasesPage: React.FC = () => {
                 <td className="px-6 py-5">
                   <div className="font-bold text-slate-900 uppercase">{c.firstName} {c.firstSurname}</div>
                   <div className="text-[10px] text-slate-400 font-bold">{c.docType}: {c.docNumber}</div>
+                </td>
+                <td className="px-6 py-5">
+                   <div className="flex flex-col gap-1">
+                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tight border self-start ${c.applicantRole === 'FAMILIAR' ? 'bg-purple-100 text-purple-800 border-purple-200' : 'bg-blue-100 text-blue-800 border-blue-200'}`}>
+                        {c.applicantRole || 'TITULAR'}
+                      </span>
+                      {c.linkedCaseId && (
+                        <div className="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase italic">
+                           <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                           Vinculado a: {c.linkedCaseId}
+                        </div>
+                      )}
+                   </div>
                 </td>
                 <td className="px-6 py-5">
                    <span className="text-[11px] font-black text-slate-600 uppercase tracking-tight">{c.destinationUnit}</span>

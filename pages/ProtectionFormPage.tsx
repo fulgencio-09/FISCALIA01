@@ -37,7 +37,10 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
     city: '',
     requestDate: new Date().toISOString().split('T')[0],
     nunc: '',
-    petitionerName: '',
+    firstName: '',
+    secondName: '',
+    firstSurname: '',
+    secondSurname: '',
     petitionerDocType: '',
     petitionerDocNumber: '',
     petitionerExpeditionPlace: '',
@@ -90,7 +93,6 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
 
   // Automatic Search Effect (Debounced)
   useEffect(() => {
-    // Allows search even in readOnly mode so the Involved Persons list populates
     if (!formData.nunc) {
         setAvailablePersons([]);
         setSpoaSuccess(false);
@@ -98,20 +100,17 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
         return;
     }
 
-    // Debounce: Esperar 600ms después de que el usuario deje de escribir
     const timeoutId = setTimeout(() => {
         setSpoaLoading(true);
         setSpoaSuccess(false);
         setAvailablePersons([]);
         
-        // Simular búsqueda en la base de datos
         const foundPersons = SPOA_SEARCH_DB[formData.nunc];
         
         if (foundPersons && foundPersons.length > 0) {
             setAvailablePersons(foundPersons);
             setSpoaSuccess(true);
             
-            // Auto-select person if loading an existing record (based on DocNumber)
             if (formData.petitionerDocNumber) {
                 const match = foundPersons.find(p => p.data.petitionerDocNumber === formData.petitionerDocNumber);
                 if (match) {
@@ -123,7 +122,7 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
             setSelectedPerson('');
         }
         setSpoaLoading(false);
-    }, 600); // 600ms delay
+    }, 600);
 
     return () => clearTimeout(timeoutId);
   }, [formData.nunc, formData.petitionerDocNumber]);
@@ -145,7 +144,6 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
     }
   };
 
-  // 2. Person Selection Logic with Auto-fill for requested fields
   const handlePersonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedLabel = e.target.value;
     setSelectedPerson(selectedLabel);
@@ -161,7 +159,6 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
     if (selectedLabel) {
       const personData = availablePersons.find(p => p.label === selectedLabel);
       if (personData) {
-        // Auto-llenar campos biográficos, procesales y de funcionarios (incluyendo teléfonos y correos)
         setFormData(prev => ({
           ...prev,
           ...personData.data
@@ -206,7 +203,6 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
     setIsAnalyzing(false);
   };
 
-  // Validation Logic per Step
   const validateStep = (step: number): boolean => {
     if (readOnly) return true;
 
@@ -214,9 +210,9 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
     let fieldsToValidate: (keyof ProtectionRequestForm)[] = [];
 
     switch (step) {
-      case 0: // General & Petitioner
+      case 0:
         fieldsToValidate = [
-          'city', 'nunc', 'petitionerName', 'petitionerDocType', 'petitionerDocNumber',
+          'city', 'nunc', 'firstName', 'firstSurname', 'petitionerDocType', 'petitionerDocNumber',
           'petitionerExpeditionPlace', 'petitionerExpeditionDate', 'residenceAddress',
           'locationAddress', 'email', 'mobile', 'civilStatus', 'personQuality'
         ];
@@ -225,25 +221,24 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
              newErrors['involvedPerson'] = 'Debe seleccionar una persona involucrada de la lista.';
         }
         break;
-      case 1: // Procedural
+      case 1:
         fieldsToValidate = [
           'investigatedFacts', 'legalSystem', 'investigatedCrimes', 'investigationStage',
           'proceduralMeasures', 'riskReview'
         ];
         break;
-      case 2: // Fiscal
+      case 2:
         fieldsToValidate = [
           'fiscalName', 'fiscalRole', 'fiscalUnit', 'fiscalCorrespondenceAddress',
           'fiscalCell', 'fiscalInstitutionalEmail'
         ];
         break;
-      case 3: // Police
+      case 3:
         fieldsToValidate = [
           'policeName', 'policeEntity', 'policeCell'
         ];
         break;
-      case 4: // Attachments
-        // Section 6 is no longer required as per user request
+      case 4:
         break;
     }
 
@@ -311,15 +306,8 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
-  // FORM VIEW
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-8">
-      
-      {/* Header */}
       <div className="mb-6 flex justify-between items-start">
         <div>
             <h1 className="text-2xl font-bold text-slate-900">
@@ -343,10 +331,7 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
       </div>
       
       <form onSubmit={handleSubmit}>
-        
-        {/* Datos Generales */}
         <FormSection title="Datos Generales">
-          
           {formData.radicado && (
              <>
                <InputField 
@@ -420,10 +405,8 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
                 />
              </div>
           )}
-
         </FormSection>
 
-        {/* Tabs / Stepper */}
         <div className="mb-8 print:hidden sticky top-0 z-30 bg-slate-50 pt-2 pb-2">
           <div className="flex items-center justify-between relative">
              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-slate-200 -z-10 rounded"></div>
@@ -465,34 +448,48 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
           </div>
         </div>
 
-        {/* Step 0: Petitioner */}
         {currentStep === 0 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <FormSection title="Sección 1: Información de La persona quien solicita proteger">
               <InputField 
-                label="Nombres y Apellidos" required value={formData.petitionerName} 
-                onChange={e => updateField('petitionerName', e.target.value)} error={errors.petitionerName}
-                disabled
+                label="Primer Nombre" required value={formData.firstName} 
+                onChange={e => updateField('firstName', e.target.value)} error={errors.firstName}
+                disabled={readOnly || isSpoaDataLoaded}
+              />
+              <InputField 
+                label="Segundo Nombre" value={formData.secondName} 
+                onChange={e => updateField('secondName', e.target.value)} error={errors.secondName}
+                disabled={readOnly || isSpoaDataLoaded}
+              />
+              <InputField 
+                label="Primer Apellido" required value={formData.firstSurname} 
+                onChange={e => updateField('firstSurname', e.target.value)} error={errors.firstSurname}
+                disabled={readOnly || isSpoaDataLoaded}
+              />
+              <InputField 
+                label="Segundo Apellido" value={formData.secondSurname} 
+                onChange={e => updateField('secondSurname', e.target.value)} error={errors.secondSurname}
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <SelectField 
                 label="Tipo de Documento" required options={DOC_TYPES} value={formData.petitionerDocType} 
                 onChange={e => updateField('petitionerDocType', e.target.value)} error={errors.petitionerDocType}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <InputField 
                 label="Número de Documento" type="number" required value={formData.petitionerDocNumber} 
                 onChange={e => updateField('petitionerDocNumber', e.target.value)} error={errors.petitionerDocNumber}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <SelectField 
                 label="Lugar de Expedición" required options={CITIES} value={formData.petitionerExpeditionPlace} 
                 onChange={e => updateField('petitionerExpeditionPlace', e.target.value)} error={errors.petitionerExpeditionPlace}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <InputField 
                 label="Fecha de Expedición" type="date" required value={formData.petitionerExpeditionDate} 
                 onChange={e => updateField('petitionerExpeditionDate', e.target.value)} error={errors.petitionerExpeditionDate}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <InputField 
                 label="Dirección Residencia" required value={formData.residenceAddress} 
@@ -533,29 +530,28 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
           </div>
         )}
 
-        {/* Step 1: Procesal */}
         {currentStep === 1 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <FormSection title="Sección 2: Información sobre actuaciones procesales">
               <TextAreaField 
                 label="Hechos que se investigan" required className="col-span-1 md:col-span-3"
                 value={formData.investigatedFacts} onChange={e => updateField('investigatedFacts', e.target.value)} error={errors.investigatedFacts}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <SelectField 
                 label="Sistema" required options={LEGAL_SYSTEMS} value={formData.legalSystem} 
                 onChange={e => updateField('legalSystem', e.target.value)} error={errors.legalSystem}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <InputField 
                 label="Delitos Investigados" required className="col-span-1 md:col-span-2"
                 value={formData.investigatedCrimes} onChange={e => updateField('investigatedCrimes', e.target.value)} error={errors.investigatedCrimes}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <InputField 
                 label="Etapa de Investigación" required value={formData.investigationStage} 
                 onChange={e => updateField('investigationStage', e.target.value)} error={errors.investigationStage}
-                disabled
+                disabled={readOnly || isSpoaDataLoaded}
               />
               <TextAreaField 
                 label="Medidas procesales decretadas (o a decretar)" required className="col-span-1 md:col-span-3"
@@ -611,31 +607,29 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
           </div>
         )}
 
-        {/* Step 2: Fiscal */}
         {currentStep === 2 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <FormSection title="Sección 3: Información Fiscal Conocimiento">
-               <InputField label="Nombre Funcionario Fiscal" required value={formData.fiscalName} onChange={e => updateField('fiscalName', e.target.value)} error={errors.fiscalName} disabled />
-               <InputField label="Cargo" required value={formData.fiscalRole} onChange={e => updateField('fiscalRole', e.target.value)} error={errors.fiscalRole} disabled />
-               <InputField label="Unidad" required value={formData.fiscalUnit} onChange={e => updateField('fiscalUnit', e.target.value)} error={errors.fiscalUnit} disabled />
-               <InputField label="Dirección Correspondencia" required value={formData.fiscalCorrespondenceAddress} onChange={e => updateField('fiscalCorrespondenceAddress', e.target.value)} error={errors.fiscalCorrespondenceAddress} disabled />
-               <InputField label="Teléfono Fijo" value={formData.fiscalPhone} onChange={e => updateField('fiscalPhone', e.target.value)} error={errors.fiscalPhone} disabled />
+               <InputField label="Nombre Funcionario Fiscal" required value={formData.fiscalName} onChange={e => updateField('fiscalName', e.target.value)} error={errors.fiscalName} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Cargo" required value={formData.fiscalRole} onChange={e => updateField('fiscalRole', e.target.value)} error={errors.fiscalRole} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Unidad" required value={formData.fiscalUnit} onChange={e => updateField('fiscalUnit', e.target.value)} error={errors.fiscalUnit} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Dirección Correspondencia" required value={formData.fiscalCorrespondenceAddress} onChange={e => updateField('fiscalCorrespondenceAddress', e.target.value)} error={errors.fiscalCorrespondenceAddress} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Teléfono Fijo" value={formData.fiscalPhone} onChange={e => updateField('fiscalPhone', e.target.value)} error={errors.fiscalPhone} disabled={readOnly || isSpoaDataLoaded} />
                <InputField label="Celular" required value={formData.fiscalCell} onChange={e => updateField('fiscalCell', e.target.value)} error={errors.fiscalCell} disabled={readOnly} />
-               <InputField label="Email Institucional" type="email" required value={formData.fiscalInstitutionalEmail} onChange={e => updateField('fiscalInstitutionalEmail', e.target.value)} error={errors.fiscalInstitutionalEmail} disabled />
+               <InputField label="Email Institucional" type="email" required value={formData.fiscalInstitutionalEmail} onChange={e => updateField('fiscalInstitutionalEmail', e.target.value)} error={errors.fiscalInstitutionalEmail} disabled={readOnly || isSpoaDataLoaded} />
                <InputField label="Email Opcional" type="email" value={formData.fiscalOptionalEmail} onChange={e => updateField('fiscalOptionalEmail', e.target.value)} error={errors.fiscalOptionalEmail} disabled={readOnly} />
             </FormSection>
           </div>
         )}
 
-        {/* Step 3: Funcionarios */}
         {currentStep === 3 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <FormSection title="Sección 4: Información Funcionario Policía Judicial">
-               <InputField label="Nombre Funcionario" required value={formData.policeName} onChange={e => updateField('policeName', e.target.value)} error={errors.policeName} disabled />
-               <InputField label="Entidad" required value={formData.policeEntity} onChange={e => updateField('policeEntity', e.target.value)} error={errors.policeEntity} disabled />
-               <InputField label="Teléfono" value={formData.policePhone} onChange={e => updateField('policePhone', e.target.value)} error={errors.policePhone} disabled />
-               <InputField label="Celular" required value={formData.policeCell} onChange={e => updateField('policeCell', e.target.value)} error={errors.policeCell} disabled />
-               <InputField label="Email" type="email" value={formData.policeEmail} onChange={e => updateField('policeEmail', e.target.value)} error={errors.policeEmail} disabled={readOnly} />
+               <InputField label="Nombre Funcionario" required value={formData.policeName} onChange={e => updateField('policeName', e.target.value)} error={errors.policeName} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Entidad" required value={formData.policeEntity} onChange={e => updateField('policeEntity', e.target.value)} error={errors.policeEntity} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Teléfono" value={formData.policePhone} onChange={e => updateField('policePhone', e.target.value)} error={errors.policePhone} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Celular" required value={formData.policeCell} onChange={e => updateField('policeCell', e.target.value)} error={errors.policeCell} disabled={readOnly || isSpoaDataLoaded} />
+               <InputField label="Email" type="email" value={formData.policeEmail} onChange={e => updateField('policeEmail', e.target.value)} error={errors.policeEmail} disabled={readOnly || isSpoaDataLoaded} />
             </FormSection>
              <FormSection title="Sección 5: Información Asistente del Fiscal (opcional)">
                <InputField label="Nombre Asistente" value={formData.assistantName} onChange={e => updateField('assistantName', e.target.value)} error={errors.assistantName} disabled={readOnly} />
@@ -646,7 +640,6 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
           </div>
         )}
 
-        {/* Step 4: Soportes */}
         {currentStep === 4 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <FormSection title="Sección 6: Soportes">
@@ -662,7 +655,6 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
           </div>
         )}
 
-        {/* Footer Actions */}
         <div className="flex justify-between mt-8 pt-6 border-t border-slate-200">
            <button 
              type="button" 

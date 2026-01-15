@@ -133,6 +133,14 @@ export const MISSION_TYPES = [
   "EVALUACIÓN DE RIESGO", "IMPLEMENTACIÓN ESQUEMA", "VISITA TÉCNICA", "VERIFICACIÓN"
 ];
 
+export const APPLICANT_ROLES_NEW = [
+  "TITULAR", "REPRESENTANTE LEGAL"
+];
+
+export const APPLICANT_ROLES_EXISTING = [
+  "TITULAR", "FAMILIAR", "REPRESENTANTE LEGAL"
+];
+
 export const MOCK_REQUESTS: ProtectionRequestSummary[] = [
   {
     id: "1",
@@ -142,7 +150,10 @@ export const MOCK_REQUESTS: ProtectionRequestSummary[] = [
     status: 'RADICADA',
     docType: DocType.CC,
     docNumber: "79123456",
-    fullName: "Pedro Pablo Pérez",
+    firstName: "PEDRO",
+    secondName: "PABLO",
+    firstSurname: "PÉREZ",
+    secondSurname: "GARCÍA",
     requestDate: "2024-05-15",
     isActive: true
   },
@@ -153,7 +164,10 @@ export const MOCK_REQUESTS: ProtectionRequestSummary[] = [
     status: 'CREADA',
     docType: DocType.CC,
     docNumber: "52987654",
-    fullName: "Juanita Castro",
+    firstName: "JUANITA",
+    secondName: "ESTELLA",
+    firstSurname: "CASTRO",
+    secondSurname: "LOPEZ",
     requestDate: "2024-05-18",
     isActive: true
   },
@@ -165,7 +179,10 @@ export const MOCK_REQUESTS: ProtectionRequestSummary[] = [
     status: 'RADICADA',
     docType: DocType.CC,
     docNumber: "900123456",
-    fullName: "Comerciantes Unidos del Centro",
+    firstName: "COMERCIANTES",
+    secondName: "UNIDOS",
+    firstSurname: "DEL",
+    secondSurname: "CENTRO",
     requestDate: "2024-04-20",
     isActive: false
   }
@@ -187,7 +204,8 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     firstName: "PEDRO",
     secondName: "PABLO",
     firstSurname: "PÉREZ",
-    secondSurname: "",
+    secondSurname: "GARCÍA",
+    applicantRole: "TITULAR",
     subject: "SOLICITUD EVALUACIÓN DE RIESGO",
     assignedArea: "PROTECCIÓN A PERSONAS",
     missionStartDate: "2024-06-01",
@@ -198,6 +216,91 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     generateMission: true,
     attachments: [],
     caseId: "CASE-2024-001"
+  },
+  {
+    radicado: "FGN-2024-112233",
+    radicationDate: "2024-07-20",
+    destinationUnit: "REGIONAL CALI",
+    remittingEntity: "FISCALÍA GENERAL DE LA NACIÓN",
+    candidateClassification: "TESTIGO",
+    origin: "CALI",
+    remitterName: "ALVARO URIBE",
+    requestDepartment: "VALLE DEL CAUCA",
+    requestCity: "Cali",
+    docType: "Cédula de Ciudadanía",
+    docNumber: "1110555888",
+    firstName: "MARCO",
+    secondName: "AURELIO",
+    firstSurname: "CASAS",
+    secondSurname: "MORALES",
+    applicantRole: "TITULAR",
+    subject: "SOLICITUD MEDIDAS DE EMERGENCIA",
+    assignedArea: "PROTECCIÓN A PERSONAS",
+    missionStartDate: "2024-07-25",
+    missionType: "VERIFICACIÓN",
+    dueDate: "2024-08-05",
+    observations: "Testigo clave en proceso de anticorrupción.",
+    folios: "12",
+    generateMission: true,
+    attachments: [],
+    caseId: "CASE-2024-085"
+  },
+  {
+    radicado: "FGN-2024-998877",
+    radicationDate: "2024-08-02",
+    destinationUnit: "NIVEL CENTRAL",
+    remittingEntity: "DEFENSORÍA DEL PUEBLO",
+    candidateClassification: "INTERVINIENTE",
+    origin: "MEDELLÍN",
+    remitterName: "LUISA FERNANDA",
+    requestDepartment: "ANTIOQUIA",
+    requestCity: "Medellín",
+    docType: "Cédula de Ciudadanía",
+    docNumber: "43555222",
+    firstName: "ELENA",
+    secondName: "",
+    firstSurname: "MARIN",
+    secondSurname: "OSPINA",
+    applicantRole: "REPRESENTANTE LEGAL",
+    subject: "REVALUACIÓN DE RIESGO",
+    assignedArea: "INTELIGENCIA PROTECTIVA",
+    missionStartDate: "2024-08-05",
+    missionType: "EVALUACIÓN DE RIESGO",
+    dueDate: "2024-08-15",
+    observations: "Actúa en representación de colectivos de víctimas.",
+    folios: "89",
+    generateMission: false,
+    attachments: [],
+    caseId: "CASE-2024-102"
+  },
+  {
+    radicado: "FGN-2024-774411",
+    radicationDate: "2024-08-10",
+    destinationUnit: "REGIONAL BOGOTÁ",
+    remittingEntity: "FISCALÍA GENERAL DE LA NACIÓN",
+    candidateClassification: "VICTIMA",
+    origin: "BOGOTÁ",
+    remitterName: "ROBERTO MARTINEZ",
+    requestDepartment: "BOGOTÁ D.C.",
+    requestCity: "Bogotá D.C.",
+    docType: "Cédula de Ciudadanía",
+    docNumber: "10203040",
+    firstName: "MARIA",
+    secondName: "ISABEL",
+    firstSurname: "PEREZ",
+    secondSurname: "RODRIGUEZ",
+    applicantRole: "FAMILIAR",
+    subject: "SOLICITUD EVALUACIÓN DE RIESGO",
+    assignedArea: "PROTECCIÓN A PERSONAS",
+    missionStartDate: "2024-08-12",
+    missionType: "EVALUACIÓN DE RIESGO",
+    dueDate: "2024-08-25",
+    observations: "Núcleo familiar del señor Pedro Pablo Pérez.",
+    folios: "5",
+    generateMission: true,
+    attachments: [],
+    caseId: "CASE-2024-115",
+    linkedCaseId: "CASE-2024-001"
   }
 ];
 
@@ -207,7 +310,7 @@ export const MOCK_MISSIONS: ProtectionMission[] = [
     missionNo: "MT-2024-8842",
     caseRadicado: "FGN-2024-582910",
     type: "EVALUACIÓN DE RIESGO",
-    petitionerName: "PEDRO PABLO PÉREZ",
+    petitionerName: "PEDRO PABLO PÉREZ GARCÍA",
     petitionerDoc: "79123456",
     assignedArea: "PROTECCIÓN A PERSONAS",
     status: 'PENDIENTE',
@@ -223,7 +326,10 @@ export const MOCK_FULL_REQUESTS: Record<string, ProtectionRequestForm> = {
     nunc: "110016000000202300001",
     radicado: "FGN-2024-582910",
     radicationDate: "2024-05-16 09:30:00",
-    petitionerName: "Pedro Pablo Pérez",
+    firstName: "PEDRO",
+    secondName: "PABLO",
+    firstSurname: "PÉREZ",
+    secondSurname: "GARCÍA",
     petitionerDocType: DocType.CC,
     petitionerDocNumber: "79123456",
     petitionerExpeditionPlace: "Bogotá D.C.",
@@ -261,7 +367,10 @@ export const MOCK_FULL_REQUESTS: Record<string, ProtectionRequestForm> = {
     city: "Medellín",
     requestDate: "2024-05-18",
     nunc: "050016000000202400123",
-    petitionerName: "Juanita Castro",
+    firstName: "JUANITA",
+    secondName: "ESTELLA",
+    firstSurname: "CASTRO",
+    secondSurname: "LOPEZ",
     petitionerDocType: DocType.CC,
     petitionerDocNumber: "52987654",
     petitionerExpeditionPlace: "Medellín",
@@ -300,9 +409,12 @@ export const MOCK_FULL_REQUESTS: Record<string, ProtectionRequestForm> = {
 export const SPOA_SEARCH_DB: Record<string, any> = {
   "110016000000202300001": [
     {
-      label: "Pedro Pablo Pérez (Victima) - CC 79123456",
+      label: "PEDRO PABLO PÉREZ GARCÍA (Victima) - CC 79123456",
       data: {
-        petitionerName: "Pedro Pablo Pérez",
+        firstName: "PEDRO",
+        secondName: "PABLO",
+        firstSurname: "PÉREZ",
+        secondSurname: "GARCÍA",
         petitionerDocType: DocType.CC,
         petitionerDocNumber: "79123456",
         petitionerExpeditionPlace: "Bogotá D.C.",
@@ -330,9 +442,12 @@ export const SPOA_SEARCH_DB: Record<string, any> = {
   ],
   "050016000000202400123": [
     {
-      label: "Juanita Castro (Testigo) - CC 52987654",
+      label: "JUANITA ESTELLA CASTRO LOPEZ (Testigo) - CC 52987654",
       data: {
-        petitionerName: "Juanita Castro",
+        firstName: "JUANITA",
+        secondName: "ESTELLA",
+        firstSurname: "CASTRO",
+        secondSurname: "LOPEZ",
         petitionerDocType: DocType.CC,
         petitionerDocNumber: "52987654",
         petitionerExpeditionPlace: "Medellín",

@@ -215,6 +215,7 @@ export interface ProtectionCaseForm {
   secondName: string;
   firstSurname: string;
   secondSurname: string;
+  applicantRole: string;
   subject?: string;
   assignedArea: string;
   missionStartDate: string;
@@ -224,7 +225,8 @@ export interface ProtectionCaseForm {
   folios: string;
   generateMission: boolean;
   attachments: File[];
-  caseId?: string; 
+  caseId?: string;
+  linkedCaseId?: string; // Nuevo: Vínculo con otro caso
 }
 
 export interface ValidationErrors {
@@ -241,7 +243,10 @@ export interface ProtectionRequestSummary {
   status: RequestProcessStatus;
   docType: string;
   docNumber: string;
-  fullName: string;
+  firstName: string;
+  secondName: string;
+  firstSurname: string;
+  secondSurname: string;
   requestDate: string;
   isActive: boolean;
 }
@@ -252,7 +257,10 @@ export interface ProtectionRequestForm {
   nunc: string;
   radicado?: string;
   radicationDate?: string;
-  petitionerName: string;
+  firstName: string;
+  secondName: string;
+  firstSurname: string;
+  secondSurname: string;
   petitionerDocType: string;
   petitionerDocNumber: string;
   petitionerExpeditionPlace: string;

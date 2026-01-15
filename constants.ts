@@ -1,5 +1,5 @@
 
-import { DocType, CivilStatus, PersonQuality, LegalSystem, ProtectionRequestForm, ProtectionRequestSummary, ProtectionCaseForm, ProtectionMission } from './types';
+import { DocType, CivilStatus, PersonQuality, LegalSystem, ProtectionRequestForm, ProtectionRequestSummary, ProtectionCaseForm, ProtectionMission, FamilyMember } from './types';
 
 export const APP_NAME = "Sistema de Gestión de Protección";
 
@@ -141,6 +141,52 @@ export const APPLICANT_ROLES_EXISTING = [
   "TITULAR", "FAMILIAR", "REPRESENTANTE LEGAL"
 ];
 
+export const MOCK_FAMILY_DATA: Record<string, FamilyMember[]> = {
+  "CASE-2024-001": [
+    {
+      id: "fam-1",
+      firstName: "MARIA",
+      secondName: "ISABEL",
+      firstSurname: "PEREZ",
+      secondSurname: "RODRIGUEZ",
+      docType: "Cédula de Ciudadanía",
+      docNumber: "10203040",
+      relationship: "CÓNYUGE",
+      birthDate: "1992-03-15",
+      isActive: true,
+      age: "32"
+    },
+    {
+      id: "fam-2",
+      firstName: "JUAN",
+      secondName: "ESTEBAN",
+      firstSurname: "PEREZ",
+      secondSurname: "PEREZ",
+      docType: "Tarjeta de Identidad",
+      docNumber: "1105123456",
+      relationship: "HIJO/A",
+      birthDate: "2015-08-20",
+      isActive: true,
+      age: "9"
+    }
+  ],
+  "CASE-2024-102": [
+    {
+        id: "fam-child-1",
+        firstName: "NICOLÁS",
+        secondName: "ALBERTO",
+        firstSurname: "MARÍN",
+        secondSurname: "OSPINA",
+        docType: "Tarjeta de Identidad",
+        docNumber: "1102555333",
+        relationship: "HIJO/A",
+        birthDate: "2006-05-12",
+        isActive: true,
+        age: "18"
+    }
+  ]
+};
+
 export const MOCK_REQUESTS: ProtectionRequestSummary[] = [
   {
     id: "1",
@@ -267,7 +313,7 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     missionStartDate: "2024-08-05",
     missionType: "EVALUACIÓN DE RIESGO",
     dueDate: "2024-08-15",
-    observations: "Actúa en representación de colectivos de víctimas.",
+    observations: "Representante legal de su hijo menor de edad vinculado al núcleo familiar.",
     folios: "89",
     generateMission: false,
     attachments: [],

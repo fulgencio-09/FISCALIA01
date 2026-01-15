@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ProtectionMission, TechnicalInterviewForm, FamilyMember, Pet } from '../types';
 import { InputField, SelectField, TextAreaField } from '../components/FormComponents';
-import { COLOMBIA_GEO, MOCK_FULL_REQUESTS, MOCK_SAVED_CASES, REGIONAL_UNITS, DOC_TYPES, PROFESSIONS } from '../constants';
+import { COLOMBIA_GEO, MOCK_FULL_REQUESTS, MOCK_SAVED_CASES, REGIONAL_UNITS, DOC_TYPES, PROFESSIONS, MOCK_FAMILY_DATA } from '../constants';
 
 interface InterviewFormPageProps {
     mission?: ProtectionMission;
@@ -202,6 +202,9 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
     // EFECTO DE SINCRONIZACIÓN
     useEffect(() => {
         if (extendedData) {
+            const caseId = extendedData.caseInfo?.caseId || '';
+            const familyFromDb = MOCK_FAMILY_DATA[caseId] || [];
+
             setFormData(prev => ({
                 ...prev,
                 name1: extendedData.caseInfo?.firstName || prev.name1,
@@ -224,6 +227,8 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                 caseNumber: mission?.caseRadicado || prev.caseNumber,
                 missionNumber: mission?.missionNo || prev.missionNumber,
                 assignedEvaluator: mission?.assignedOfficial || prev.assignedEvaluator,
+                // CARGA AUTOMÁTICA DEL NÚCLEO FAMILIAR
+                familyMembers: familyFromDb.length > 0 ? familyFromDb : prev.familyMembers
             }));
         }
     }, [extendedData, mission]);
@@ -727,286 +732,141 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                                             <input className="w-full bg-transparent outline-none border-b border-transparent focus:border-indigo-400" placeholder="EJ: 15 KG" value={p.weight} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, weight: e.target.value.toUpperCase() } : item))} />
                                                         </td>
                                                         <td className="p-2 border-r border-slate-100 text-center">
-                                                            <div className="flex flex-col items-center">
-                                                                <span className="text-[7px] font-black text-slate-400 uppercase">Esterelizado</span>
-                                                                <input type="checkbox" className="w-3 h-3 accent-indigo-600" checked={p.isSterilized} onChange={() => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isSterilized: !item.isSterilized } : item))} />
-                                                            </div>
+                                                            <input type="checkbox" checked={p.isSterilized} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isSterilized: e.target.checked } : item))} />
                                                         </td>
                                                         <td className="p-2 border-r border-slate-100 text-center">
-                                                            <div className="flex flex-col items-center">
-                                                                <span className="text-[7px] font-black text-slate-400 uppercase">Vacunado</span>
-                                                                <input type="checkbox" className="w-3 h-3 accent-indigo-600" checked={p.isVaccinated} onChange={() => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isVaccinated: !item.isVaccinated } : item))} />
-                                                            </div>
+                                                            <input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isVaccinated: e.target.checked } : item))} />
                                                         </td>
                                                         <td className="p-2 border-r border-slate-100 text-center">
-                                                            <div className="flex flex-col items-center">
-                                                                <span className="text-[7px] font-black text-slate-400 uppercase">Desparazitado</span>
-                                                                <input type="checkbox" className="w-3 h-3 accent-indigo-600" checked={p.isDewormed} onChange={() => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isDewormed: !item.isDewormed } : item))} />
-                                                            </div>
+                                                            <input type="checkbox" checked={p.isDewormed} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isDewormed: e.target.checked } : item))} />
                                                         </td>
                                                         <td className="p-2 text-center">
-                                                            <button type="button" onClick={() => updateField('pets', formData.pets.filter(item => item.id !== p.id))} className="text-red-500 hover:scale-110 transition-transform">
-                                                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                                                            </button>
+                                                            <button type="button" onClick={() => updateField('pets', formData.pets.filter(item => item.id !== p.id))} className="text-red-500 hover:scale-110 transition-transform"><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
                                                         </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </table>
                                     </div>
-                                    <button type="button" onClick={addPet} className="bg-indigo-600 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 mb-8">+ Vincular Animal</button>
+                                    <div className="flex justify-end mb-8">
+                                        <button type="button" onClick={addPet} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all">+ Registrar Mascota</button>
+                                    </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                        <SelectField label="Raza de Manejo Especial?" options={['SI', 'NO']} value={formData.isSpecialBreed} onChange={e => updateField('isSpecialBreed', e.target.value)} />
-                                        <SelectField label="¿Tiene recursos para adquirir el guacal, costos de transporte aéreo? " options={['SI', 'NO']} value={formData.hasTravelResources} onChange={e => updateField('hasTravelResources', e.target.value)} />
+                                        <SelectField label="Condición de salud del animal" options={['BUENA', 'REGULAR', 'MALA']} value={formData.petHealthCondition} onChange={e => updateField('petHealthCondition', e.target.value)} />
+                                        <SelectField label="¿Es raza de manejo especial?" options={['SI', 'NO']} value={formData.isSpecialBreed} onChange={e => updateField('isSpecialBreed', e.target.value)} />
+                                        <SelectField label="¿Cuenta con recursos para transporte/traslado?" options={['SI', 'NO']} value={formData.hasTravelResources} onChange={e => updateField('hasTravelResources', e.target.value)} />
+                                        <InputField label="Observaciones Mascotas" value={formData.petObservations} onChange={e => updateField('petObservations', e.target.value)} />
                                     </div>
-                                    <TextAreaField label="Condición de salud / Visitas veterinario" value={formData.petHealthCondition} onChange={e => updateField('petHealthCondition', e.target.value)} className="h-24 mb-16" />
-                                    <div className="border border-gray-400 rounded-lg p-4 bg-gray-50 text-[11px] text-gray-700 space-y-2 uppercase font-medium">
-                                        <p>• Contar con carné de vacunación anual actualizado.</p>
-                                        <p>• El animal debe contar con elementos de identificación y de contacto del propietario.</p>
-                                        <p>• El cuidador del animal debe ser mayor de edad.</p>
-                                        <p>• Uso obligatorio de bozal para raza de manejo especial.</p>
-                                    </div>
-                                    <TextAreaField label="Observaciones adicionales animales" value={formData.petObservations} onChange={e => updateField('petObservations', e.target.value)} className="h-24 mt-8" />
                                 </>
                             )}
                         </section>
                     </div>
                 )}
 
-                {/* PASO 6: ANTECEDENTES MÉDICOS Y CLÍNICOS / CONSUMO */}
+                {/* PASO 6: SALUD Y CONSUMO */}
                 {currentStep === 5 && (
-                    <div className="space-y-12 animate-in slide-in-from-right-8 duration-300">
+                    <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 6. Antecedentes Médicos y Clínicos</h3>
-                            <div className="space-y-8">
-                                {/* FÍSICA TITULAR */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-6 border-l-4 border-indigo-600">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest block mb-3">¿Tiene alguna enfermedad física?</label>
-                                        <div className="flex gap-4 mb-4">
-                                            <button type="button" onClick={() => updateField('physicalIllness', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.physicalIllness === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('physicalIllness', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.physicalIllness === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                        <InputField label="¿Qué enfermedad?" value={formData.physicalIllnessDetails} onChange={e => updateField('physicalIllnessDetails', e.target.value)} disabled={formData.physicalIllness !== 'SI'} />
-                                    </div>
-                                    <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.hospitalizedPhysical} onChange={e => updateField('hospitalizedPhysical', e.target.value)} disabled={formData.physicalIllness !== 'SI'} />
-                                </div>
-                                {/* FÍSICA FAMILIAR */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-6 border-l-4 border-emerald-600">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest block mb-3">Otro miembro de su grupo familiar tiene alguna enfermedad física</label>
-                                        <div className="flex gap-4 mb-4">
-                                            <button type="button" onClick={() => updateField('familyPhysicalIllness', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.familyPhysicalIllness === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('familyPhysicalIllness', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.familyPhysicalIllness === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <InputField label="¿Quién?" value={formData.familyPhysicalWho} onChange={e => updateField('familyPhysicalWho', e.target.value)} disabled={formData.familyPhysicalIllness !== 'SI'} />
-                                            <InputField label="Enfermedad" value={formData.familyPhysicalIllnessDetails} onChange={e => updateField('familyPhysicalIllnessDetails', e.target.value)} disabled={formData.familyPhysicalIllness !== 'SI'} />
-                                        </div>
-                                    </div>
-                                    <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyPhysicalHospitalized} onChange={e => updateField('familyPhysicalHospitalized', e.target.value)} disabled={formData.familyPhysicalIllness !== 'SI'} />
-                                </div>
-                                {/* MENTAL TITULAR */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-6 border-l-4 border-indigo-600">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest block mb-3">¿Tiene alguna enfermedad mental?</label>
-                                        <div className="flex gap-4 mb-4">
-                                            <button type="button" onClick={() => updateField('mentalIllness', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.mentalIllness === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('mentalIllness', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.mentalIllness === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                        <InputField label="¿Qué enfermedad?" value={formData.mentalIllnessDetails} onChange={e => updateField('mentalIllnessDetails', e.target.value)} disabled={formData.mentalIllness !== 'SI'} />
-                                    </div>
-                                    <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.hospitalizedMental} onChange={e => updateField('hospitalizedMental', e.target.value)} disabled={formData.mentalIllness !== 'SI'} />
-                                </div>
-                                {/* MENTAL FAMILIAR */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-6 border-l-4 border-emerald-600">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest block mb-3">Otro miembro de su grupo familiar tiene alguna enfermedad mental</label>
-                                        <div className="flex gap-4 mb-4">
-                                            <button type="button" onClick={() => updateField('familyMentalIllness', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.familyMentalIllness === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('familyMentalIllness', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.familyMentalIllness === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <InputField label="¿Quién?" value={formData.familyMentalWho} onChange={e => updateField('familyMentalWho', e.target.value)} disabled={formData.familyMentalIllness !== 'SI'} />
-                                            <InputField label="Enfermedad" value={formData.familyMentalIllnessDetails} onChange={e => updateField('familyMentalIllnessDetails', e.target.value)} disabled={formData.familyMentalIllness !== 'SI'} />
-                                        </div>
-                                    </div>
-                                    <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyMentalHospitalized} onChange={e => updateField('familyMentalHospitalized', e.target.value)} disabled={formData.familyMentalIllness !== 'SI'} />
-                                </div>
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 6. Salud</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <SelectField label="¿Padece alguna enfermedad física?" options={['SI', 'NO']} value={formData.physicalIllness} onChange={e => updateField('physicalIllness', e.target.value)} />
+                                {formData.physicalIllness === 'SI' && (
+                                    <>
+                                        <InputField label="Detalle enfermedad física" value={formData.physicalIllnessDetails} onChange={e => updateField('physicalIllnessDetails', e.target.value)} />
+                                        <SelectField label="¿Ha estado hospitalizado por esto?" options={['SI', 'NO']} value={formData.hospitalizedPhysical} onChange={e => updateField('hospitalizedPhysical', e.target.value)} />
+                                    </>
+                                )}
+                                <SelectField label="¿Algún miembro de su familia padece enfermedad física?" options={['SI', 'NO']} value={formData.familyPhysicalIllness} onChange={e => updateField('familyPhysicalIllness', e.target.value)} />
+                                {formData.familyPhysicalIllness === 'SI' && (
+                                    <>
+                                        <InputField label="¿Quién?" value={formData.familyPhysicalWho} onChange={e => updateField('familyPhysicalWho', e.target.value)} />
+                                        <InputField label="Detalle enfermedad familiar" value={formData.familyPhysicalIllnessDetails} onChange={e => updateField('familyPhysicalIllnessDetails', e.target.value)} />
+                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyPhysicalHospitalized} onChange={e => updateField('familyPhysicalHospitalized', e.target.value)} />
+                                    </>
+                                )}
                             </div>
-                            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <div className="md:col-span-3 mb-16"><TextAreaField label="Medicamentos que no puede suspender" value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} className="h-24" /></div>
-                                <SelectField label="¿Quién está en tratamiento?" options={['USTED', 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR']} value={formData.whoInTreatment} onChange={e => updateField('whoInTreatment', e.target.value)} />
-                                <div className="md:col-span-2"><InputField label="Si su respuesta anterior fue OTRO. Especifique ¿Quién?" value={formData.whoInTreatmentDetail} onChange={e => updateField('whoInTreatmentDetail', e.target.value)} disabled={formData.whoInTreatment !== 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR'} /></div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <SelectField label="¿Padece alguna enfermedad mental/psicológica?" options={['SI', 'NO']} value={formData.mentalIllness} onChange={e => updateField('mentalIllness', e.target.value)} />
+                                {formData.mentalIllness === 'SI' && (
+                                    <>
+                                        <InputField label="Detalle enfermedad mental" value={formData.mentalIllnessDetails} onChange={e => updateField('mentalIllnessDetails', e.target.value)} />
+                                        <SelectField label="¿Ha estado hospitalizado por esto?" options={['SI', 'NO']} value={formData.hospitalizedMental} onChange={e => updateField('hospitalizedMental', e.target.value)} />
+                                    </>
+                                )}
+                                <SelectField label="¿Algún miembro de su familia padece enfermedad mental?" options={['SI', 'NO']} value={formData.familyMentalIllness} onChange={e => updateField('familyMentalIllness', e.target.value)} />
+                                {formData.familyMentalIllness === 'SI' && (
+                                    <>
+                                        <InputField label="¿Quién?" value={formData.familyMentalWho} onChange={e => updateField('familyMentalWho', e.target.value)} />
+                                        <InputField label="Detalle enfermedad mental familiar" value={formData.familyMentalIllnessDetails} onChange={e => updateField('familyMentalIllnessDetails', e.target.value)} />
+                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyMentalHospitalized} onChange={e => updateField('familyMentalHospitalized', e.target.value)} />
+                                    </>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <TextAreaField label="Medicamentos de uso ininterrumpido" value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} />
+                                <SelectField label="¿Quién se encuentra en tratamiento?" options={['TITULAR', 'INTEGRANTE DE SU NÚCLEO FAMILIAR', 'AMBOS', 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR', 'NINGUNO']} value={formData.whoInTreatment} onChange={e => updateField('whoInTreatment', e.target.value)} />
+                                {formData.whoInTreatment === 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR' && (
+                                    <InputField label="Especifique quién" value={formData.whoInTreatmentDetail} onChange={e => updateField('whoInTreatmentDetail', e.target.value)} />
+                                )}
                             </div>
                         </section>
-
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Consumo de Sustancias Psicoactivas</h3>
-                            <div className="space-y-10">
-                                {/* CONSUMO TITULAR */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50 p-6 border-l-4 border-indigo-600">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase mb-3 block">¿Consume o ha consumido sustancias psicoactivas?</label>
-                                        <div className="flex gap-3">
-                                            <button type="button" onClick={() => updateField('consumesSubstances', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.consumesSubstances === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('consumesSubstances', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.consumesSubstances === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                    </div>
-                                    <InputField label="¿Qué sustancias?" value={formData.substancesDetails} onChange={e => updateField('substancesDetails', e.target.value)} disabled={formData.consumesSubstances !== 'SI'} />
-                                    <InputField label="Tiempo de consumo" value={formData.consumptionTime} onChange={e => updateField('consumptionTime', e.target.value)} disabled={formData.consumesSubstances !== 'SI'} />
-                                </div>
-
-                                {/* CONSUMO FAMILIAR */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50 p-6 border-l-4 border-emerald-600">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase mb-3 block">¿Otro miembro del grupo familiar consume o ha consumido?</label>
-                                        <div className="flex gap-3">
-                                            <button type="button" onClick={() => updateField('familyConsumesSubstances', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.familyConsumesSubstances === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('familyConsumesSubstances', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.familyConsumesSubstances === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                    </div>
-                                    <InputField label="¿Quién?" value={formData.familyConsumesWho} onChange={e => updateField('familyConsumesWho', e.target.value)} disabled={formData.familyConsumesSubstances !== 'SI'} />
-                                    <InputField label="¿Qué sustancias?" value={formData.familySubstancesDetails} onChange={e => updateField('familySubstancesDetails', e.target.value)} disabled={formData.familyConsumesSubstances !== 'SI'} />
-                                </div>
-                                {/* TRATAMIENTO TITULAR - INDEPENDIENTE */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50 p-6 border-l-4 border-indigo-400">
-                                    <div className="md:col-span-3">
-                                        <label className="text-[10px] font-black uppercase mb-3 block tracking-widest">¿Ha estado en tratamiento por consumo de sustancias psicoactivas?</label>
-                                        <div className="flex gap-3">
-                                            <button type="button" onClick={() => updateField('inTreatmentSubstances', 'SI')} className={`px-6 py-1.5 text-[9px] font-black border ${formData.inTreatmentSubstances === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('inTreatmentSubstances', 'NO')} className={`px-6 py-1.5 text-[9px] font-black border ${formData.inTreatmentSubstances === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* TRATAMIENTO FAMILIAR - INDEPENDIENTE */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50 p-6 border-l-4 border-emerald-400">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase mb-3 block tracking-widest">¿Otro miembro de su grupo familiar ha estado en tratamiento?</label>
-                                        <div className="flex gap-3">
-                                            <button type="button" onClick={() => updateField('familyInTreatmentSubstances', 'SI')} className={`px-6 py-1.5 text-[9px] font-black border ${formData.familyInTreatmentSubstances === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                            <button type="button" onClick={() => updateField('familyInTreatmentSubstances', 'NO')} className={`px-6 py-1.5 text-[9px] font-black border ${formData.familyInTreatmentSubstances === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                        </div>
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <InputField
-                                            label="Especifique ¿Quién?"
-                                            value={formData.familyInTreatmentWho}
-                                            onChange={e => updateField('familyInTreatmentWho', e.target.value)}
-                                            disabled={formData.familyInTreatmentSubstances !== 'SI'}
-                                        />
-                                    </div>
-                                </div>
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Consumo de Sustancias</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <SelectField label="¿Consume sustancias psicoactivas o alcohol?" options={['SI', 'NO']} value={formData.consumesSubstances} onChange={e => updateField('consumesSubstances', e.target.value)} />
+                                {formData.consumesSubstances === 'SI' && (
+                                    <>
+                                        <InputField label="Detalle sustancias" value={formData.substancesDetails} onChange={e => updateField('substancesDetails', e.target.value)} />
+                                        <InputField label="Tiempo de consumo" value={formData.consumptionTime} onChange={e => updateField('consumptionTime', e.target.value)} />
+                                        <SelectField label="¿Se encuentra en tratamiento?" options={['SI', 'NO']} value={formData.inTreatmentSubstances} onChange={e => updateField('inTreatmentSubstances', e.target.value)} />
+                                    </>
+                                )}
+                                <SelectField label="¿Algún miembro de su familia consume?" options={['SI', 'NO']} value={formData.familyConsumesSubstances} onChange={e => updateField('familyConsumesSubstances', e.target.value)} />
+                                {formData.familyConsumesSubstances === 'SI' && (
+                                    <>
+                                        <InputField label="¿Quién?" value={formData.familyConsumesWho} onChange={e => updateField('familyConsumesWho', e.target.value)} />
+                                        <InputField label="Detalle sustancias familiar" value={formData.familySubstancesDetails} onChange={e => updateField('familySubstancesDetails', e.target.value)} />
+                                        <SelectField label="¿Se encuentra en tratamiento?" options={['SI', 'NO']} value={formData.familyInTreatmentSubstances} onChange={e => updateField('familyInTreatmentSubstances', e.target.value)} />
+                                        {formData.familyInTreatmentSubstances === 'SI' && <InputField label="¿Quién está en tratamiento?" value={formData.familyInTreatmentWho} onChange={e => updateField('familyInTreatmentWho', e.target.value)} />}
+                                    </>
+                                )}
                             </div>
                         </section>
                     </div>
                 )}
 
-                {/* PASO 7: INTERVENCIÓN PROCESAL Y VULNERABILIDADES */}
+                {/* PASO 7: VULNERABILIDAD Y SEGURIDAD */}
                 {currentStep === 6 && (
-                    <div className="space-y-12 animate-in slide-in-from-right-8 duration-300">
+                    <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 7. Intervención Procesal e Identificación de Amenaza</h3>
-                            <TextAreaField label="Calidad procesal, intervención, radicados, despachos y fechas de intervenciones." value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} className="h-40 mb-8" />
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 pb-2 mb-8">Amenazas recibidas y riesgos identificados</h3>
-                            <TextAreaField label="Hechos constitutivos de amenaza oriesgo. Circunstancias de tiempo, modo y lugar; tipo de amenaza; identificación del actor y motivación." value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} className="h-40" />
-                        </section>
-
-                        <section className="space-y-10">
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 pb-2">Condenas en su contra y beneficios </h3>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-                                {/* Bloque 1: Condenas */}
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                                    <label className="text-[10px] font-black uppercase block mb-3">¿Tiene sentencias condenatorias en su contra?</label>
-                                    <div className="flex gap-4 mb-4">
-                                        <button type="button" onClick={() => updateField('hasConvictions', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.hasConvictions === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                        <button type="button" onClick={() => updateField('hasConvictions', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.hasConvictions === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                    </div>
-                                    <InputField
-                                        label="Especifique Detalles"
-                                        value={formData.hasConvictionsDetails}
-                                        onChange={e => updateField('hasConvictionsDetails', e.target.value)}
-                                        disabled={formData.hasConvictions !== 'SI'}
-                                    />
-                                </div>
-
-                                {/* Bloque 2: Subrogados */}
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                                    <label className="text-[10px] font-black uppercase block mb-3">¿Es beneficiario de un subrogado penal o mecanismo sustituto?</label>
-                                    <div className="flex gap-4 mb-4">
-                                        <button type="button" onClick={() => updateField('isSubstituteBeneficiary', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.isSubstituteBeneficiary === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                        <button type="button" onClick={() => updateField('isSubstituteBeneficiary', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.isSubstituteBeneficiary === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                    </div>
-                                    <InputField
-                                        label="Especifique Detalles"
-                                        value={formData.isSubstituteBeneficiaryDetails}
-                                        onChange={e => updateField('isSubstituteBeneficiaryDetails', e.target.value)}
-                                        disabled={formData.isSubstituteBeneficiary !== 'SI'}
-                                    />
-                                </div>
-                                 <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 pb-2">Antecedentes de evaluaciones </h3>
-
-                                {/* Bloque 3: Evaluación Previa */}
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                                    <label className="text-[10px] font-black uppercase block mb-3">¿Ha sido evaluado por un programa de protección?</label>
-                                    <div className="flex gap-4 mb-4">
-                                        <button type="button" onClick={() => updateField('previouslyEvaluated', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.previouslyEvaluated === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                        <button type="button" onClick={() => updateField('previouslyEvaluated', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.previouslyEvaluated === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                    </div>
-                                    <InputField
-                                        label="¿Cual?"
-                                        value={formData.previouslyEvaluatedWhich}
-                                        onChange={e => updateField('previouslyEvaluatedWhich', e.target.value)}
-                                        disabled={formData.previouslyEvaluated !== 'SI'}
-                                    />
-                                </div>
-
-                                {/* Bloque 4: Medidas Actuales */}
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                                    <label className="text-[10px] font-black uppercase block mb-3">¿Tiene medidas de protección actualmente?</label>
-                                    <div className="flex gap-4 mb-4">
-                                        <button type="button" onClick={() => updateField('hasCurrentMeasures', 'SI')} className={`px-4 py-1 text-[9px] font-black border ${formData.hasCurrentMeasures === 'SI' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>SI</button>
-                                        <button type="button" onClick={() => updateField('hasCurrentMeasures', 'NO')} className={`px-4 py-1 text-[9px] font-black border ${formData.hasCurrentMeasures === 'NO' ? 'bg-indigo-600 text-white' : 'bg-white'}`}>NO</button>
-                                    </div>
-                                    <InputField
-                                        label="¿De quién?"
-                                        value={formData.currentMeasuresWho}
-                                        onChange={e => updateField('currentMeasuresWho', e.target.value)}
-                                        disabled={formData.hasCurrentMeasures !== 'SI'}
-                                    />
-                                </div>
-                            </div>
-                        </section>
-
-                        <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-2">Vulnerabilidades</h3>
-                            <p className="text-[12px] mb-8">Identificar factores de vulnerabilidad asociados a sus comportamientos, permanencia en zona de riesgo, lugar de residencia y trabajo.</p>
-                            
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 7. Vulnerabilidades y Factores de Riesgo</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <div className="space-y-4">
-                                    <SelectField label="¿Aplica normas de autoprotección?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.appliesSecurityNorms} onChange={e => updateField('appliesSecurityNorms', e.target.value)} />
-                                    <TextAreaField label="Observaciones Autoprotección" value={formData.housePhysicalDescription} onChange={e => updateField('housePhysicalDescription', e.target.value)} disabled={formData.appliesSecurityNorms === 'SI'} />
-                                </div>
-                                <div className="space-y-4">
-                                    <SelectField label="¿Permanece en zona de riesgo?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.remainsInRiskZone} onChange={e => updateField('remainsInRiskZone', e.target.value)} />
-                                    <TextAreaField label="Especifique ¿Cuál?" value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={formData.remainsInRiskZone !== 'SI'} />
-                                </div>
+                                <TextAreaField label="Intervención Procesal" value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} />
+                                <TextAreaField label="Amenazas Recibidas" value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} />
                             </div>
-
-                            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200 space-y-6">
-                                <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-200 pb-2">Vulnerabilidad en zona de residencia</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <SelectField label="¿La residencia cuenta con medios tecnológicos de seguridad?" options={['SI', 'NO']} value={formData.techSecurityMeans} onChange={e => updateField('techSecurityMeans', e.target.value)} />
-                                    <SelectField label="¿Existen organizaciones ilegales en el sector de residencia?" options={['SI', 'NO']} value={formData.illegalOrgsInSector} onChange={e => updateField('illegalOrgsInSector', e.target.value)} />
-                                    <SelectField label="¿Existen puntos de apoyo de la fuerza pública cercanos al lugar de residencia?" options={['SI', 'NO']} value={formData.policeSupportNearby} onChange={e => updateField('policeSupportNearby', e.target.value)} />
-                                </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <SelectField label="¿Tiene antecedentes penales?" options={['SI', 'NO']} value={formData.hasConvictions} onChange={e => updateField('hasConvictions', e.target.value)} />
+                                {formData.hasConvictions === 'SI' && <InputField label="Detalle antecedentes" value={formData.hasConvictionsDetails} onChange={e => updateField('hasConvictionsDetails', e.target.value)} />}
+                                <SelectField label="¿Es beneficiario de sustitutiva?" options={['SI', 'NO']} value={formData.isSubstituteBeneficiary} onChange={e => updateField('isSubstituteBeneficiary', e.target.value)} />
+                                {formData.isSubstituteBeneficiary === 'SI' && <InputField label="Detalle beneficio" value={formData.isSubstituteBeneficiaryDetails} onChange={e => updateField('isSubstituteBeneficiaryDetails', e.target.value)} />}
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-1 gap-8 mt-10">
-                                <TextAreaField label="Descripción de características físicas de la vivienda" value={formData.housePhysicalDescription} onChange={e => updateField('housePhysicalDescription', e.target.value)} className="h-24 mb-10" />
-                                <TextAreaField label="Vulnerabilidad asociada al entorno de trabajo" value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} className="h-24 mb-10" />
-                                <TextAreaField label="Vulnerabilidad en desplazamientos cotidianos" value={formData.dailyMobilityVulnerability} onChange={e => updateField('dailyMobilityVulnerability', e.target.value)} className="h-24" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <SelectField label="¿Ha sido evaluado previamente?" options={['SI', 'NO']} value={formData.previouslyEvaluated} onChange={e => updateField('previouslyEvaluated', e.target.value)} />
+                                {formData.previouslyEvaluated === 'SI' && <InputField label="¿Por qué entidad?" value={formData.previouslyEvaluatedWhich} onChange={e => updateField('previouslyEvaluatedWhich', e.target.value)} />}
+                                <SelectField label="¿Tiene medidas de protección vigentes?" options={['SI', 'NO']} value={formData.hasCurrentMeasures} onChange={e => updateField('hasCurrentMeasures', e.target.value)} />
+                                {formData.hasCurrentMeasures === 'SI' && <InputField label="¿Quién las otorga?" value={formData.currentMeasuresWho} onChange={e => updateField('currentMeasuresWho', e.target.value)} />}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                                <SelectField label="¿Aplica normas de seguridad?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.appliesSecurityNorms} onChange={e => updateField('appliesSecurityNorms', e.target.value)} />
+                                <SelectField label="¿Permanece en zona de riesgo?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.remainsInRiskZone} onChange={e => updateField('remainsInRiskZone', e.target.value)} />
+                                <SelectField label="¿Hay grupos ilegales en su sector?" options={['SI', 'NO']} value={formData.illegalOrgsInSector} onChange={e => updateField('illegalOrgsInSector', e.target.value)} />
+                                <SelectField label="¿Cuenta con medios técnicos de seguridad?" options={['SI', 'NO']} value={formData.techSecurityMeans} onChange={e => updateField('techSecurityMeans', e.target.value)} />
+                                <SelectField label="¿Hay apoyo policial cercano?" options={['SI', 'NO']} value={formData.policeSupportNearby} onChange={e => updateField('policeSupportNearby', e.target.value)} />
+                            </div>
+                            <div className="space-y-8">
+                                <TextAreaField label="Descripción física de la vivienda" value={formData.housePhysicalDescription} onChange={e => updateField('housePhysicalDescription', e.target.value)} />
+                                <TextAreaField label="Vulnerabilidad en el entorno laboral" value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} />
+                                <TextAreaField label="Vulnerabilidad en desplazamientos diarios" value={formData.dailyMobilityVulnerability} onChange={e => updateField('dailyMobilityVulnerability', e.target.value)} />
                             </div>
                         </section>
                     </div>
@@ -1014,83 +874,90 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
 
                 {/* PASO 8: FACTORES DIFERENCIALES Y CIERRE */}
                 {currentStep === 7 && (
-                    <div className="space-y-12 animate-in slide-in-from-right-8 duration-300">
+                    <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 8. Factores Diferenciales y de Riesgo</h3>
-                            <p className="text-[12px] mb-8">Marque si el(la) candidato(a) o su núcleo familiar pertenece a poblaciones con enfoques diferenciales. Solo se puede seleccionar un destinatario por cada factor.</p>
-                            <div className="overflow-x-auto border-2 border-slate-900 rounded-2xl overflow-hidden mb-8">
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 8. Factores Diferenciales</h3>
+                            <div className="overflow-x-auto border-2 border-slate-900 rounded-2xl bg-white shadow-inner mb-8">
                                 <table className="w-full text-left">
-                                    <thead className="bg-slate-900 text-white text-[8px] font-black uppercase tracking-widest">
+                                    <thead className="bg-slate-900 text-white text-[9px] font-black uppercase tracking-tighter">
                                         <tr>
-                                            <th className="p-4 border-r border-slate-700">Enfoque Diferencial / Género</th>
+                                            <th className="p-4 border-r border-slate-700">Enfoque Diferencial</th>
                                             <th className="p-4 border-r border-slate-700 text-center">Titular</th>
-                                            <th className="p-4 text-center">Familiar</th>
+                                            <th className="p-4 text-center">N. Familiar</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-200">
-                                        {ENFOQUES_DIFERENCIALES.map(factor => (
-                                            <tr key={factor} className="hover:bg-slate-50">
-                                                <td className="p-4 text-[9px] font-black uppercase border-r border-slate-100">{factor}</td>
-                                                <td className="p-4 text-center border-r border-slate-100">
-                                                    <input type="checkbox" checked={formData.differentialFactors[factor]?.titular || false} onChange={() => toggleDifferential(factor, 'titular')} className="w-4 h-4 accent-indigo-600" />
+                                        {[...ENFOQUES_DIFERENCIALES, ...ENFOQUES_GENERO].map(factor => (
+                                            <tr key={factor} className="hover:bg-slate-50 transition-colors">
+                                                <td className="p-3 border-r border-slate-100 text-[10px] font-bold uppercase">{factor}</td>
+                                                <td className="p-3 border-r border-slate-100 text-center">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        className="w-4 h-4 accent-indigo-600"
+                                                        checked={formData.differentialFactors[factor]?.titular || false} 
+                                                        onChange={() => toggleDifferential(factor, 'titular')} 
+                                                    />
                                                 </td>
-                                                <td className="p-4 text-center">
-                                                    <input type="checkbox" checked={formData.differentialFactors[factor]?.familiar || false} onChange={() => toggleDifferential(factor, 'familiar')} className="w-4 h-4 accent-indigo-600" />
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        <tr className="bg-slate-900 text-white text-[8px] font-black uppercase tracking-widest"><th className="p-4" colSpan={3}>Enfoque de Género</th></tr>
-                                        {ENFOQUES_GENERO.map(factor => (
-                                            <tr key={factor} className="hover:bg-slate-50">
-                                                <td className="p-4 text-[9px] font-black uppercase border-r border-slate-100">{factor}</td>
-                                                <td className="p-4 text-center border-r border-slate-100">
-                                                    <input type="checkbox" checked={formData.differentialFactors[factor]?.titular || false} onChange={() => toggleDifferential(factor, 'titular')} className="w-4 h-4 accent-indigo-600" />
-                                                </td>
-                                                <td className="p-4 text-center">
-                                                    <input type="checkbox" checked={formData.differentialFactors[factor]?.familiar || false} onChange={() => toggleDifferential(factor, 'familiar')} className="w-4 h-4 accent-indigo-600" />
+                                                <td className="p-3 text-center">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        className="w-4 h-4 accent-indigo-600"
+                                                        checked={formData.differentialFactors[factor]?.familiar || false} 
+                                                        onChange={() => toggleDifferential(factor, 'familiar')} 
+                                                    />
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
-                            <TextAreaField label="Observaciones Enfoques" value={formData.observationsDifferential} onChange={e => updateField('observationsDifferential', e.target.value)} className="h-24 mb-10" />
-                            <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-                                <TextAreaField label="Vulnerabilidad Población Diferencial" value={formData.vulnerabilityDifferentialPop} onChange={e => updateField('vulnerabilityDifferentialPop', e.target.value)} className="h-32 mb-10" />
-                                <TextAreaField label="Vulnerabilidad Género" value={formData.vulnerabilityGender} onChange={e => updateField('vulnerabilityGender', e.target.value)} className="h-32 mb-10" />
-                                <TextAreaField label="Vulnerability Entorno Familiar" value={formData.vulnerabilityFamilyEnvironment} onChange={e => updateField('vulnerabilityFamilyEnvironment', e.target.value)} className="h-32 mb-10" />
+                            <TextAreaField label="Observaciones Factores Diferenciales" value={formData.observationsDifferential} onChange={e => updateField('observationsDifferential', e.target.value)} className="mb-8" />
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <TextAreaField label="Vulnerabilidad Población Diferencial" value={formData.vulnerabilityDifferentialPop} onChange={e => updateField('vulnerabilityDifferentialPop', e.target.value)} />
+                                <TextAreaField label="Vulnerabilidad por Género" value={formData.vulnerabilityGender} onChange={e => updateField('vulnerabilityGender', e.target.value)} />
+                                <TextAreaField label="Vulnerabilidad Entorno Familiar" value={formData.vulnerabilityFamilyEnvironment} onChange={e => updateField('vulnerabilityFamilyEnvironment', e.target.value)} />
                             </div>
                         </section>
-                        <section className="bg-slate-900 text-white p-8 rounded-3xl space-y-6">
-                            <h4 className="text-xs font-black uppercase tracking-widest border-b border-white/20 pb-4">Cláusula Adicional - Art. 26 Fraude de Subvenciones</h4>
-                            <p className="text-[10px] italic leading-relaxed opacity-80">
-                                El contenido del artículo 403A del Código Penal Colombiano establece penas para quien obtenga una subvención mediante engaño. La evaluación técnica no genera compromiso automático de protección.
-                            </p>
-                            <div className="pt-10 flex justify-between items-end gap-20">
-                                <div className="flex-1 text-center">
-                                    <div className="border-b border-white/40 h-16 mb-4"></div>
-                                    <p className="text-[9px] font-black uppercase tracking-widest">Firma del Entrevistado</p>
-                                </div>
-                                <div className="flex-1 text-center">
-                                    <div className="border-b border-white/40 h-16 mb-4"></div>
-                                    <p className="text-[9px] font-black uppercase tracking-widest">Firma Evaluador: {formData.assignedEvaluator}</p>
-                                </div>
-                            </div>
-                        </section>
+                        
+                        <div className="pt-10 flex flex-col items-center gap-6">
+                            <div className="w-full h-px bg-slate-200"></div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Al presionar "Guardar Entrevista" los datos serán formalizados en el expediente SIDPA</p>
+                            <button 
+                                type="submit"
+                                className="bg-indigo-600 text-white px-16 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-200 active:scale-95"
+                            >
+                                Guardar Entrevista Técnica
+                            </button>
+                        </div>
                     </div>
                 )}
 
-                {/* Barra de Navegación */}
-                <div className="mt-14 pt-8 border-t-2 border-slate-900 flex justify-between items-center print:hidden">
-                    <button type="button" onClick={onCancel} className="text-[10px] font-black uppercase text-slate-400 hover:text-slate-900 tracking-widest transition-colors">Cancelar Operación</button>
+                {/* Footer de navegación del formulario */}
+                <div className="mt-14 pt-8 border-t border-slate-100 flex justify-between items-center print:hidden">
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="px-8 py-3 bg-white text-slate-400 font-black rounded-xl uppercase text-[10px] tracking-widest hover:text-slate-900 transition-all"
+                    >
+                        Cancelar Proceso
+                    </button>
                     <div className="flex gap-4">
-                        {currentStep > 0 && (
-                            <button type="button" onClick={() => setCurrentStep(prev => prev - 1)} className="px-10 py-3 bg-white border-2 border-slate-900 text-slate-900 font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">Anterior</button>
-                        )}
-                        {currentStep < STEPS.length - 1 ? (
-                            <button type="button" onClick={() => setCurrentStep(prev => prev + 1)} className="px-14 py-4 bg-slate-900 text-white font-black rounded-xl uppercase text-[10px] tracking-[0.2em] shadow-2xl hover:bg-black transition-all">Siguiente Paso</button>
-                        ) : (
-                            <button type="submit" className="px-16 py-4 bg-emerald-600 text-white font-black rounded-xl uppercase text-[10px] tracking-[0.2em] shadow-2xl hover:bg-emerald-700 transition-all">Finalizar y Archivar Entrevista</button>
+                        <button
+                            type="button"
+                            onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
+                            disabled={currentStep === 0}
+                            className={`px-8 py-3 font-black rounded-xl uppercase text-[10px] tracking-widest transition-all ${currentStep === 0 ? 'text-slate-200 cursor-not-allowed' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
+                        >
+                            Anterior
+                        </button>
+                        {currentStep < 7 && (
+                            <button
+                                type="button"
+                                onClick={() => setCurrentStep(prev => Math.min(7, prev + 1))}
+                                className="px-10 py-3 bg-indigo-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
+                            >
+                                Siguiente
+                            </button>
                         )}
                     </div>
                 </div>

@@ -12,48 +12,20 @@ import {
   SUBJECTS,
   AREAS,
   ORIGINS,
-  MOCK_MISSIONS
+  MOCK_MISSIONS,
+  MOCK_FAMILY_DATA
 } from '../constants';
 import { FamilyMember, ProtectionMission, ProtectionCaseForm } from '../types';
 import { InputField, SelectField, TextAreaField, FileUpload } from '../components/FormComponents';
 
-const INITIAL_FAMILY_DATA: Record<string, FamilyMember[]> = {
-  "CASE-2024-001": [
-    {
-      id: "fam-1",
-      firstName: "MARIA",
-      secondName: "ISABEL",
-      firstSurname: "PEREZ",
-      secondSurname: "RODRIGUEZ",
-      docType: "Cédula de Ciudadanía",
-      docNumber: "10203040",
-      relationship: "CÓNYUGE",
-      birthDate: "1992-03-15",
-      isActive: true
-    },
-    {
-      id: "fam-2",
-      firstName: "JUAN",
-      secondName: "ESTEBAN",
-      firstSurname: "PEREZ",
-      secondSurname: "PEREZ",
-      docType: "Tarjeta de Identidad",
-      docNumber: "1105123456",
-      relationship: "HIJO/A",
-      birthDate: "2015-08-20",
-      isActive: true
-    }
-  ]
-};
-
 const SavedCasesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeModal, setActiveModal] = useState<{ type: 'MISSION' | 'FAMILY' | 'LIST_FAMILY' | 'LIST_MISSIONS' | 'MISSION_DETAIL' | 'EDIT_MISSION' | 'NONE', caseId: string }>({ type: 'NONE', caseId: '' });
+  const [activeModal, setActiveModal] = useState<{ type: 'MISSION' | 'FAMILY' | 'LIST_FAMILY' | 'LIST_MISSIONS' | 'MISSION_DETAIL' | 'EDIT_MISSION' | 'TRANSFER_OWNER' | 'NONE', caseId: string }>({ type: 'NONE', caseId: '' });
   const [confirmDeactivate, setConfirmDeactivate] = useState<{ show: boolean, memberId: string, caseId: string } | null>(null);
   
   // States for dynamic data
   const [allSavedCases, setAllSavedCases] = useState<ProtectionCaseForm[]>(MOCK_SAVED_CASES);
-  const [allFamilyData, setAllFamilyData] = useState<Record<string, FamilyMember[]>>(INITIAL_FAMILY_DATA);
+  const [allFamilyData, setAllFamilyData] = useState<Record<string, FamilyMember[]>>(MOCK_FAMILY_DATA);
   const [missionsList, setMissionsList] = useState<ProtectionMission[]>(MOCK_MISSIONS);
   const [selectedMission, setSelectedMission] = useState<ProtectionMission | null>(null);
   const [editAttachments, setEditAttachments] = useState<File[]>([]);
@@ -101,6 +73,53 @@ const SavedCasesPage: React.FC = () => {
     const member = (allFamilyData[caseId] || []).find(m => m.id === memberId);
     showNotification(`Integrante ${member?.isActive ? 'desactivado' : 'activado'} correctamente.`);
     setConfirmDeactivate(null);
+  };
+
+  const handleTransferOwnership = (selectedMemberId: string) => {
+    const caseId = activeModal.caseId;
+    const currentCase = allSavedCases.find(c => c.caseId === caseId);
+    const family = allFamilyData[caseId] || [];
+    const newTitular = family.find(m => m.id === selectedMemberId);
+
+    if (!currentCase || !newTitular) return;
+
+    // 1. Convert Current Representante Legal to Familiar
+    const formerRepAsFamiliar: FamilyMember = {
+        id: `fam-former-${Date.now()}`,
+        firstName: currentCase.firstName,
+        secondName: currentCase.secondName,
+        firstSurname: currentCase.firstSurname,
+        secondSurname: currentCase.secondSurname,
+        docType: currentCase.docType,
+        docNumber: currentCase.docNumber,
+        relationship: "PADRE/MADRE",
+        birthDate: "1980-01-01", // Placeholder
+        isActive: true
+    };
+
+    // 2. Update Case Data with New Titular
+    const updatedCase: ProtectionCaseForm = {
+        ...currentCase,
+        firstName: newTitular.firstName,
+        secondName: newTitular.secondName || '',
+        firstSurname: newTitular.firstSurname,
+        secondSurname: newTitular.secondSurname || '',
+        docType: "Cédula de Ciudadanía", // Suponemos que ya tiene CC
+        docNumber: newTitular.docNumber,
+        applicantRole: "TITULAR",
+        observations: `${currentCase.observations}\n[TRASLADO TITULARIDAD ${new Date().toLocaleDateString()}] El menor alcanzó mayoría de edad.`
+    };
+
+    // 3. Remove New Titular from Family and Add Former Rep
+    const updatedFamily = family
+        .filter(m => m.id !== selectedMemberId)
+        .concat(formerRepAsFamiliar);
+
+    setAllSavedCases(prev => prev.map(c => c.caseId === caseId ? updatedCase : c));
+    setAllFamilyData(prev => ({ ...prev, [caseId]: updatedFamily }));
+
+    showNotification(`Titularidad trasladada exitosamente a ${newTitular.firstName} ${newTitular.firstSurname}. El anterior representante legal ahora es integrante familiar.`);
+    closeModal();
   };
 
   const handleFamilySubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -286,7 +305,7 @@ const SavedCasesPage: React.FC = () => {
                 </td>
                 <td className="px-6 py-5">
                    <div className="flex flex-col gap-1">
-                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tight border self-start ${c.applicantRole === 'FAMILIAR' ? 'bg-purple-100 text-purple-800 border-purple-200' : 'bg-blue-100 text-blue-800 border-blue-200'}`}>
+                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tight border self-start ${c.applicantRole === 'FAMILIAR' ? 'bg-purple-100 text-purple-800 border-purple-200' : c.applicantRole === 'REPRESENTANTE LEGAL' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-blue-100 text-blue-800 border-blue-200'}`}>
                         {c.applicantRole || 'TITULAR'}
                       </span>
                       {c.linkedCaseId && (
@@ -302,6 +321,15 @@ const SavedCasesPage: React.FC = () => {
                 </td>
                 <td className="px-6 py-5 text-center">
                   <div className="flex items-center justify-center gap-3">
+                    {c.applicantRole === 'REPRESENTANTE LEGAL' && (
+                        <button 
+                            onClick={() => setActiveModal({ type: 'TRANSFER_OWNER', caseId: c.caseId || '' })}
+                            className="p-2.5 text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-xl transition-all border border-amber-100"
+                            title="Trasladar Titularidad por Mayoría de Edad"
+                        >
+                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                        </button>
+                    )}
                     <button 
                       onClick={() => { setEditingMember(null); setActiveModal({ type: 'FAMILY', caseId: c.caseId || '' }); }}
                       className="p-2.5 text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded-xl transition-all border border-emerald-100"
@@ -330,6 +358,64 @@ const SavedCasesPage: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* --- MODAL: TRASLADO TITULARIDAD POR MAYORÍA DE EDAD --- */}
+      {activeModal.type === 'TRANSFER_OWNER' && (
+        <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[2.5rem] shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-8 bg-amber-600 text-white flex justify-between items-center">
+                 <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white/20 rounded-2xl">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-black uppercase tracking-tight leading-tight">Traslado de Titularidad</h3>
+                        <p className="text-amber-100 text-[10px] font-black uppercase opacity-80 tracking-widest">Mayoría de Edad Detectada</p>
+                    </div>
+                 </div>
+                 <button onClick={closeModal} className="text-white hover:opacity-70"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+              <div className="p-10 space-y-8">
+                 <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100">
+                    <p className="text-amber-900 text-sm font-medium leading-relaxed">
+                        Esta funcionalidad permite trasladar la titularidad del caso desde el <b>Representante Legal</b> hacia un <b>Menor de edad</b> que ha cumplido la mayoría de edad (18 años).
+                    </p>
+                    <p className="mt-4 text-amber-900 text-xs italic">
+                        * Al confirmar, el actual representante pasará a formar parte del núcleo familiar como 'Familiar'.
+                    </p>
+                 </div>
+
+                 <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Seleccione al integrante para ser Nuevo Titular:</label>
+                    <div className="space-y-3">
+                        {currentFamilyMembers.length > 0 ? currentFamilyMembers.map(member => (
+                            <button 
+                                key={member.id}
+                                onClick={() => handleTransferOwnership(member.id)}
+                                className="w-full flex items-center justify-between p-5 bg-white border border-slate-200 rounded-2xl hover:border-amber-500 hover:bg-amber-50 group transition-all"
+                            >
+                                <div className="text-left">
+                                    <div className="font-black text-slate-800 uppercase text-xs">{member.firstName} {member.firstSurname}</div>
+                                    <div className="text-[10px] text-slate-400 font-bold uppercase">{member.docType}: {member.docNumber}</div>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-[10px] font-black text-blue-600 uppercase mb-1">{member.relationship}</span>
+                                    <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Trasladar</span>
+                                </div>
+                            </button>
+                        )) : (
+                            <div className="text-center py-6 text-slate-400 text-xs italic">No hay integrantes en el núcleo familiar vinculados.</div>
+                        )}
+                    </div>
+                 </div>
+
+                 <div className="pt-6 border-t border-slate-100 flex justify-end">
+                    <button onClick={closeModal} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      )}
 
       {/* --- MODAL: LISTADO NÚCLEO FAMILIAR --- */}
       {activeModal.type === 'LIST_FAMILY' && (

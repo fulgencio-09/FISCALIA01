@@ -154,7 +154,9 @@ export const MOCK_FAMILY_DATA: Record<string, FamilyMember[]> = {
       relationship: "CÓNYUGE",
       birthDate: "1992-03-15",
       isActive: true,
-      age: "32"
+      age: "32",
+      sex: "FEMENINO",
+      residencePlace: "BOGOTÁ D.C."
     },
     {
       id: "fam-2",
@@ -167,7 +169,9 @@ export const MOCK_FAMILY_DATA: Record<string, FamilyMember[]> = {
       relationship: "HIJO/A",
       birthDate: "2015-08-20",
       isActive: true,
-      age: "9"
+      age: "9",
+      sex: "MASCULINO",
+      residencePlace: "BOGOTÁ D.C."
     }
   ],
   "CASE-2024-102": [
@@ -182,7 +186,9 @@ export const MOCK_FAMILY_DATA: Record<string, FamilyMember[]> = {
         relationship: "HIJO/A",
         birthDate: "2006-05-12",
         isActive: true,
-        age: "18"
+        age: "18",
+        sex: "MASCULINO",
+        residencePlace: "MEDELLÍN"
     }
   ]
 };

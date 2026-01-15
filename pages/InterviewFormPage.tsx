@@ -309,7 +309,8 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
             birthDate: '',
             age: '',
             isActive: true,
-            residencePlace: ''
+            residencePlace: '',
+            sex: ''
         };
         setFormData(prev => ({ ...prev, familyMembers: [...prev.familyMembers, newMember] }));
     };
@@ -612,6 +613,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                         <th className="p-3 border-r border-slate-700">Tipo Doc</th>
                                         <th className="p-3 border-r border-slate-700">Número Doc</th>
                                         <th className="p-3 border-r border-slate-700">Vínculo</th>
+                                        <th className="p-3 border-r border-slate-700">Sexo</th>
                                         <th className="p-3 border-r border-slate-700">Lugar Residencia</th>
                                         <th className="p-3 border-r border-slate-700">Fecha Nacimiento</th>
                                         <th className="p-3 border-r border-slate-700">Edad</th>
@@ -644,6 +646,15 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                                             </td>
                                             <td className="p-2 border-r border-slate-100">
                                                 <input className="w-full bg-transparent text-[10px] uppercase outline-none border-b border-transparent focus:border-indigo-400" placeholder="EJ: CÓNYUGE" value={fam.relationship} onChange={e => updateFamilyMember(fam.id, 'relationship', e.target.value.toUpperCase())} />
+                                            </td>
+                                            <td className="p-2 border-r border-slate-100">
+                                                <select className="w-full bg-transparent text-[10px] outline-none" value={fam.sex} onChange={e => updateFamilyMember(fam.id, 'sex', e.target.value)}>
+                                                    <option value="">-</option>
+                                                    <option value="MASCULINO">MASCULINO</option>
+                                                    <option value="FEMENINO">FEMENINO</option>
+                                                    <option value="OTRO">OTRO</option>
+                                                    <option value="NO INFORMA">NO INFORMA</option>
+                                                </select>
                                             </td>
                                             <td className="p-2 border-r border-slate-100">
                                                 <input className="w-full bg-transparent text-[10px] uppercase outline-none border-b border-transparent focus:border-indigo-400" value={fam.residencePlace} onChange={e => updateFamilyMember(fam.id, 'residencePlace', e.target.value.toUpperCase())} />
@@ -767,69 +778,112 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                 {currentStep === 5 && (
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 6. Salud</h3>
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 6. Antecedentes Médicos o Clínicos</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <SelectField label="¿Padece alguna enfermedad física?" options={['SI', 'NO']} value={formData.physicalIllness} onChange={e => updateField('physicalIllness', e.target.value)} />
+                                <SelectField label="¿Tiene alguna enfermedad física?" options={['SI', 'NO']} value={formData.physicalIllness} onChange={e => updateField('physicalIllness', e.target.value)} />
                                 {formData.physicalIllness === 'SI' && (
-                                    <>
-                                        <InputField label="Detalle enfermedad física" value={formData.physicalIllnessDetails} onChange={e => updateField('physicalIllnessDetails', e.target.value)} />
-                                        <SelectField label="¿Ha estado hospitalizado por esto?" options={['SI', 'NO']} value={formData.hospitalizedPhysical} onChange={e => updateField('hospitalizedPhysical', e.target.value)} />
-                                    </>
+                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-4 rounded-xl">
+                                        <InputField label="¿Qué enfermedad física?" value={formData.physicalIllnessDetails} onChange={e => updateField('physicalIllnessDetails', e.target.value)} />
+                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.hospitalizedPhysical} onChange={e => updateField('hospitalizedPhysical', e.target.value)} />
+                                    </div>
                                 )}
-                                <SelectField label="¿Algún miembro de su familia padece enfermedad física?" options={['SI', 'NO']} value={formData.familyPhysicalIllness} onChange={e => updateField('familyPhysicalIllness', e.target.value)} />
+                                <SelectField label="¿Otro miembro de su familia tiene alguna enfermedad física?" options={['SI', 'NO']} value={formData.familyPhysicalIllness} onChange={e => updateField('familyPhysicalIllness', e.target.value)} />
                                 {formData.familyPhysicalIllness === 'SI' && (
-                                    <>
+                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-4 rounded-xl">
                                         <InputField label="¿Quién?" value={formData.familyPhysicalWho} onChange={e => updateField('familyPhysicalWho', e.target.value)} />
-                                        <InputField label="Detalle enfermedad familiar" value={formData.familyPhysicalIllnessDetails} onChange={e => updateField('familyPhysicalIllnessDetails', e.target.value)} />
+                                        <InputField label="¿Qué enfermedad?" value={formData.familyPhysicalIllnessDetails} onChange={e => updateField('familyPhysicalIllnessDetails', e.target.value)} />
                                         <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyPhysicalHospitalized} onChange={e => updateField('familyPhysicalHospitalized', e.target.value)} />
-                                    </>
+                                    </div>
                                 )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <SelectField label="¿Padece alguna enfermedad mental/psicológica?" options={['SI', 'NO']} value={formData.mentalIllness} onChange={e => updateField('mentalIllness', e.target.value)} />
+                                <SelectField label="¿Tiene alguna enfermedad mental?" options={['SI', 'NO']} value={formData.mentalIllness} onChange={e => updateField('mentalIllness', e.target.value)} />
                                 {formData.mentalIllness === 'SI' && (
-                                    <>
-                                        <InputField label="Detalle enfermedad mental" value={formData.mentalIllnessDetails} onChange={e => updateField('mentalIllnessDetails', e.target.value)} />
-                                        <SelectField label="¿Ha estado hospitalizado por esto?" options={['SI', 'NO']} value={formData.hospitalizedMental} onChange={e => updateField('hospitalizedMental', e.target.value)} />
-                                    </>
+                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-4 rounded-xl">
+                                        <InputField label="¿Qué enfermedad mental?" value={formData.mentalIllnessDetails} onChange={e => updateField('mentalIllnessDetails', e.target.value)} />
+                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.hospitalizedMental} onChange={e => updateField('hospitalizedMental', e.target.value)} />
+                                    </div>
                                 )}
-                                <SelectField label="¿Algún miembro de su familia padece enfermedad mental?" options={['SI', 'NO']} value={formData.familyMentalIllness} onChange={e => updateField('familyMentalIllness', e.target.value)} />
+                                <SelectField label="¿Otro miembro de su familia padece enfermedad mental?" options={['SI', 'NO']} value={formData.familyMentalIllness} onChange={e => updateField('familyMentalIllness', e.target.value)} />
                                 {formData.familyMentalIllness === 'SI' && (
-                                    <>
+                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-4 rounded-xl">
                                         <InputField label="¿Quién?" value={formData.familyMentalWho} onChange={e => updateField('familyMentalWho', e.target.value)} />
-                                        <InputField label="Detalle enfermedad mental familiar" value={formData.familyMentalIllnessDetails} onChange={e => updateField('familyMentalIllnessDetails', e.target.value)} />
+                                        <InputField label="¿Qué enfermedad mental?" value={formData.familyMentalIllnessDetails} onChange={e => updateField('familyMentalIllnessDetails', e.target.value)} />
                                         <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyMentalHospitalized} onChange={e => updateField('familyMentalHospitalized', e.target.value)} />
-                                    </>
+                                    </div>
                                 )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <TextAreaField label="Medicamentos de uso ininterrumpido" value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} />
-                                <SelectField label="¿Quién se encuentra en tratamiento?" options={['TITULAR', 'INTEGRANTE DE SU NÚCLEO FAMILIAR', 'AMBOS', 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR', 'NINGUNO']} value={formData.whoInTreatment} onChange={e => updateField('whoInTreatment', e.target.value)} />
+                                <TextAreaField label="Medicamentos de tratamiento que no pueda suspender" value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} />
+                                <SelectField label="¿Quién está en tratamiento?" options={['TITULAR', 'INTEGRANTE DE SU NÚCLEO FAMILIAR', 'AMBOS', 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR', 'NINGUNO']} value={formData.whoInTreatment} onChange={e => updateField('whoInTreatment', e.target.value)} />
                                 {formData.whoInTreatment === 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR' && (
                                     <InputField label="Especifique quién" value={formData.whoInTreatmentDetail} onChange={e => updateField('whoInTreatmentDetail', e.target.value)} />
                                 )}
                             </div>
                         </section>
-                        <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Consumo de Sustancias</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <SelectField label="¿Consume sustancias psicoactivas o alcohol?" options={['SI', 'NO']} value={formData.consumesSubstances} onChange={e => updateField('consumesSubstances', e.target.value)} />
-                                {formData.consumesSubstances === 'SI' && (
-                                    <>
-                                        <InputField label="Detalle sustancias" value={formData.substancesDetails} onChange={e => updateField('substancesDetails', e.target.value)} />
-                                        <InputField label="Tiempo de consumo" value={formData.consumptionTime} onChange={e => updateField('consumptionTime', e.target.value)} />
-                                        <SelectField label="¿Se encuentra en tratamiento?" options={['SI', 'NO']} value={formData.inTreatmentSubstances} onChange={e => updateField('inTreatmentSubstances', e.target.value)} />
-                                    </>
-                                )}
-                                <SelectField label="¿Algún miembro de su familia consume?" options={['SI', 'NO']} value={formData.familyConsumesSubstances} onChange={e => updateField('familyConsumesSubstances', e.target.value)} />
-                                {formData.familyConsumesSubstances === 'SI' && (
-                                    <>
-                                        <InputField label="¿Quién?" value={formData.familyConsumesWho} onChange={e => updateField('familyConsumesWho', e.target.value)} />
-                                        <InputField label="Detalle sustancias familiar" value={formData.familySubstancesDetails} onChange={e => updateField('familySubstancesDetails', e.target.value)} />
-                                        <SelectField label="¿Se encuentra en tratamiento?" options={['SI', 'NO']} value={formData.familyInTreatmentSubstances} onChange={e => updateField('familyInTreatmentSubstances', e.target.value)} />
-                                        {formData.familyInTreatmentSubstances === 'SI' && <InputField label="¿Quién está en tratamiento?" value={formData.familyInTreatmentWho} onChange={e => updateField('familyInTreatmentWho', e.target.value)} />}
-                                    </>
-                                )}
+
+                        <section className="bg-slate-50/50 p-6 rounded-3xl border border-slate-200">
+                            <h3 className="text-[11px] font-black uppercase text-indigo-700 mb-8 flex items-center gap-2">
+                                <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                                Consumo de sustancias psicoactivas
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                                {/* Pregunta 1: Titular Consume */}
+                                <div className="space-y-4">
+                                    <SelectField 
+                                        label="¿Consume sustancias psicoactivas?" 
+                                        options={['SI', 'NO']} 
+                                        value={formData.consumesSubstances} 
+                                        onChange={e => updateField('consumesSubstances', e.target.value)} 
+                                    />
+                                    {formData.consumesSubstances === 'SI' && (
+                                        <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm animate-in zoom-in-95 duration-200">
+                                            <InputField label="¿Qué sustancias?" value={formData.substancesDetails} onChange={e => updateField('substancesDetails', e.target.value)} />
+                                            <InputField label="Tiempo de consumo" value={formData.consumptionTime} onChange={e => updateField('consumptionTime', e.target.value)} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Pregunta 2: Tratamiento Titular */}
+                                <div className="space-y-4">
+                                    <SelectField 
+                                        label="¿Ha estado en tratamiento por consumo de sustancias psicoactivas?" 
+                                        options={['SI', 'NO']} 
+                                        value={formData.inTreatmentSubstances} 
+                                        onChange={e => updateField('inTreatmentSubstances', e.target.value)} 
+                                    />
+                                </div>
+
+                                {/* Pregunta 3: Familia Consume */}
+                                <div className="space-y-4">
+                                    <SelectField 
+                                        label="¿Algún miembro de su familia consume?" 
+                                        options={['SI', 'NO']} 
+                                        value={formData.familyConsumesSubstances} 
+                                        onChange={e => updateField('familyConsumesSubstances', e.target.value)} 
+                                    />
+                                    {formData.familyConsumesSubstances === 'SI' && (
+                                        <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm animate-in zoom-in-95 duration-200">
+                                            <InputField label="¿Quién?" value={formData.familyConsumesWho} onChange={e => updateField('familyConsumesWho', e.target.value)} />
+                                            <InputField label="Detalle sustancias" value={formData.familySubstancesDetails} onChange={e => updateField('familySubstancesDetails', e.target.value)} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Pregunta 4: Tratamiento Familia */}
+                                <div className="space-y-4">
+                                    <SelectField 
+                                        label="¿Otro miembro de su grupo familiar ha estado en tratamiento por consumo de sustancias?" 
+                                        options={['SI', 'NO']} 
+                                        value={formData.familyInTreatmentSubstances} 
+                                        onChange={e => updateField('familyInTreatmentSubstances', e.target.value)} 
+                                    />
+                                    {formData.familyInTreatmentSubstances === 'SI' && (
+                                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm animate-in zoom-in-95 duration-200">
+                                            <InputField label="¿Quién está en tratamiento?" value={formData.familyInTreatmentWho} onChange={e => updateField('familyInTreatmentWho', e.target.value)} />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </section>
                     </div>

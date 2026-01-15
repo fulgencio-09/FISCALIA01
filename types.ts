@@ -42,6 +42,7 @@ export interface FamilyMember {
   isActive: boolean;
   age?: string;
   residencePlace?: string;
+  sex?: string; // Nuevo campo: Sexo del integrante
 }
 
 export interface Pet {

@@ -94,7 +94,9 @@ const SavedCasesPage: React.FC = () => {
         docNumber: currentCase.docNumber,
         relationship: "PADRE/MADRE",
         birthDate: "1980-01-01", // Placeholder
-        isActive: true
+        isActive: true,
+        sex: "NO INFORMA",
+        residencePlace: currentCase.requestCity
     };
 
     // 2. Update Case Data with New Titular
@@ -136,6 +138,8 @@ const SavedCasesPage: React.FC = () => {
       docNumber: formData.get('docNumber') as string,
       relationship: (formData.get('relationship') as string).toUpperCase(),
       birthDate: formData.get('birthDate') as string,
+      sex: formData.get('sex') as string,
+      residencePlace: (formData.get('residencePlace') as string || "").toUpperCase(),
     };
 
     setAllFamilyData(prev => {
@@ -250,7 +254,7 @@ const SavedCasesPage: React.FC = () => {
            <div className="bg-white rounded-2xl shadow-2xl max-sm w-full overflow-hidden animate-in zoom-in-95 duration-200">
               <div className="p-8 text-center">
                  <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" cy="12" r="0"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                  </div>
                  <h3 className="text-xl font-bold text-slate-900 mb-3">Confirmar desactivar</h3>
                  <p className="text-slate-500 text-sm leading-relaxed mb-8">
@@ -557,7 +561,7 @@ const SavedCasesPage: React.FC = () => {
                     <h3 className="text-sm font-black uppercase tracking-tight text-slate-700">SIDPA 3.0 - VISTA PREVIA</h3>
                  </div>
                  <div className="flex items-center gap-3">
-                    <button onClick={() => window.print()} className="px-6 py-2 bg-white border border-slate-300 text-slate-700 font-bold rounded-lg text-[10px] uppercase hover:bg-slate-50 transition-all flex items-center gap-2"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6v-8z"/></svg>Imprimir Documento</button>
+                    <button onClick={() => window.print()} className="px-6 py-2 bg-white border border-slate-300 text-slate-700 font-bold rounded-lg text-[10px] uppercase hover:bg-slate-50 transition-all flex items-center gap-2"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6v-8z"/></svg>Imprimir Documento</button>
                     <button onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId })} className="p-2 text-slate-400 hover:text-slate-900 transition-colors"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                  </div>
               </div>
@@ -693,6 +697,8 @@ const SavedCasesPage: React.FC = () => {
                     <InputField label="Número Documento" name="docNumber" defaultValue={editingMember?.docNumber} required placeholder="Sin puntos ni comas" />
                     <SelectField label="Parentesco" name="relationship" options={["CÓNYUGE", "HIJO/A", "PADRE/MADRE", "HERMANO/A", "TÍO/A", "SOBRINO/A", "ABUELO/A", "OTRO"]} defaultValue={editingMember?.relationship} required />
                     <InputField label="Fecha de Nacimiento" name="birthDate" type="date" defaultValue={editingMember?.birthDate} required />
+                    <SelectField label="Sexo" name="sex" options={["MASCULINO", "FEMENINO", "OTRO", "NO INFORMA"]} defaultValue={editingMember?.sex} required />
+                    <InputField label="Lugar de Residencia" name="residencePlace" defaultValue={editingMember?.residencePlace} placeholder="EJ: BOGOTÁ D.C." required />
                  </div>
                  <div className="flex justify-end gap-4 border-t border-slate-100 pt-8">
                     <button type="button" onClick={() => { setEditingMember(null); setActiveModal({type: 'LIST_FAMILY', caseId: activeModal.caseId}); }} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>

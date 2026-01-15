@@ -815,8 +815,8 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, onCancel
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <TextAreaField label="Medicamentos de tratamiento que no pueda suspender" value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} />
-                                <SelectField label="¿Quién está en tratamiento?" options={['TITULAR', 'INTEGRANTE DE SU NÚCLEO FAMILIAR', 'AMBOS', 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR', 'NINGUNO']} value={formData.whoInTreatment} onChange={e => updateField('whoInTreatment', e.target.value)} />
-                                {formData.whoInTreatment === 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR' && (
+                                <SelectField label="¿Quién está en tratamiento?" options={['Usted','Otro miembro de su núcleo familiar']} value={formData.whoInTreatment} onChange={e => updateField('whoInTreatment', e.target.value)} />
+                                {formData.whoInTreatment === 'Otro miembro de su núcleo familiar' && (
                                     <InputField label="Especifique quién" value={formData.whoInTreatmentDetail} onChange={e => updateField('whoInTreatmentDetail', e.target.value)} />
                                 )}
                             </div>

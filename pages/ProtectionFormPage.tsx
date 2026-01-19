@@ -25,6 +25,7 @@ interface ProtectionFormPageProps {
 const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, isEditing = false, onCancel, onSaveSuccess, readOnly = false }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [submissionResult, setSubmissionResult] = useState<{success: boolean, radicado: string} | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   
   // State for SPOA Search
   const [spoaLoading, setSpoaLoading] = useState(false);
@@ -131,6 +132,13 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // PREVENIR GUARDADO AUTOMÁTICO AL PRESIONAR ENTER
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  };
 
   const updateField = (field: keyof ProtectionRequestForm, value: any) => {
     if (readOnly) return;
@@ -284,30 +292,63 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const initiateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (readOnly) return;
-    
-    if (validateStep(currentStep)) { 
-      setIsSubmitting(true);
-      
-      setTimeout(() => {
-        const radicado = isEditing ? (initialData?.radicado || "ACTUALIZADO") : ""; 
-        setSubmissionResult({ success: true, radicado });
-        setIsSubmitting(false);
-        
-        if (onSaveSuccess) {
-           const message = isEditing 
-            ? `La solicitud con NUNC ${formData.nunc} ha sido guardada exitosamente.`
-            : `La solicitud con NUNC ${formData.nunc} ha sido guardada exitosamente. El sistema ha registrado la información satisfactoriamente.`;
-           onSaveSuccess(message);
-        }
-      }, 1500);
+    if (validateStep(currentStep)) {
+      setShowConfirmModal(true);
     }
   };
 
+  const handleFinalSubmit = () => {
+    setShowConfirmModal(false);
+    setIsSubmitting(true);
+    
+    setTimeout(() => {
+      const radicado = isEditing ? (initialData?.radicado || "ACTUALIZADO") : ""; 
+      setSubmissionResult({ success: true, radicado });
+      setIsSubmitting(false);
+      
+      if (onSaveSuccess) {
+         const message = isEditing 
+          ? `La solicitud con NUNC ${formData.nunc} ha sido guardada exitosamente.`
+          : `La solicitud con NUNC ${formData.nunc} ha sido guardada exitosamente. El sistema ha registrado la información satisfactoriamente.`;
+         onSaveSuccess(message);
+      }
+    }, 1500);
+  };
+
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8">
+    <div className="max-w-5xl mx-auto p-4 md:p-8" onKeyDown={handleKeyDown}>
+      {/* MODAL DE CONFIRMACIÓN PARA EVITAR GUARDADO AUTOMÁTICO */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="p-6 text-center">
+                 <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                 </div>
+                 <h3 className="text-lg font-bold text-slate-900 mb-2">Confirmar Guardado</h3>
+                 <p className="text-slate-500 text-sm mb-6">¿Está seguro de que desea finalizar y guardar esta solicitud de medida de protección?</p>
+                 <div className="flex gap-3">
+                    <button 
+                      onClick={() => setShowConfirmModal(false)}
+                      className="flex-1 px-4 py-2 border border-slate-300 text-slate-600 font-bold rounded-lg hover:bg-slate-50 transition-colors uppercase text-xs"
+                    >
+                      Seguir Editando
+                    </button>
+                    <button 
+                      onClick={handleFinalSubmit}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-lg uppercase text-xs"
+                    >
+                      Sí, Guardar
+                    </button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      )}
+
       <div className="mb-6 flex justify-between items-start">
         <div>
             <h1 className="text-2xl font-bold text-slate-900">
@@ -317,20 +358,20 @@ const ProtectionFormPage: React.FC<ProtectionFormPageProps> = ({ initialData, is
                 }
             </h1>
             <p className="text-slate-500 text-sm mt-1">
-               {readOnly ? "Modo solo lectura. No se permiten cambios." : "Diligencie el formulario paso a paso."}
+               {readOnly ? "Modo solo lectura. No se permiten cambios." : "Diligencie el formulario paso a paso. No olvide adjuntar los soportes en la última sección."}
             </p>
         </div>
-        {onCancel && (
+         {onCancel && (
             <button 
                 onClick={onCancel}
                 className="text-sm bg-slate-200 text-slate-700 px-3 py-1.5 rounded hover:bg-slate-300 transition-colors"
             >
                 {readOnly ? "Volver" : "Cancelar Edición"}
             </button>
-        )}
+        )} 
       </div>
       
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={initiateSubmit}>
         <FormSection title="Datos Generales">
           {formData.radicado && (
              <>

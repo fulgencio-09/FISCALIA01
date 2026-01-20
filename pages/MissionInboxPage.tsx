@@ -5,9 +5,10 @@ import { ProtectionMission } from '../types';
 interface MissionInboxPageProps {
   missions: ProtectionMission[];
   onStartInterview: (mission: ProtectionMission) => void;
+  onStartITVR: (mission: ProtectionMission) => void; // Nueva prop
 }
 
-const MissionInboxPage: React.FC<MissionInboxPageProps> = ({ missions, onStartInterview }) => {
+const MissionInboxPage: React.FC<MissionInboxPageProps> = ({ missions, onStartInterview, onStartITVR }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Missions with status 'ASIGNADA' (Reassigned)
@@ -30,7 +31,7 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({ missions, onStartIn
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Bandeja de Misiones</h1>
-          <p className="text-slate-500 font-medium italic">Listado de misiones reasignadas para ejecución de entrevista técnica.</p>
+          <p className="text-slate-500 font-medium italic">Listado de misiones reasignadas para ejecución de entrevista técnica y valoración de riesgo.</p>
         </div>
         <div className="relative max-w-sm w-full">
           <input 
@@ -70,13 +71,24 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({ missions, onStartIn
                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{m.assignedOfficial || 'POR ASIGNAR'}</span>
                     </td>
                     <td className="px-8 py-6 text-center">
-                        <button 
-                            onClick={() => onStartInterview(m)}
-                            className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 mx-auto"
-                        >
-                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            Crear Entrevista
-                        </button>
+                        <div className="flex items-center justify-center gap-3">
+                            <button 
+                                onClick={() => onStartInterview(m)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-100 flex items-center gap-2"
+                                title="Crear Entrevista Técnica"
+                            >
+                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                Entrevista
+                            </button>
+                            <button 
+                                onClick={() => onStartITVR(m)}
+                                className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-black active:scale-95 transition-all shadow-lg shadow-slate-200 flex items-center gap-2"
+                                title="Valoración Técnica de Riesgo (Matriz ITVR)"
+                            >
+                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                ITVR
+                            </button>
+                        </div>
                     </td>
                   </tr>
                 ))

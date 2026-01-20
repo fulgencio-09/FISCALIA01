@@ -42,7 +42,7 @@ export interface FamilyMember {
   isActive: boolean;
   age?: string;
   residencePlace?: string;
-  sex?: string; // Nuevo campo: Sexo del integrante
+  sex?: string;
 }
 
 export interface Pet {
@@ -75,22 +75,85 @@ export interface ProtectionMission {
   observations?: string;
 }
 
+export interface ITVRForm {
+  // Datos Misión
+  evaluationNo: string; // Nuevo: Numero de evaluación
+  evaluationDate: string; // Nuevo: Fecha de evaluación
+  missionNo: string;
+  caseNo: string;
+  radicado: string;
+  evaluator: string;
+  
+  // 1. Amenaza
+  realidadAmenaza: string;
+  obs1: string;
+  individualidadAmenaza: string;
+  obs2: string;
+  situacionAmenazado: string;
+  obs3: string;
+  escenarioAmenaza: string;
+  obs4: string;
+  generadorAmenaza: string;
+  obs5: string;
+  capacidadAmenaza: string;
+  obs6: string;
+  interesAmenaza: string;
+  obs7: string;
+  inminenciaAmenaza: string;
+  obs8: string;
+
+  // 2. Riesgo Específico
+  especificoIndividualizable: string;
+  obs9: string;
+  concreto: string;
+  obs10: string;
+  presente: string;
+  obs11: string;
+  importante: string;
+  obs12: string;
+  serio: string;
+  obs13: string;
+  claroDiscernible: string;
+  obs14: string;
+  excepcional: string;
+  obs15: string;
+  proporcionalidad: string;
+  obs16: string;
+  graveInminente: string;
+  obs17: string;
+
+  // 3. Vulnerabilidad
+  conductasComportamientos: string;
+  obs18: string;
+  permanenciaZona: string;
+  obs19: string;
+  vulnerabilidadResidencial: string;
+  obs20: string;
+  vulnerabilidadLaboral: string;
+  obs21: string;
+  vulnerabilidadDesplazamientos: string;
+  obs22: string;
+  presenciaFDG: string;
+  obs23: string;
+  vulnerabilidadAsociadaFDG: string;
+  obs24: string;
+  vulnerabilidadAsociadaGenero: string;
+  obs25: string;
+  vulnerabilidadesNucleo: string;
+  obs26: string;
+}
+
 export interface TechnicalInterviewForm {
-  // Sección 1: Datos Misión (Precargados)
   caseNumber: string;
   missionNumber: string;
   missionObject: string;
   assignedEvaluator: string;
   regional: string;
   interviewAuthorized: 'SI' | 'NO' | 'NO APLICA' | '';
-  
-  // Sección 1: Control (Evaluador)
   place: string;
   date: string;
   startTime: string;
   endTime: string;
-  
-  // Sección 2: Candidato (Precargados)
   name1: string;
   name2: string;
   surname1: string;
@@ -99,7 +162,6 @@ export interface TechnicalInterviewForm {
   docNumber: string;
   expeditionDate: string;
   expeditionPlace: string;
-  // Sección 2: Complementarios (Evaluador)
   birthPlace: string;
   birthDepartment: string;
   birthMunicipality: string;
@@ -119,8 +181,6 @@ export interface TechnicalInterviewForm {
   zone: 'URBANA' | 'RURAL' | '';
   ruvRegistered: 'SI' | 'NO' | '';
   rumvRegistered: 'SI' | 'NO' | '';
-  
-  // Sección 3: Caracterización
   personQuality: string;
   civilStatus: string;
   dependentsCount: string;
@@ -129,11 +189,7 @@ export interface TechnicalInterviewForm {
   profession: string;
   monthlyIncome: string;
   observationsGeneral: string;
-  
-  // Sección 4: Familia
   familyMembers: FamilyMember[];
-  
-  // Sección 5: Animales
   hasPets: 'SI' | 'NO' | '';
   petsCount: string;
   pets: Pet[];
@@ -141,8 +197,6 @@ export interface TechnicalInterviewForm {
   isSpecialBreed: 'SI' | 'NO' | '';
   hasTravelResources: 'SI' | 'NO' | '';
   petObservations: string;
-  
-  // Sección 6: Médicos y Clínicos
   physicalIllness: 'SI' | 'NO' | '';
   physicalIllnessDetails: string;
   hospitalizedPhysical: 'SI' | 'NO' | '';
@@ -160,8 +214,6 @@ export interface TechnicalInterviewForm {
   uninterruptibleMeds: string;
   whoInTreatment: string;
   whoInTreatmentDetail: string;
-  
-  // Consumo
   consumesSubstances: 'SI' | 'NO' | '';
   substancesDetails: string;
   consumptionTime: string;
@@ -171,8 +223,6 @@ export interface TechnicalInterviewForm {
   inTreatmentSubstances: 'SI' | 'NO' | '';
   familyInTreatmentSubstances: 'SI' | 'NO' | '';
   familyInTreatmentWho: string;
-
-  // Sección 7: Intervención Procesal y Vulnerabilidades
   proceduralIntervention: string;
   threatsReceived: string;
   hasConvictions: 'SI' | 'NO' | '';
@@ -191,8 +241,6 @@ export interface TechnicalInterviewForm {
   housePhysicalDescription: string;
   workEnvironmentVulnerability: string;
   dailyMobilityVulnerability: string;
-  
-  // Sección 8: Factores Diferenciales
   differentialFactors: Record<string, { titular: boolean; familiar: boolean }>;
   observationsDifferential: string;
   vulnerabilityDifferentialPop: string;
@@ -227,7 +275,7 @@ export interface ProtectionCaseForm {
   generateMission: boolean;
   attachments: File[];
   caseId?: string;
-  linkedCaseId?: string; // Nuevo: Vínculo con otro caso
+  linkedCaseId?: string;
 }
 
 export interface ValidationErrors {

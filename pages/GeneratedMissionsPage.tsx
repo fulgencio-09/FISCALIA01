@@ -92,7 +92,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
         observations
     };
 
-    const successMessage = `Se ha asignado la Misión al funcionario ${assignedOfficial} de la Regional ${regional}`;
+    const successMessage = `Se ha asignado la Orden de Trabajo al funcionario ${assignedOfficial} de la Regional ${regional}`;
     
     if (onSaveSuccess) {
       onSaveSuccess(successMessage, updatedMission);
@@ -131,7 +131,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                     </div>
                 </div>
                 <div className="text-right border-l-2 border-slate-900 pl-8">
-                    <span className="text-[9px] font-black text-slate-400 block tracking-widest uppercase">Misión No.</span>
+                    <span className="text-[9px] font-black text-slate-400 block tracking-widest uppercase">Orden No.</span>
                     <span className="text-xl font-mono font-black text-blue-700">{selectedMission.missionNo}</span>
                 </div>
             </div>
@@ -142,19 +142,22 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                 <section>
                     <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        I. Datos del Expediente y Misión (Precargados)
+                        I. Datos del Expediente y orden de trabajo (Precargados)
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <InputField label="Numero de Misión" value={selectedMission.missionNo} disabled className="bg-slate-50" />
+                        <InputField label="Numero de Orden de Trabajo" value={selectedMission.missionNo} disabled className="bg-slate-50" />
                         <InputField label="Numero de caso" value={associatedCase.caseId || ''} disabled className="bg-slate-50" />
                         <InputField label="Numero de Radicado" value={associatedCase.radicado} disabled className="bg-slate-50" />
                         
-                        <InputField label="Fecha de generación Misión de Trabajo" value={selectedMission.creationDate} disabled className="bg-slate-50" />
-                        <InputField label="Fecha de Inicio de Misión de Trabajo" value={associatedCase.missionStartDate} disabled className="bg-slate-50" />
+                        <InputField label="Fecha de generación Orden de Trabajo" value={selectedMission.creationDate} disabled className="bg-slate-50" />
+                        <InputField label="Fecha de inicio de orden de trabajo" value={associatedCase.missionStartDate} disabled className="bg-slate-50" />
                         <InputField label="Fecha de vencimiento de términos" value={selectedMission.dueDate} disabled className="bg-slate-50 text-red-600 font-bold" />
                         
-                        <div className="md:col-span-3">
-                             <InputField label="Tipo de Misión" value={selectedMission.type} disabled className="bg-slate-50 uppercase font-bold" />
+                        <div className="md:col-span-2">
+                             <InputField label="Tipo de orden de trabajo" value={selectedMission.type} disabled className="bg-slate-50 uppercase font-bold" />
+                        </div>
+                        <div>
+                             <InputField label="Clasificación de orden de trabajo" value={selectedMission.missionClassification || associatedCase.missionClassification || ''} disabled className="bg-slate-50 uppercase font-black text-blue-800" />
                         </div>
                     </div>
                 </section>
@@ -183,7 +186,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                 <section className="bg-blue-50/40 p-10 rounded-[2.5rem] border-2 border-blue-200">
                     <h3 className="text-[11px] font-black uppercase text-blue-900 mb-8 flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        III. Gestión de Reasignación de Misión
+                        III. Gestión de Reasignación de Orden de Trabajo
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <SelectField 
@@ -201,7 +204,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                             onChange={e => setAssignedOfficial(e.target.value)} 
                         />
                         <InputField 
-                            label="Fecha de reasignación de misión" 
+                            label="Fecha de reasignación de orden" 
                             type="date" 
                             value={reassignmentDate} 
                             onChange={e => setReassignmentDate(e.target.value)} 
@@ -262,13 +265,13 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
     <div className="max-w-7xl mx-auto p-4 md:p-10">
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Misiones de Protección (Pendientes)</h1>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Bandeja de Ordenes (Pendientes)</h1>
           <p className="text-slate-500 font-medium italic">Bandeja de órdenes de trabajo esperando asignación inicial.</p>
         </div>
         <div className="relative max-w-sm w-full">
           <input 
             type="text" 
-            placeholder="Filtrar misiones..." 
+            placeholder="Filtrar ordenes..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all"
@@ -283,7 +286,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
             <thead className="bg-slate-50/50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
               <tr>
                 <th className="px-8 py-6">Fecha Generación</th>
-                <th className="px-8 py-6">Número Misión</th>
+                <th className="px-8 py-6">Número Orden</th>
                 <th className="px-8 py-6">Asunto</th>
                 <th className="px-8 py-6">No. Radicado</th>
                 <th className="px-8 py-6">No. Caso</th>
@@ -316,7 +319,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                             onClick={() => handleReassignAction(m)}
                             className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 mx-auto"
                         >
-                            Reasignar Misión
+                            Asignar Orden
                         </button>
                     </td>
                     </tr>
@@ -326,7 +329,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                     <td colSpan={6} className="px-8 py-20 text-center">
                         <div className="flex flex-col items-center gap-4 opacity-40">
                              <svg width="48" height="48" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                             <p className="text-[11px] font-black uppercase tracking-widest">No hay misiones pendientes de asignación</p>
+                             <p className="text-[11px] font-black uppercase tracking-widest">No hay ordenes pendientes de asignación</p>
                         </div>
                     </td>
                 </tr>

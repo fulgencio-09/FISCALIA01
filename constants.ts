@@ -42,14 +42,62 @@ export const COLOMBIA_GEO: Record<string, string[]> = {
   "SAN ANDRÉS Y PROVIDENCIA": ["San Andrés", "Providencia"],
   "SANTANDER": ["Bucaramanga", "Floridablanca", "Girón", "Barrancabermeja"],
   "SUCRE": ["Sincelejo", "Corozal"],
+  "SANTANDER DE QUILICHAO": ["SANTANDER DE QUILICHAO"],
   "TOLIMA": ["Ibagué", "Espinal", "Melgar"],
   "VALLE DEL CAUCA": ["Cali", "Buenaventura", "Palmira", "Tuluá", "Buga", "Cartago"],
   "VAUPÉS": ["Mitú"],
   "VICHADA": ["Puerto Carreño"]
 };
 
+// Mock para el Web Service de la Registraduría
+// Se incluye birthDate para calcular la mayoría/minoría de 14 años
+export const REGISTRY_WS_DB: Record<string, any> = {
+  "79123456": {
+    firstName: "PEDRO",
+    secondName: "PABLO",
+    firstSurname: "PÉREZ",
+    secondSurname: "GARCÍA",
+    petitionerDocType: DocType.CC,
+    petitionerDocNumber: "79123456",
+    petitionerExpeditionDate: "2010-05-20",
+    petitionerExpeditionPlace: "Bogotá D.C.",
+    birthDate: "1990-05-20" // Mayor de 14 -> Bloqueado
+  },
+  "52987654": {
+    firstName: "JUANITA",
+    secondName: "ESTELLA",
+    firstSurname: "CASTRO",
+    secondSurname: "LOPEZ",
+    petitionerDocType: DocType.CC,
+    petitionerDocNumber: "52987654",
+    petitionerExpeditionDate: "2015-11-12",
+    petitionerExpeditionPlace: "Medellín",
+    birthDate: "2000-11-12" // Mayor de 14 -> Bloqueado
+  },
+  "1105123456": {
+    firstName: "SANTIAGO",
+    secondName: "",
+    firstSurname: "GÓMEZ",
+    secondSurname: "RUIZ",
+    petitionerDocType: DocType.TI,
+    petitionerDocNumber: "1105123456",
+    petitionerExpeditionDate: "2023-01-10",
+    petitionerExpeditionPlace: "Cali",
+    birthDate: "2015-08-20" // Menor de 14 -> Editable
+  }
+};
+
 export const REGIONAL_UNITS = [
-  "REGIONAL BARRANQUILLA", "REGIONAL BOGOTÁ", "REGIONAL CALI", "REGIONAL MEDELLÍN", "REGIONAL CÚCUTA", "NIVEL CENTRAL"
+  "Unidad Regional Centro Sur",
+  "Unidad Regional Caribe",
+  "Unidad Regional Pácifico",
+  "Unidad Regional Orinoquía",
+  "Unidad Regional Nororiente",
+  "Unidad Regional Noroccidente",
+  "Nivel Central",
+  "Unidad Regional Eje cafetero",
+  "Sección satelital Boyacá",
+  "Sección satelital Cucuta"
 ];
 
 export const ENTITIES = [
@@ -125,12 +173,31 @@ export const SUBJECTS = [
   "SOLICITUD EVALUACIÓN DE RIESGO", "SOLICITUD MEDIDAS DE EMERGENCIA", "REVALUACIÓN DE RIESGO", "ESTUDIO DE SEGURIDAD A INSTALACIONES"
 ];
 
-export const AREAS = [
-  "PROTECCIÓN A PERSONAS", "PROTECCIÓN A INSTALACIONES", "INTELIGENCIA PROTECTIVA"
+export const SECCIONES = [
+  "Sección de Investigaciones y evaluaciones",
+  "Sección de Operaciones",
+  "Sección de Asistencia integral",
+  "Sección de Justicia transicional",
+  "Sección Juridica",
+  "Sección de Gestión documental",
+  "Sección Administrativa",
+  "Sección Gastos Reservados",
+  "Sección de Esquemas de seguridad",
+  "Area Verificación para el ingreso",
+  "PQRS"
 ];
 
 export const MISSION_TYPES = [
-  "EVALUACIÓN DE RIESGO", "IMPLEMENTACIÓN ESQUEMA", "VISITA TÉCNICA", "VERIFICACIÓN"
+  "IMPLEMENTACIÓN ESQUEMA", "VISITA TÉCNICA", "VERIFICACIÓN"
+];
+
+export const EVALUATION_MISSION_TYPES = [
+  "Evaluación técnica de amenaza y riesgo",
+  "Estudio de riesgo"
+];
+
+export const MISSION_CLASSIFICATIONS = [
+  "OPERACIONAL", "MISIONAL"
 ];
 
 export const APPLICANT_ROLES_NEW = [
@@ -244,7 +311,7 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
   {
     radicado: "FGN-2024-582910",
     radicationDate: "2024-05-16",
-    destinationUnit: "REGIONAL BOGOTÁ",
+    destinationUnit: "Unidad Regional Centro Sur",
     remittingEntity: "FISCALÍA GENERAL DE LA NACIÓN",
     candidateClassification: "VICTIMA",
     origin: "BOGOTÁ",
@@ -259,9 +326,9 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     secondSurname: "GARCÍA",
     applicantRole: "TITULAR",
     subject: "SOLICITUD EVALUACIÓN DE RIESGO",
-    assignedArea: "PROTECCIÓN A PERSONAS",
+    assignedArea: "Sección de Investigaciones y evaluaciones",
     missionStartDate: "2024-06-01",
-    missionType: "EVALUACIÓN DE RIESGO",
+    missionType: "Evaluación técnica de amenaza y riesgo",
     dueDate: "2024-06-15",
     observations: "Caso prioritario por amenazas de BACRIM.",
     folios: "45",
@@ -272,7 +339,7 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
   {
     radicado: "FGN-2024-112233",
     radicationDate: "2024-07-20",
-    destinationUnit: "REGIONAL CALI",
+    destinationUnit: "Unidad Regional Pácifico",
     remittingEntity: "FISCALÍA GENERAL DE LA NACIÓN",
     candidateClassification: "TESTIGO",
     origin: "CALI",
@@ -287,7 +354,7 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     secondSurname: "MORALES",
     applicantRole: "TITULAR",
     subject: "SOLICITUD MEDIDAS DE EMERGENCIA",
-    assignedArea: "PROTECCIÓN A PERSONAS",
+    assignedArea: "Sección de Operaciones",
     missionStartDate: "2024-07-25",
     missionType: "VERIFICACIÓN",
     dueDate: "2024-08-05",
@@ -300,7 +367,7 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
   {
     radicado: "FGN-2024-998877",
     radicationDate: "2024-08-02",
-    destinationUnit: "NIVEL CENTRAL",
+    destinationUnit: "Nivel Central",
     remittingEntity: "DEFENSORÍA DEL PUEBLO",
     candidateClassification: "INTERVINIENTE",
     origin: "MEDELLÍN",
@@ -315,9 +382,9 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     secondSurname: "OSPINA",
     applicantRole: "REPRESENTANTE LEGAL",
     subject: "REVALUACIÓN DE RIESGO",
-    assignedArea: "INTELIGENCIA PROTECTIVA",
+    assignedArea: "Sección de Justicia transicional",
     missionStartDate: "2024-08-05",
-    missionType: "EVALUACIÓN DE RIESGO",
+    missionType: "Evaluación técnica de amenaza y riesgo",
     dueDate: "2024-08-15",
     observations: "Representante legal de su hijo menor de edad vinculado al núcleo familiar.",
     folios: "89",
@@ -328,7 +395,7 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
   {
     radicado: "FGN-2024-774411",
     radicationDate: "2024-08-10",
-    destinationUnit: "REGIONAL BOGOTÁ",
+    destinationUnit: "Unidad Regional Centro Sur",
     remittingEntity: "FISCALÍA GENERAL DE LA NACIÓN",
     candidateClassification: "VICTIMA",
     origin: "BOGOTÁ",
@@ -343,9 +410,9 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     secondSurname: "RODRIGUEZ",
     applicantRole: "FAMILIAR",
     subject: "SOLICITUD EVALUACIÓN DE RIESGO",
-    assignedArea: "PROTECCIÓN A PERSONAS",
+    assignedArea: "Sección de Investigaciones y evaluaciones",
     missionStartDate: "2024-08-12",
-    missionType: "EVALUACIÓN DE RIESGO",
+    missionType: "Evaluación técnica de amenaza y riesgo",
     dueDate: "2024-08-25",
     observations: "Núcleo familiar del señor Pedro Pablo Pérez.",
     folios: "5",
@@ -361,15 +428,66 @@ export const MOCK_MISSIONS: ProtectionMission[] = [
     id: "MT-1",
     missionNo: "MT-2024-8842",
     caseRadicado: "FGN-2024-582910",
-    type: "EVALUACIÓN DE RIESGO",
+    type: "Evaluación técnica de amenaza y riesgo",
     petitionerName: "PEDRO PABLO PÉREZ GARCÍA",
     petitionerDoc: "79123456",
-    assignedArea: "PROTECCIÓN A PERSONAS",
+    assignedArea: "Sección de Investigaciones y evaluaciones",
     status: 'PENDIENTE',
     dueDate: "2024-06-15",
     creationDate: "2024-06-01"
   }
 ];
+
+export const SPOA_SEARCH_DB: Record<string, any> = {
+  "110016000000202300001": [
+    {
+      label: "PROCESO HOMICIDIO - FISCALÍA 45 VIDA",
+      data: {
+        investigatedFacts: "El día 15 de enero de 2023, en el sector de San Victorino, el ciudadano fue abordado por sujetos armados...",
+        legalSystem: LegalSystem.LEY_906,
+        investigatedCrimes: "Extorsión Agravada, Amenazas",
+        investigationStage: "Indagación",
+        fiscalName: "Roberto Martínez",
+        fiscalRole: "Fiscal Especializado",
+        fiscalUnit: "Unidad de Vida - Fiscalía 45",
+        fiscalCorrespondenceAddress: "Diag 22B # 52-01 Bloque F",
+        fiscalCell: "3119998877",
+        fiscalInstitutionalEmail: "roberto.martinez@fiscalia.gov.co",
+        policeName: "Capitán Andrés López",
+        policeEntity: "SIJIN - MEBOG",
+        policeCell: "3102003000",
+        policeEmail: "andres.lopez@policia.gov.co",
+        assistantName: "Marta Lucía Restrepo",
+        assistantEmail: "marta.restrepo@fiscalia.gov.co",
+        assistantCell: "3201234567"
+      }
+    }
+  ],
+  "050016000000202400123": [
+    {
+      label: "PROCESO CONCIERTO PARA DELINQUIR - CTI MEDELLÍN",
+      data: {
+        investigatedFacts: "Testigo presencial de hechos ocurridos en la Comuna 13 relacionados con Grupos Armados Organizados...",
+        legalSystem: LegalSystem.LEY_906,
+        investigatedCrimes: "Concierto para Delinquir",
+        investigationStage: "Juicio",
+        fiscalName: "Angela María Holguín",
+        fiscalRole: "Fiscal Local",
+        fiscalUnit: "Unidad de Estructura de Apoyo",
+        fiscalCorrespondenceAddress: "Carrera 52 # 42-73",
+        fiscalCell: "3145556677",
+        fiscalInstitutionalEmail: "angela.holguin@fiscalia.gov.co",
+        policeName: "Subteniente Carlos Ruiz",
+        policeEntity: "CTI Medellín",
+        policeCell: "3128889900",
+        policeEmail: "carlos.ruiz@fiscalia.gov.co",
+        assistantName: "Jorge Isaacs",
+        assistantEmail: "jorge.isaacs@fiscalia.gov.co",
+        assistantCell: "3114445566"
+      }
+    }
+  ]
+};
 
 export const MOCK_FULL_REQUESTS: Record<string, ProtectionRequestForm> = {
   "1": {
@@ -456,75 +574,6 @@ export const MOCK_FULL_REQUESTS: Record<string, ProtectionRequestForm> = {
     policeEmail: "carlos.ruiz@fiscalia.gov.co",
     attachments: []
   }
-};
-
-export const SPOA_SEARCH_DB: Record<string, any> = {
-  "110016000000202300001": [
-    {
-      label: "PEDRO PABLO PÉREZ GARCÍA (Victima) - CC 79123456",
-      data: {
-        firstName: "PEDRO",
-        secondName: "PABLO",
-        firstSurname: "PÉREZ",
-        secondSurname: "GARCÍA",
-        petitionerDocType: DocType.CC,
-        petitionerDocNumber: "79123456",
-        petitionerExpeditionPlace: "Bogotá D.C.",
-        petitionerExpeditionDate: "1990-05-20",
-        personQuality: PersonQuality.VICTIM,
-        investigatedFacts: "El día 15 de enero de 2023, en el sector de San Victorino, el ciudadano fue abordado por sujetos armados...",
-        legalSystem: LegalSystem.LEY_906,
-        investigatedCrimes: "Extorsión Agravada, Amenazas",
-        investigationStage: "Indagación",
-        fiscalName: "Roberto Martínez",
-        fiscalRole: "Fiscal Especializado",
-        fiscalUnit: "Unidad de Vida - Fiscalía 45",
-        fiscalCorrespondenceAddress: "Diag 22B # 52-01 Bloque F",
-        fiscalCell: "3119998877",
-        fiscalInstitutionalEmail: "roberto.martinez@fiscalia.gov.co",
-        policeName: "Capitán Andrés López",
-        policeEntity: "SIJIN - MEBOG",
-        policeCell: "3102003000",
-        policeEmail: "andres.lopez@policia.gov.co",
-        assistantName: "Marta Lucía Restrepo",
-        assistantEmail: "marta.restrepo@fiscalia.gov.co",
-        assistantCell: "3201234567"
-      }
-    }
-  ],
-  "050016000000202400123": [
-    {
-      label: "JUANITA ESTELLA CASTRO LOPEZ (Testigo) - CC 52987654",
-      data: {
-        firstName: "JUANITA",
-        secondName: "ESTELLA",
-        firstSurname: "CASTRO",
-        secondSurname: "LOPEZ",
-        petitionerDocType: DocType.CC,
-        petitionerDocNumber: "52987654",
-        petitionerExpeditionPlace: "Medellín",
-        petitionerExpeditionDate: "2000-11-12",
-        personQuality: PersonQuality.WITNESS,
-        investigatedFacts: "Testigo presencial de hechos ocurridos en la Comuna 13 relacionados con Grupos Armados Organizados...",
-        legalSystem: LegalSystem.LEY_906,
-        investigatedCrimes: "Concierto para Delinquir",
-        investigationStage: "Juicio",
-        fiscalName: "Angela María Holguín",
-        fiscalRole: "Fiscal Local",
-        fiscalUnit: "Unidad de Estructura de Apoyo",
-        fiscalCorrespondenceAddress: "Carrera 52 # 42-73",
-        fiscalCell: "3145556677",
-        fiscalInstitutionalEmail: "angela.holguin@fiscalia.gov.co",
-        policeName: "Subteniente Carlos Ruiz",
-        policeEntity: "CTI Medellín",
-        policeCell: "3128889900",
-        policeEmail: "carlos.ruiz@fiscalia.gov.co",
-        assistantName: "Jorge Isaacs",
-        assistantEmail: "jorge.isaacs@fiscalia.gov.co",
-        assistantCell: "3114445566"
-      }
-    }
-  ]
 };
 
 export const DOC_TYPES = Object.values(DocType);

@@ -9,21 +9,23 @@ import AssignedMissionsPage from './pages/AssignedMissionsPage';
 import MissionInboxPage from './pages/MissionInboxPage';
 import InterviewFormPage from './pages/InterviewFormPage';
 import ITVRFormPage from './pages/ITVRFormPage';
-import ITVRListPage from './pages/ITVRListPage'; // Nuevo import
+import ITVRListPage from './pages/ITVRListPage'; 
+import MissionDocumentPage from './pages/MissionDocumentPage';
 import { ProtectionRequestForm, UserRole, ProtectionMission, ITVRForm } from './types';
 import { MOCK_FULL_REQUESTS, MOCK_REQUESTS, MOCK_MISSIONS } from './constants';
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions' | 'assigned-missions' | 'mission-inbox' | 'interview-form' | 'itvr-form' | 'itvr-list'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions' | 'assigned-missions' | 'mission-inbox' | 'interview-form' | 'itvr-form' | 'itvr-list' | 'mission-doc'>('home');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isEvaluacionesOpen, setIsEvaluacionesOpen] = useState(true);
   const [isProcesosOpen, setIsProcesosOpen] = useState(true);
   
-  const [userRole, setUserRole] = useState<UserRole>('LIDER');
+  const [userRole, setUserRole] = useState<UserRole>('FISCAL');
   
   const [editingRequest, setEditingRequest] = useState<ProtectionRequestForm | undefined>(undefined);
   const [selectedMissionForInterview, setSelectedMissionForInterview] = useState<ProtectionMission | undefined>(undefined);
   const [selectedMissionForITVR, setSelectedMissionForITVR] = useState<ProtectionMission | undefined>(undefined);
+  const [selectedMissionForDoc, setSelectedMissionForDoc] = useState<ProtectionMission | undefined>(undefined);
   const [editingITVR, setEditingITVR] = useState<ITVRForm | undefined>(undefined);
   const [isReadOnlyMode, setIsReadOnlyMode] = useState(false);
 
@@ -86,6 +88,21 @@ const App: React.FC = () => {
     setCurrentPage('itvr-form');
   };
 
+  const handleViewMission = (mission: ProtectionMission) => {
+    setSelectedMissionForDoc(mission);
+    setCurrentPage('mission-doc');
+  };
+
+  const handleAcceptMission = (mission: ProtectionMission) => {
+    handleUpdateMission({ ...mission, status: 'ACTIVA' });
+    showToast(`Misión ${mission.missionNo} aceptada correctamente por el Fiscal.`);
+  };
+
+  const handleRejectMission = (mission: ProtectionMission) => {
+    handleUpdateMission({ ...mission, status: 'ANULADA' });
+    showToast(`Misión ${mission.missionNo} rechazada por el Fiscal.`);
+  };
+
   const handleEditITVR = (itvr: ITVRForm) => {
     setEditingITVR(itvr);
     setIsReadOnlyMode(false);
@@ -111,7 +128,7 @@ const App: React.FC = () => {
                     <p className="text-sm font-bold mt-0.5">{globalToast.message}</p>
                 </div>
                 <button onClick={() => setGlobalToast({ show: false, message: '' })} className="ml-auto text-slate-400 hover:text-white p-1 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
         </div>
@@ -148,7 +165,7 @@ const App: React.FC = () => {
             </div>
           </div>
           
-          {(userRole === 'GESTOR' || userRole === 'LIDER') && (
+          {(userRole === 'GESTOR' || userRole === 'LIDER' || userRole === 'FISCAL') && (
             <div className="mt-4 px-2">
                 <button onClick={() => setIsEvaluacionesOpen(!isEvaluacionesOpen)} className="w-full flex items-center justify-between px-3 py-3 text-slate-700 hover:bg-slate-50 rounded-lg transition-colors group">
                 <div className="flex items-center gap-3">
@@ -166,9 +183,9 @@ const App: React.FC = () => {
                     <SidebarItem indent page="saved-cases" label="Consultar Casos" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} />
                     </>
                 )}
-                {userRole === 'LIDER' && (
+                {(userRole === 'LIDER' || userRole === 'FISCAL') && (
                     <>
-                    <SidebarItem indent page="missions" label="Misiones Pendientes" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} />
+                    {userRole === 'LIDER' && <SidebarItem indent page="missions" label="Misiones Pendientes" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} />}
                     <SidebarItem indent page="mission-inbox" label="Bandeja de Misiones" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m3 16 3-3 3 3 3-3 3 3 3-3 3 3" /></svg>} />
                     <SidebarItem indent page="itvr-list" label="ITVR" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>} />
                     <SidebarItem indent page="assigned-missions" label="Visualizar Misiones" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>} />
@@ -237,10 +254,16 @@ const App: React.FC = () => {
                   <p className="text-slate-500 mb-12 leading-relaxed font-medium text-lg">Sistema Institucional de la Fiscalía General de la Nación para la Gestión Digital de Medidas de Protección y Asistencia.</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {userRole === 'FISCAL' ? (
+                        <>
                         <button onClick={() => setCurrentPage('form')} className="bg-blue-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
                            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                            Nueva Solicitud
                         </button>
+                        <button onClick={() => setCurrentPage('mission-inbox')} className="bg-indigo-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 3-3 3 3 3-3 3 3 3-3 3 3" /></svg>
+                           Bandeja de Misiones
+                        </button>
+                        </>
                     ) : userRole === 'LIDER' ? (
                         <button onClick={() => setCurrentPage('missions')} className="bg-indigo-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
                            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -265,11 +288,22 @@ const App: React.FC = () => {
           {currentPage === 'cases' && userRole === 'GESTOR' && <ProtectionCasesPage />}
           {currentPage === 'saved-cases' && userRole === 'GESTOR' && <SavedCasesPage />}
           {currentPage === 'missions' && userRole === 'LIDER' && <GeneratedMissionsPage missions={allMissions} onSaveSuccess={(msg, updatedM) => { showToast(msg); handleUpdateMission(updatedM); }} />}
-          {currentPage === 'mission-inbox' && userRole === 'LIDER' && <MissionInboxPage missions={allMissions} onStartInterview={handleStartInterview} onStartITVR={handleStartITVR} />}
-          {currentPage === 'assigned-missions' && userRole === 'LIDER' && <AssignedMissionsPage missions={allMissions} onUpdateMission={handleUpdateMission} />}
-          {currentPage === 'interview-form' && userRole === 'LIDER' && <InterviewFormPage mission={selectedMissionForInterview} onCancel={() => setCurrentPage('mission-inbox')} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('mission-inbox'); }} />}
-          {currentPage === 'itvr-list' && userRole === 'LIDER' && <ITVRListPage onEdit={handleEditITVR} onView={handleViewITVR} />}
-          {currentPage === 'itvr-form' && userRole === 'LIDER' && <ITVRFormPage initialData={editingITVR} mission={selectedMissionForITVR} onCancel={() => setCurrentPage('itvr-list')} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('itvr-list'); }} readOnly={isReadOnlyMode} />}
+          {currentPage === 'mission-inbox' && (userRole === 'LIDER' || userRole === 'FISCAL') && (
+            <MissionInboxPage 
+              missions={allMissions} 
+              userRole={userRole}
+              onStartInterview={handleStartInterview} 
+              onStartITVR={handleStartITVR} 
+              onViewMission={handleViewMission}
+              onAcceptMission={handleAcceptMission}
+              onRejectMission={handleRejectMission}
+            />
+          )}
+          {currentPage === 'assigned-missions' && (userRole === 'LIDER' || userRole === 'FISCAL') && <AssignedMissionsPage missions={allMissions} onUpdateMission={handleUpdateMission} />}
+          {currentPage === 'interview-form' && (userRole === 'LIDER' || userRole === 'FISCAL') && <InterviewFormPage mission={selectedMissionForInterview} onCancel={() => setCurrentPage('mission-inbox')} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('mission-inbox'); }} />}
+          {currentPage === 'itvr-list' && (userRole === 'LIDER' || userRole === 'FISCAL') && <ITVRListPage onEdit={handleEditITVR} onView={handleViewITVR} />}
+          {currentPage === 'itvr-form' && (userRole === 'LIDER' || userRole === 'FISCAL') && <ITVRFormPage initialData={editingITVR} mission={selectedMissionForITVR} onCancel={() => { if(userRole === 'FISCAL') { setCurrentPage('mission-inbox') } else { setCurrentPage('itvr-list') } }} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('itvr-list'); }} readOnly={isReadOnlyMode} />}
+          {currentPage === 'mission-doc' && selectedMissionForDoc && <MissionDocumentPage mission={selectedMissionForDoc} onCancel={() => setCurrentPage('mission-inbox')} />}
         </div>
       </main>
     </div>

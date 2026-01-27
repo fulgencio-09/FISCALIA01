@@ -176,7 +176,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                     <span className="font-bold">{associatedCase.docNumber}</span>
                 </div>
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
-                    <span className="font-bold">UNIDAD ASIGNADA:</span>
+                    <span className="font-bold">SECCION ASIGNADA:</span>
                     <span className="uppercase">{selectedMission.assignedArea}</span>
                 </div>
 

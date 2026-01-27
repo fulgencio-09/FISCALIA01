@@ -63,6 +63,7 @@ export interface ProtectionMission {
   missionNo: string;
   caseRadicado: string;
   type: string;
+  missionClassification?: string;
   petitionerName: string;
   petitionerDoc: string;
   assignedArea: string;
@@ -269,6 +270,7 @@ export interface ProtectionCaseForm {
   assignedArea: string;
   missionStartDate: string;
   missionType: string;
+  missionClassification?: string;
   dueDate: string;
   observations: string;
   folios: string;

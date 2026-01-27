@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   MOCK_REQUESTS, 
   REGIONAL_UNITS, 
@@ -9,8 +9,10 @@ import {
   CITIES, 
   DOC_TYPES, 
   SUBJECTS, 
-  AREAS, 
+  SECCIONES, 
   MISSION_TYPES, 
+  EVALUATION_MISSION_TYPES,
+  MISSION_CLASSIFICATIONS,
   ORIGINS,
   APPLICANT_ROLES_NEW,
   APPLICANT_ROLES_EXISTING
@@ -53,7 +55,7 @@ const ProtectionCasesPage: React.FC = () => {
     request: ProtectionRequestSummary | null;
   }>({ show: false, caseId: '', request: null });
 
-  const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png";
+  const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
 
   const initialFormState: ProtectionCaseForm = {
     radicado: '',
@@ -75,12 +77,30 @@ const ProtectionCasesPage: React.FC = () => {
     assignedArea: '',
     missionStartDate: new Date().toISOString().split('T')[0],
     missionType: '',
+    missionClassification: '',
     dueDate: '',
     observations: '',
     folios: '',
     generateMission: false,
     attachments: []
   };
+
+  // Logic to set classification based on mission type
+  useEffect(() => {
+    if (formData) {
+        let classification = '';
+        const mType = formData.missionType;
+        if (mType === 'Evaluación técnica de amenaza y riesgo' || mType === 'Estudio de riesgo' || mType === 'VERIFICACIÓN') {
+            classification = 'MISIONAL';
+        } else if (mType === 'IMPLEMENTACIÓN ESQUEMA' || mType === 'VISITA TÉCNICA') {
+            classification = 'OPERACIONAL';
+        }
+        
+        if (classification && classification !== formData.missionClassification) {
+            setFormData(prev => prev ? ({ ...prev, missionClassification: classification }) : null);
+        }
+    }
+  }, [formData?.missionType]);
 
   const filteredRequests = useMemo(() => {
     if (!searchTerm.trim()) return radicatedRequests;
@@ -145,7 +165,15 @@ const ProtectionCasesPage: React.FC = () => {
 
   const updateField = (field: keyof ProtectionCaseForm, value: any) => {
       if (formData) {
-          setFormData({ ...formData, [field]: value });
+          const nextData = { ...formData, [field]: value };
+          
+          // Lógica de limpieza al cambiar Sección Asignada
+          if (field === 'assignedArea') {
+              nextData.missionType = '';
+              nextData.missionClassification = '';
+          }
+          
+          setFormData(nextData);
       }
   };
 
@@ -205,6 +233,11 @@ const ProtectionCasesPage: React.FC = () => {
     </button>
   );
 
+  // Determinar opciones dinámicas para Tipo de Misión
+  const missionTypeOptions = formData?.assignedArea === 'Sección de Investigaciones y evaluaciones' 
+    ? EVALUATION_MISSION_TYPES 
+    : MISSION_TYPES;
+
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8">
        {toast.show && (
@@ -216,7 +249,7 @@ const ProtectionCasesPage: React.FC = () => {
             `}>
                 <div className={`${toast.type === 'success' ? 'bg-indigo-700' : 'bg-amber-700'} p-2 rounded-full flex-shrink-0`}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        {toast.type === 'success' ? <polyline points="20 6 9 17 4 12"/> : <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>}
+                        {toast.type === 'success' ? <polyline points="20 6 9 17 4 12"/> : <circle cx="12" cy="12" r="10"/><line x1="12" cy="8" x2="12" y2="12"/><line x1="12" cy="16" x2="12.01" y2="16"/>}
                     </svg>
                 </div>
                 <div className="flex-1">
@@ -413,11 +446,11 @@ const ProtectionCasesPage: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg border border-slate-200">
             <div className="p-6 border-b border-slate-200 bg-slate-50 rounded-t-xl flex justify-between items-center">
                <div>
-                  <h2 className="text-xl font-bold text-slate-800">Generación de Misión / Caso</h2>
+                  <h2 className="text-xl font-bold text-slate-800">Generación de Orden de Trabajo / Caso</h2>
                   <p className="text-sm text-slate-500">
                     {isExistingCaseAssociation 
                       ? "Asociando solicitud a expediente existente." 
-                      : "Formalización del caso de protección y asignación de misión inicial."}
+                      : "Formalización del caso de protección y asignación de orden de trabajo inicial."}
                   </p>
                </div>
                <div className="flex flex-col items-end gap-2">
@@ -433,7 +466,7 @@ const ProtectionCasesPage: React.FC = () => {
             <div className="flex border-b border-slate-200 overflow-x-auto bg-white sticky top-0 z-10">
                 {!isExistingCaseAssociation && <TabButton id="CORRESPONDENCE" label="1. Correspondencia" />}
                 <TabButton id="TITULAR" label={`${isExistingCaseAssociation ? '1' : '2'}. Información Titular`} />
-                <TabButton id="ASSIGNMENT" label={`${isExistingCaseAssociation ? '2' : '3'}. Asignación y Misión`} />
+                <TabButton id="ASSIGNMENT" label={`${isExistingCaseAssociation ? '2' : '3'}. Asignación y orden de trabajo`} />
             </div>
 
             <form onSubmit={handleSave} className="p-6 md:p-8 min-h-[400px]">
@@ -460,7 +493,6 @@ const ProtectionCasesPage: React.FC = () => {
                         </div>
                     )}
                     
-                    {/* NUEVO CAMPO: Calidad del Solicitante */}
                     <div className="md:col-span-2">
                         <SelectField 
                             label="Calidad del Solicitante" 
@@ -482,9 +514,23 @@ const ProtectionCasesPage: React.FC = () => {
 
                {activeTab === 'ASSIGNMENT' && (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                    <SelectField label="Área Asignada" required options={AREAS} value={formData?.assignedArea} onChange={e => updateField('assignedArea', e.target.value)} />
-                    <InputField label="Fecha de Inicio Misión" type="date" required value={formData?.missionStartDate} onChange={e => updateField('missionStartDate', e.target.value)} />
-                    <SelectField label="Tipo de Misión" required options={MISSION_TYPES} value={formData?.missionType} onChange={e => updateField('missionType', e.target.value)} />
+                    <SelectField label="Seccion Asignada" required options={SECCIONES} value={formData?.assignedArea} onChange={e => updateField('assignedArea', e.target.value)} />
+                    <InputField label="Fecha de inicio de orden de trabajo" type="date" required value={formData?.missionStartDate} onChange={e => updateField('missionStartDate', e.target.value)} />
+                    <SelectField 
+                        label="Tipo de orden de trabajo" 
+                        required 
+                        options={missionTypeOptions} 
+                        value={formData?.missionType} 
+                        onChange={e => updateField('missionType', e.target.value)} 
+                    />
+                    <SelectField 
+                        label="Clasificación de orden de trabajo" 
+                        required 
+                        options={MISSION_CLASSIFICATIONS} 
+                        value={formData?.missionClassification} 
+                        onChange={e => updateField('missionClassification', e.target.value)} 
+                        title="Depende del tipo de orden de trabajo"
+                    />
                     <InputField label="Términos Vencen" type="date" value={formData?.dueDate} onChange={e => updateField('dueDate', e.target.value)} />
                     <div className="md:col-span-2"><TextAreaField label="Observaciones" value={formData?.observations} onChange={e => updateField('observations', e.target.value)} className="min-h-[120px]" /></div>
                     <div className="md:col-span-2 mt-4"><FileUpload label="Adjuntar soportes" files={formData?.attachments || []} onFilesSelected={handleFileSelect} onRemoveFile={handleRemoveFile} /></div>
@@ -507,7 +553,7 @@ const ProtectionCasesPage: React.FC = () => {
                     </div>
                     <div className="border-r border-slate-900 flex flex-col text-center divide-y divide-slate-900">
                         <div className="p-2 text-[10px] font-bold uppercase flex-1 flex items-center justify-center">SUBPROCESO PROTECCIÓN Y ASISTENCIA</div>
-                        <div className="p-2 text-sm font-black uppercase flex-1 flex items-center justify-center">MISIÓN DE TRABAJO</div>
+                        <div className="p-2 text-sm font-black uppercase flex-1 flex items-center justify-center">ORDEN DE TRABAJO</div>
                     </div>
                     <div className="p-0 text-[8px] font-bold uppercase divide-y divide-slate-900">
                         <div className="p-2">CÓDIGO: FGN-MS01-F-03</div>
@@ -523,7 +569,7 @@ const ProtectionCasesPage: React.FC = () => {
                         <span>{new Date().toISOString().replace('T', ' ').split('.')[0]}</span>
                     </div>
                     <div className="grid grid-cols-[200px,1fr] gap-x-4">
-                        <span className="font-bold">MISIÓN DE TRABAJO No.:</span>
+                        <span className="font-bold">ORDEN DE TRABAJO No.:</span>
                         <span className="font-bold">{missionOrderNo}</span>
                     </div>
                     <div className="grid grid-cols-[200px,1fr] gap-x-4 items-start">
@@ -554,8 +600,12 @@ const ProtectionCasesPage: React.FC = () => {
                         <span className="uppercase">{formData?.requestCity}</span>
                     </div>
                     <div className="grid grid-cols-[200px,1fr] gap-x-4">
-                        <span className="font-bold">TIPO DE MISIÓN:</span>
+                        <span className="font-bold">TIPO DE ORDEN DE TRABAJO:</span>
                         <span className="uppercase">{formData?.missionType}</span>
+                    </div>
+                    <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                        <span className="font-bold">CLASIFICACIÓN DE ORDEN:</span>
+                        <span className="uppercase font-bold">{formData?.missionClassification}</span>
                     </div>
                     <div className="grid grid-cols-[200px,1fr] gap-x-4">
                         <span className="font-bold">NOMBRES:</span>
@@ -578,7 +628,7 @@ const ProtectionCasesPage: React.FC = () => {
                         <span className="font-bold">{formData?.docNumber}</span>
                     </div>
                     <div className="grid grid-cols-[200px,1fr] gap-x-4">
-                        <span className="font-bold">UNIDAD ASIGNADA:</span>
+                        <span className="font-bold">SECCION ASIGNADA:</span>
                         <span className="uppercase">{formData?.assignedArea}</span>
                     </div>
 
@@ -624,7 +674,7 @@ const ProtectionCasesPage: React.FC = () => {
                 </div>
 
                 <div className="mt-10 pt-6 border-t border-slate-100 flex justify-end gap-4 print:hidden">
-                    <button onClick={() => window.print()} className="px-6 py-2 bg-white text-slate-700 border border-slate-300 font-bold rounded hover:bg-slate-100 transition-all text-xs uppercase">Imprimir Misión</button>
+                    <button onClick={() => window.print()} className="px-6 py-2 bg-white text-slate-700 border border-slate-300 font-bold rounded hover:bg-slate-100 transition-all text-xs uppercase">Imprimir Orden</button>
                     <button onClick={handleFinishSummary} className="px-10 py-2 bg-blue-600 text-white font-bold rounded shadow-lg hover:bg-blue-700 transition-all text-xs uppercase active:scale-95">Finalizar y Volver al Listado</button>
                 </div>
             </div>

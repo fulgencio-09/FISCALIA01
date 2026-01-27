@@ -16,7 +16,6 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
   const [associatedCase, setAssociatedCase] = useState<ProtectionCaseForm | null>(null);
 
   // Form states for re-assignment (Editable fields)
-  const [assignedOfficial, setAssignedOfficial] = useState('');
   const [regional, setRegional] = useState('');
   const [reassignmentDate, setReassignmentDate] = useState(new Date().toISOString().split('T')[0]);
   const [observations, setObservations] = useState('');
@@ -55,7 +54,6 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
     setAssociatedCase(caseData || null);
     
     // Reset editable fields
-    setAssignedOfficial('');
     setRegional('');
     setReassignmentDate(new Date().toISOString().split('T')[0]);
     setObservations('');
@@ -75,8 +73,8 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
 
   const handleSaveReassignment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!regional || !assignedOfficial) {
-      alert("Regional y Funcionario son campos obligatorios.");
+    if (!regional) {
+      alert("La Regional es un campo obligatorio.");
       return;
     }
     
@@ -86,13 +84,12 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
     const updatedMission: ProtectionMission = {
         ...selectedMission,
         status: 'ASIGNADA', // CAMBIO DE ESTADO
-        assignedOfficial,
         regional,
         reassignmentDate,
         observations
     };
 
-    const successMessage = `Se ha asignado la Orden de Trabajo al funcionario ${assignedOfficial} de la Regional ${regional}`;
+    const successMessage = `Se ha asignado la Orden de Trabajo a la Regional ${regional}`;
     
     if (onSaveSuccess) {
       onSaveSuccess(successMessage, updatedMission);
@@ -188,20 +185,13 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                         III. Gestión de Reasignación de Orden de Trabajo
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <SelectField 
-                            label="Regional" 
+                            label="Regional de Destino" 
                             required 
                             options={REGIONAL_UNITS} 
                             value={regional} 
                             onChange={e => setRegional(e.target.value)} 
-                        />
-                        <SelectField 
-                            label="Funcionario" 
-                            required 
-                            options={MOCK_OFFICIALS} 
-                            value={assignedOfficial} 
-                            onChange={e => setAssignedOfficial(e.target.value)} 
                         />
                         <InputField 
                             label="Fecha de reasignación de orden" 
@@ -212,17 +202,17 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                     </div>
                     <div className="mt-8">
                         <TextAreaField 
-                            label="Observaciones" 
+                            label="Observaciones de la Asignación" 
                             required 
                             value={observations} 
                             onChange={e => setObservations(e.target.value)} 
-                            placeholder="Ingrese los motivos de la reasignación o instrucciones adicionales..."
+                            placeholder="Ingrese instrucciones para la regional o motivos de la asignación..."
                             className="min-h-[120px]"
                         />
                     </div>
                     <div className="mt-8">
                         <FileUpload 
-                            label="Adjuntar Documentos"
+                            label="Adjuntar Documentos Complementarios"
                             files={attachedFiles}
                             onFilesSelected={handleFileChange}
                             onRemoveFile={handleRemoveFile}
@@ -233,7 +223,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                 <div className="pt-10 flex justify-between items-end border-t-2 border-slate-100">
                     <div className="w-64 border-t border-slate-300 pt-2 text-center">
                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-8 italic">Firma Digital del Responsable</p>
-                         <p className="text-[10px] font-black uppercase text-slate-900">{assignedOfficial || "________________________"}</p>
+                         <p className="text-[10px] font-black uppercase text-slate-900">GESTOR DE PROTECCIÓN</p>
                     </div>
                     <div className="text-right">
                          <img src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${selectedMission.missionNo}`} alt="QR" className="inline-block border-2 border-slate-900 p-1 rounded bg-white shadow-sm" />
@@ -253,7 +243,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                     type="submit" 
                     className="px-14 py-3 bg-blue-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
                 >
-                    Confirmar Reasignación
+                    Confirmar Asignación
                 </button>
             </div>
         </form>
@@ -265,7 +255,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
     <div className="max-w-7xl mx-auto p-4 md:p-10">
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Bandeja de Ordenes (Pendientes)</h1>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Bandeja de Ordenes de Trabajo (Pendientes)</h1>
           <p className="text-slate-500 font-medium italic">Bandeja de órdenes de trabajo esperando asignación inicial.</p>
         </div>
         <div className="relative max-w-sm w-full">

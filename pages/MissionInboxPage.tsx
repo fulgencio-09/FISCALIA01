@@ -24,7 +24,6 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   // Misiones en bandeja: Incluimos ASIGNADA (Creada), ACTIVA (Aceptada) y ANULADA (Rechazada) 
-  // para que no desaparezcan de la vista al procesarlas.
   const inboxMissions = useMemo(() => {
     return missions.filter(m => ['ASIGNADA', 'ACTIVA', 'ANULADA'].includes(m.status));
   }, [missions]);
@@ -39,7 +38,6 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
     );
   }, [searchTerm, inboxMissions]);
 
-  // Helper para mostrar los estados solicitados por el usuario
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'ASIGNADA': return { label: 'CREADA', color: 'bg-blue-100 text-blue-700 border-blue-200' };
@@ -53,17 +51,15 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
     <div className="max-w-7xl mx-auto p-4 md:p-10">
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Bandeja de Misiones</h1>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Bandeja de Ordenes de Trabajo</h1>
           <p className="text-slate-500 font-medium italic">
-            {userRole === 'FISCAL' 
-              ? 'Revisión, aceptación o rechazo de órdenes de trabajo.' 
-              : 'Ejecución de entrevista técnica y valoración de riesgo.'}
+            Ejecución de entrevista técnica y valoración de riesgo para órdenes de trabajo activas.
           </p>
         </div>
         <div className="relative max-w-sm w-full">
           <input 
             type="text" 
-            placeholder="Buscar misión..." 
+            placeholder="Buscar orden..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all"
@@ -78,7 +74,7 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
             <thead className="bg-slate-50/50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
               <tr>
                 <th className="px-8 py-6">Fecha Asignación</th>
-                <th className="px-8 py-6">Misión No.</th>
+                <th className="px-8 py-6">Orden No.</th>
                 <th className="px-8 py-6">Candidato</th>
                 <th className="px-8 py-6">Estado</th>
                 <th className="px-8 py-6 text-center">Gestión</th>
@@ -105,63 +101,35 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
                       </td>
                       <td className="px-8 py-6 text-center">
                           <div className="flex items-center justify-center gap-3">
-                              {userRole === 'FISCAL' ? (
+                              {isInitial || m.status === 'ACTIVA' ? (
                                 <>
+                                  <button 
+                                      onClick={() => onStartInterview(m)}
+                                      className="bg-blue-600 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-100 flex items-center gap-2"
+                                      title="Crear Entrevista Técnica"
+                                  >
+                                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                      Entrevista
+                                  </button>
+                                  <button 
+                                      onClick={() => onStartITVR(m)}
+                                      className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-black active:scale-95 transition-all shadow-lg shadow-slate-200 flex items-center gap-2"
+                                      title="Valoración Técnica de Riesgo (Matriz ITVR)"
+                                  >
+                                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                      ITVR
+                                  </button>
                                   <button 
                                       onClick={() => onViewMission(m)}
                                       className="bg-white text-slate-600 px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-slate-900 hover:text-white active:scale-95 transition-all border border-slate-200 flex items-center gap-2"
-                                      title="Visualizar Misión"
+                                      title="Visualizar Orden"
                                   >
                                       <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                      Visualizar
+                                      Ver
                                   </button>
-                                  {isInitial && (
-                                    <>
-                                      <button 
-                                          onClick={() => onAcceptMission(m)}
-                                          className="bg-emerald-600 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-emerald-700 active:scale-95 transition-all shadow-lg shadow-emerald-100 flex items-center gap-2"
-                                          title="Aceptar Misión"
-                                      >
-                                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                                          Aceptar
-                                      </button>
-                                      <button 
-                                          onClick={() => onRejectMission(m)}
-                                          className="bg-rose-600 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-rose-700 active:scale-95 transition-all shadow-lg shadow-rose-100 flex items-center gap-2"
-                                          title="Rechazar Misión"
-                                      >
-                                          {/* Fixed duplicate 'cy' attributes in SVG lines by using 'y1' and 'y2' correctly */}
-                                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                          Rechazar
-                                      </button>
-                                    </>
-                                  )}
                                 </>
                               ) : (
-                                <>
-                                  {isInitial || m.status === 'ACTIVA' ? (
-                                    <>
-                                      <button 
-                                          onClick={() => onStartInterview(m)}
-                                          className="bg-blue-600 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-100 flex items-center gap-2"
-                                          title="Crear Entrevista Técnica"
-                                      >
-                                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                          Entrevista
-                                      </button>
-                                      <button 
-                                          onClick={() => onStartITVR(m)}
-                                          className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-black active:scale-95 transition-all shadow-lg shadow-slate-200 flex items-center gap-2"
-                                          title="Valoración Técnica de Riesgo (Matriz ITVR)"
-                                      >
-                                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                          ITVR
-                                      </button>
-                                    </>
-                                  ) : (
-                                    <span className="text-[9px] font-black text-slate-400 italic">PROCESO CERRADO</span>
-                                  )}
-                                </>
+                                <span className="text-[9px] font-black text-slate-400 italic">PROCESO CERRADO</span>
                               )}
                           </div>
                       </td>
@@ -171,7 +139,7 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
               ) : (
                 <tr>
                     <td colSpan={5} className="px-8 py-20 text-center opacity-30">
-                        <p className="text-[10px] font-black uppercase tracking-widest">No hay misiones registradas en bandeja</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest">No hay órdenes registradas en bandeja</p>
                     </td>
                 </tr>
               )}

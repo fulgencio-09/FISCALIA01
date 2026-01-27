@@ -74,7 +74,7 @@ const SavedCasesPage: React.FC = () => {
     });
 
     const member = (allFamilyData[caseId] || []).find(m => m.id === memberId);
-    showNotification(`Integrante ${member?.isActive ? 'desactivado' : 'activado'} correctamente.`);
+    showNotification(`Integrante ${member?.isActive ? 'desvinculado' : 'vinculado'} correctamente.`);
     setConfirmDeactivate(null);
   };
 
@@ -246,7 +246,7 @@ const SavedCasesPage: React.FC = () => {
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
               <h3 className="text-lg font-black uppercase text-slate-900 mb-4 tracking-tight">¿Confirmar Acción?</h3>
-              <p className="text-slate-500 text-sm mb-8">Esta acción cambiará el estado de vigencia del integrante en el núcleo familiar.</p>
+              <p className="text-slate-500 text-sm mb-8">Esta acción cambiará el estado de vinculación del integrante en el núcleo familiar.</p>
               <div className="flex gap-4">
                  <button onClick={() => setConfirmDeactivate(null)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-400 font-black uppercase text-[10px] rounded-xl hover:bg-slate-50">Cancelar</button>
                  <button onClick={handleToggleFamilyStatus} className="flex-1 px-4 py-2 bg-blue-600 text-white font-black uppercase text-[10px] rounded-xl shadow-lg">Confirmar</button>
@@ -258,7 +258,7 @@ const SavedCasesPage: React.FC = () => {
       {/* Main List View */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Consulta de Expedientes</h1>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Consultar casos</h1>
           <p className="text-slate-500 font-medium italic">Gestión de núcleos familiares y órdenes de trabajo por caso.</p>
         </div>
         <div className="relative max-w-sm w-full">
@@ -300,20 +300,39 @@ const SavedCasesPage: React.FC = () => {
                     <span className="bg-slate-900 text-white px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">{c.applicantRole}</span>
                   </td>
                   <td className="px-8 py-6 text-center">
-                    <div className="flex items-center justify-center gap-3">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
                       <button 
                         onClick={() => setActiveModal({ type: 'LIST_FAMILY', caseId: c.caseId || '' })}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-100 flex items-center gap-2"
+                        className="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-100"
+                        title="Ver Núcleo Familiar"
                       >
-                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        Familia
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                       </button>
+                      
+                      <button 
+                        onClick={() => setActiveModal({ type: 'FAMILY', caseId: c.caseId || '' })}
+                        className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 active:scale-95 transition-all shadow-md shadow-emerald-100"
+                        title="Nuevo Integrante"
+                      >
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                      </button>
+
+                      {c.applicantRole === 'REPRESENTANTE LEGAL' && (
+                        <button 
+                          onClick={() => setActiveModal({ type: 'TRANSFER_OWNER', caseId: c.caseId || '' })}
+                          className="p-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-md shadow-indigo-100"
+                          title="Traslado Titularidad"
+                        >
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                        </button>
+                      )}
+
                       <button 
                         onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: c.caseId || '' })}
-                        className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-black active:scale-95 transition-all shadow-lg shadow-slate-200 flex items-center gap-2"
+                        className="p-2.5 bg-slate-900 text-white rounded-xl hover:bg-black active:scale-95 transition-all shadow-md shadow-slate-200"
+                        title="Ver Órdenes de Trabajo"
                       >
-                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                        Órdenes
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                       </button>
                     </div>
                   </td>
@@ -336,18 +355,6 @@ const SavedCasesPage: React.FC = () => {
                  <button onClick={closeModal} className="text-slate-300 hover:text-slate-900 transition-colors"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
               </div>
               <div className="p-8">
-                 <div className="mb-6 flex justify-between gap-4">
-                    <button onClick={() => setActiveModal({ type: 'FAMILY', caseId: activeModal.caseId })} className="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 transition-all active:scale-95 flex items-center gap-2">
-                       <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                       Nuevo Integrante
-                    </button>
-                    {associatedCase?.applicantRole === 'REPRESENTANTE LEGAL' && (
-                      <button onClick={() => setActiveModal({ type: 'TRANSFER_OWNER', caseId: activeModal.caseId })} className="bg-indigo-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-100 transition-all active:scale-95 flex items-center gap-2">
-                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-                         Traslado Titularidad
-                      </button>
-                    )}
-                 </div>
                  <div className="overflow-hidden border border-slate-100 rounded-2xl">
                     <table className="w-full text-left text-[11px]">
                        <thead className="bg-slate-50 text-slate-400 font-black uppercase">
@@ -366,14 +373,20 @@ const SavedCasesPage: React.FC = () => {
                                 <td className="px-6 py-4 font-bold text-blue-600 uppercase">{m.relationship}</td>
                                 <td className="px-6 py-4 font-mono">{m.docNumber}</td>
                                 <td className="px-6 py-4 text-center">
-                                   <span className={`px-2 py-0.5 rounded-full font-black text-[8px] uppercase tracking-widest ${m.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`}>
-                                      {m.isActive ? 'Activo' : 'Inactivo'}
+                                   <span className={`px-2 py-0.5 rounded-full font-black text-[8px] uppercase tracking-widest ${m.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                      {m.isActive ? 'Vinculado' : 'Desvinculado'}
                                    </span>
                                 </td>
                                 <td className="px-6 py-4 text-center">
                                    <div className="flex items-center justify-center gap-2">
                                       <button onClick={() => { setEditingMember(m); setActiveModal({ type: 'FAMILY', caseId: activeModal.caseId }); }} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                                      <button onClick={() => setConfirmDeactivate({ show: true, memberId: m.id, caseId: activeModal.caseId })} className={`p-2 rounded-lg transition-all ${m.isActive ? 'text-slate-400 hover:text-red-600 hover:bg-red-50' : 'text-emerald-500 hover:bg-emerald-50'}`}><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">{m.isActive ? <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/> : <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>}</svg></button>
+                                      <button 
+                                        onClick={() => setConfirmDeactivate({ show: true, memberId: m.id, caseId: activeModal.caseId })} 
+                                        className={`p-2 rounded-lg transition-all ${m.isActive ? 'text-slate-400 hover:text-red-600 hover:bg-red-50' : 'text-emerald-500 hover:bg-emerald-50'}`}
+                                        title={m.isActive ? "Desvincular Integrante" : "Vincular Integrante"}
+                                      >
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">{m.isActive ? <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/> : <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>}</svg>
+                                      </button>
                                    </div>
                                 </td>
                              </tr>
@@ -392,7 +405,7 @@ const SavedCasesPage: React.FC = () => {
            <form onSubmit={handleFamilySubmit} className="bg-white rounded-[2.5rem] shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95">
               <div className="p-8 bg-blue-600 text-white flex justify-between items-center">
                  <h3 className="text-xl font-black uppercase tracking-tight">{editingMember ? 'Editar' : 'Vincular'} Integrante Familiar</h3>
-                 <button type="button" onClick={() => setActiveModal({ type: 'LIST_FAMILY', caseId: activeModal.caseId })} className="text-white hover:opacity-70 transition-opacity"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                 <button type="button" onClick={closeModal} className="text-white hover:opacity-70 transition-opacity"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
               </div>
               <div className="p-10 grid grid-cols-1 md:grid-cols-2 gap-6">
                  <InputField label="Primer Nombre" name="firstName" defaultValue={editingMember?.firstName} required />
@@ -407,7 +420,7 @@ const SavedCasesPage: React.FC = () => {
                  <InputField label="Lugar Residencia" name="residencePlace" defaultValue={editingMember?.residencePlace} required />
               </div>
               <div className="p-8 bg-slate-50 flex justify-end gap-4">
-                 <button type="button" onClick={() => setActiveModal({ type: 'LIST_FAMILY', caseId: activeModal.caseId })} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
+                 <button type="button" onClick={closeModal} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
                  <button type="submit" className="px-10 py-3 bg-blue-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest shadow-lg shadow-blue-100">
                     {editingMember ? 'Guardar Cambios' : 'Vincular Integrante'}
                  </button>
@@ -491,7 +504,7 @@ const SavedCasesPage: React.FC = () => {
                  ))}
               </div>
               <div className="p-8 bg-slate-50 flex justify-end">
-                 <button onClick={() => setActiveModal({ type: 'LIST_FAMILY', caseId: activeModal.caseId })} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
+                 <button onClick={closeModal} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
               </div>
            </div>
         </div>
@@ -528,7 +541,15 @@ const SavedCasesPage: React.FC = () => {
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold">NOMBRES:</span><span className="uppercase">{associatedCase.firstName} {associatedCase.secondName || ""}</span></div>
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold">PRIMER APELLIDO:</span><span className="uppercase">{associatedCase.firstSurname}</span></div>
                       <div className="grid grid-cols-[220px,1fr] gap-x-4"><span className="font-bold uppercase leading-tight">DOCUMENTO DE IDENTIDAD No.:</span><span className="font-bold">{associatedCase.docNumber}</span></div>
-                      <div className="mt-8 pt-6 border-t border-slate-200"><span className="font-bold uppercase mb-4 block underline tracking-widest">INSTRUCCIONES:</span><ol className="list-decimal pl-6 space-y-2 uppercase text-[10px] font-medium tracking-tight"><li>ENTREVISTAR AL CANDIDATO Y A LOS ADULTOS INTEGRANTES DE SU NÚCLEO FAMILIAR.</li><li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL.</li><li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li><li>RENDIR INFORME EVALUACIÓN TÉCNICA.</li></ol></div>
+                      <div className="grid grid-cols-[220px,1fr] gap-x-4">
+                        <span className="font-bold">REGIONAL ASIGNADA:</span>
+                        <span className="uppercase">{selectedMission.regional || associatedCase.destinationUnit}</span>
+                      </div>
+                      <div className="grid grid-cols-[220px,1fr] gap-x-4">
+                        <span className="font-bold">SECCION ASIGNADA:</span>
+                        <span className="uppercase">{selectedMission.unidad || associatedCase.assignedArea || selectedMission.assignedArea}</span>
+                      </div>
+                      <div className="mt-8 pt-6 border-t border-slate-200"><span className="font-bold uppercase mb-4 block underline tracking-widest">INSTRUCCIONES:</span><ol className="list-decimal pl-6 space-y-2 uppercase text-[10px] font-medium tracking-tight"><li>ENTREVISTAR AL CANDIDATO Y ALOS ADULTOS INTEGRANTES DE SU NÚCLEO FAMILIAR.</li><li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL.</li><li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li><li>RENDIR INFORME EVALUACIÓN TÉCNICA.</li></ol></div>
                       <div className="mt-8 pt-4"><span className="font-bold uppercase block mb-2 underline">OBSERVACIONES:</span><div className="p-4 border border-slate-300 min-h-[100px] text-justify whitespace-pre-wrap uppercase">{associatedCase.observations || "SIN OBSERVACIONES REGISTRADAS."}</div></div>
                       <div className="mt-8 pt-8"><span className="font-black text-sm uppercase">LOS TÉRMINOS VENCEN: {selectedMission.dueDate}</span></div>
                   </div>
@@ -547,7 +568,7 @@ const SavedCasesPage: React.FC = () => {
                     <h3 className="text-xl font-black uppercase tracking-tight">EDITAR EXPEDIENTE Y ORDEN</h3>
                     <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest">EXPEDIENTE: {associatedCase.caseId} | ORDEN: {selectedMission.missionNo}</p>
                  </div>
-                 <button onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId })} className="text-white hover:opacity-70"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                 <button onClick={closeModal} className="text-white hover:opacity-70"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
               </div>
               
               <form className="p-10 space-y-10 overflow-y-auto" onSubmit={handleEditMissionSubmit}>
@@ -602,13 +623,13 @@ const SavedCasesPage: React.FC = () => {
                         <InputField label="Vencimiento Términos" name="dueDate" type="date" defaultValue={associatedCase.dueDate} required />
                         <SelectField label="Estado de Orden" name="status" options={['PENDIENTE', 'ASIGNADA', 'ACTIVA', 'FINALIZADA', 'ANULADA']} defaultValue={selectedMission.status} required />
                         <div className="md:col-span-2">
-                           <TextAreaField label="Observaciones" name="observations" defaultValue={associatedCase.observations} className="min-h-[100px]" />
+                           <TextAreaField label="Observaciones" name="observations" defaultValue={associatedCase.observations} className="min-h-[120px]" />
                         </div>
                     </div>
                  </div>
 
                  <div className="flex justify-end gap-4 border-t border-slate-100 pt-8 flex-shrink-0">
-                    <button type="button" onClick={() => setActiveModal({ type: 'LIST_MISSIONS', caseId: activeModal.caseId })} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
+                    <button type="button" onClick={closeModal} className="px-8 py-3 text-[10px] font-black uppercase text-slate-400">Cancelar</button>
                     <button type="submit" className="px-10 py-3 bg-blue-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest shadow-lg shadow-blue-100">
                         Guardar Cambios
                     </button>

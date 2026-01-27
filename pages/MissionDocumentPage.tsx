@@ -108,8 +108,12 @@ const MissionDocumentPage: React.FC<MissionDocumentPageProps> = ({ mission, onCa
                         <span className="font-bold">{associatedCase?.docNumber || '69021780'}</span>
                     </div>
                     <div className="grid grid-cols-[240px,1fr] gap-x-4">
+                        <span className="font-bold uppercase tracking-tight">REGIONAL ASIGNADA:</span>
+                        <span className="uppercase">{mission.regional || associatedCase?.destinationUnit}</span>
+                    </div>
+                    <div className="grid grid-cols-[240px,1fr] gap-x-4">
                         <span className="font-bold uppercase tracking-tight">SECCION ASIGNADA:</span>
-                        <span className="uppercase">{mission.assignedArea || 'EVALUACIONES'}</span>
+                        <span className="uppercase">{mission.unidad || associatedCase?.assignedArea || mission.assignedArea}</span>
                     </div>
 
                     <div className="mt-8 pt-6 border-t border-slate-200">
@@ -119,14 +123,13 @@ const MissionDocumentPage: React.FC<MissionDocumentPageProps> = ({ mission, onCa
                             <li>REALIZAR VISITA AL PROCESO Y ENTREVISTAR AL FUNCIONARIO JUDICIAL DE CONOCIMIENTO.</li>
                             <li>ESTABLECER Y VERIFICAR NIVELES DE RIESGO Y AMENAZA.</li>
                             <li>RENDIR INFORME EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO.</li>
-                            <li>RENDIR INFORME EVALUACIÓN TÉCNICA DE AMENAZA Y RIESGO.</li>
                         </ol>
                     </div>
 
                     <div className="mt-8 pt-4">
                         <span className="font-bold uppercase block mb-2 underline">OBSERVACIONES:</span>
                         <div className="p-4 border border-slate-300 min-h-[80px] bg-white uppercase text-[11px]">
-                            {mission.observations || 'vdsgsdgsdggg'}
+                            {mission.observations || 'SIN OBSERVACIONES REGISTRADAS.'}
                         </div>
                     </div>
 

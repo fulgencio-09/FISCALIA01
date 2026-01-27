@@ -98,7 +98,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                 Regresar al Listado
             </button>
             <button onClick={() => window.print()} className="bg-white border border-slate-300 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm">
-                Imprimir Misión
+                Imprimir Orden de Trabajo
             </button>
         </div>
 
@@ -110,11 +110,11 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                 </div>
                 <div className="border-r border-slate-900 flex flex-col text-center divide-y divide-slate-900">
                     <div className="p-2 text-[10px] font-bold uppercase flex-1 flex items-center justify-center">SUBPROCESO PROTECCIÓN Y ASISTENCIA</div>
-                    <div className="p-2 text-sm font-black uppercase flex-1 flex items-center justify-center">MISIÓN DE TRABAJO</div>
+                    <div className="p-2 text-sm font-black uppercase flex-1 flex items-center justify-center">ORDEN DE TRABAJO</div>
                 </div>
                 <div className="p-0 text-[8px] font-bold uppercase divide-y divide-slate-900">
-                    <div className="p-2">CÓDIGO: FGN-MS01-F-03</div>
-                    <div className="p-2">VERSIÓN: 01</div>
+                    <div className="p-2">CÓDIGO: <span className="font-black">FGN-MS01-F-03</span></div>
+                    <div className="p-2">VERSIÓN: <span className="font-black">01</span></div>
                     <div className="p-2 text-right">PÁGINA 1 DE 1</div>
                 </div>
             </div>
@@ -125,7 +125,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                     <span>{selectedMission.creationDate} 15:34:57</span>
                 </div>
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
-                    <span className="font-bold">MISIÓN DE TRABAJO No.:</span>
+                    <span className="font-bold">ORDEN DE TRABAJO No.:</span>
                     <span className="font-bold">{selectedMission.missionNo}</span>
                 </div>
                 <div className="grid grid-cols-[200px,1fr] gap-x-4 items-start">
@@ -152,7 +152,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                     <span className="uppercase">{associatedCase.requestCity}</span>
                 </div>
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
-                    <span className="font-bold">TIPO DE MISIÓN:</span>
+                    <span className="font-bold">TIPO DE ORDEN DE TRABAJO:</span>
                     <span className="uppercase">{selectedMission.type}</span>
                 </div>
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
@@ -176,8 +176,12 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                     <span className="font-bold">{associatedCase.docNumber}</span>
                 </div>
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                    <span className="font-bold">REGIONAL ASIGNADA:</span>
+                    <span className="uppercase">{selectedMission.regional || associatedCase.destinationUnit}</span>
+                </div>
+                <div className="grid grid-cols-[200px,1fr] gap-x-4">
                     <span className="font-bold">SECCION ASIGNADA:</span>
-                    <span className="uppercase">{selectedMission.assignedArea}</span>
+                    <span className="uppercase">{selectedMission.unidad || associatedCase.assignedArea || selectedMission.assignedArea}</span>
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-slate-200">
@@ -227,8 +231,8 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
     <div className="max-w-7xl mx-auto p-4 md:p-10">
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Visualizar Misiones</h1>
-          <p className="text-slate-500 font-medium italic">Consulta de misiones en ejecución y finalizadas.</p>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Visualizar Ordenes de Trabajo</h1>
+          <p className="text-slate-500 font-medium italic">Consulta de órdenes de trabajo en ejecución y finalizadas.</p>
         </div>
         <button onClick={() => {setSearchTerm(''); setStartDate(''); setEndDate(''); setRegionalFilter(''); setCaseSearch(''); setStatusFilter(''); setSortOrder('asc');}} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-800 flex items-center gap-2">
           <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -238,7 +242,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
 
       <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-100/50 mb-10">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <div className="md:col-span-2 lg:col-span-1"><InputField label="Búsqueda General" placeholder="No. Misión, Radicado..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
+          <div className="md:col-span-2 lg:col-span-1"><InputField label="Búsqueda General" placeholder="No. Orden, Radicado..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
           <InputField label="Número de Caso" placeholder="EJ: CASE-2024-001" value={caseSearch} onChange={(e) => setCaseSearch(e.target.value)} />
           <SelectField label="Regional" options={REGIONAL_UNITS} value={regionalFilter} onChange={(e) => setRegionalFilter(e.target.value)} />
           <SelectField label="Estado" options={['ACTIVA', 'ASIGNADA', 'FINALIZADA', 'ANULADA']} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} />
@@ -254,7 +258,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
             <thead className="bg-slate-50/50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
               <tr>
                 <th className="px-8 py-6">Fecha Generación</th>
-                <th className="px-8 py-6">Número Misión</th>
+                <th className="px-8 py-6">Número Orden</th>
                 <th className="px-8 py-6">Asunto</th>
                 <th className="px-8 py-6">Radicado</th>
                 <th className="px-8 py-6 text-center">Estado</th>

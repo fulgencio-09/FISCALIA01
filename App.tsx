@@ -95,12 +95,12 @@ const App: React.FC = () => {
 
   const handleAcceptMission = (mission: ProtectionMission) => {
     handleUpdateMission({ ...mission, status: 'ACTIVA' });
-    showToast(`Misión ${mission.missionNo} aceptada correctamente por el Fiscal.`);
+    showToast(`Orden de Trabajo ${mission.missionNo} aceptada correctamente.`);
   };
 
   const handleRejectMission = (mission: ProtectionMission) => {
     handleUpdateMission({ ...mission, status: 'ANULADA' });
-    showToast(`Misión ${mission.missionNo} rechazada por el Fiscal.`);
+    showToast(`Orden de Trabajo ${mission.missionNo} rechazada.`);
   };
 
   const handleEditITVR = (itvr: ITVRForm) => {
@@ -160,7 +160,7 @@ const App: React.FC = () => {
               <svg className={`transition-transform duration-200 ${isProcesosOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div className={`overflow-hidden transition-all duration-300 ${isProcesosOpen ? 'max-h-[300px] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
-              {userRole === 'FISCAL' && <SidebarItem indent page="form" label="Iniciar Solicitud" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>} />}
+              {userRole === 'FISCAL' && <SidebarItem indent page="form" label="Iniciar Solicitud" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>} />}
               <SidebarItem indent page="list" label="Bandeja de Solicitud" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>} />
             </div>
           </div>
@@ -180,15 +180,15 @@ const App: React.FC = () => {
                 {userRole === 'GESTOR' && (
                     <>
                     <SidebarItem indent page="cases" label="Apertura de Casos" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/></svg>} />
-                    <SidebarItem indent page="saved-cases" label="Consultar Casos" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} />
+                    <SidebarItem indent page="saved-cases" label="Consultar casos" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} />
                     </>
                 )}
                 {(userRole === 'LIDER' || userRole === 'FISCAL') && (
                     <>
-                    {userRole === 'LIDER' && <SidebarItem indent page="missions" label="Misiones Pendientes" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} />}
-                    <SidebarItem indent page="mission-inbox" label="Bandeja de Misiones" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m3 16 3-3 3 3 3-3 3 3 3-3 3 3" /></svg>} />
+                    {userRole === 'LIDER' && <SidebarItem indent page="missions" label="Ordenes de Trabajo Pendientes" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} />}
+                    {userRole === 'LIDER' && <SidebarItem indent page="mission-inbox" label="Bandeja de Ordenes de Trabajo" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m3 16 3-3 3 3 3-3 3 3 3-3 3 3" /></svg>} />}
                     <SidebarItem indent page="itvr-list" label="ITVR" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>} />
-                    <SidebarItem indent page="assigned-missions" label="Visualizar Misiones" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>} />
+                    <SidebarItem indent page="assigned-missions" label="Visualizar Ordenes de Trabajo" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>} />
                     </>
                 )}
                 </div>
@@ -259,36 +259,44 @@ const App: React.FC = () => {
                            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                            Nueva Solicitud
                         </button>
-                        <button onClick={() => setCurrentPage('mission-inbox')} className="bg-indigo-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
-                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 3-3 3 3 3-3 3 3 3-3 3 3" /></svg>
-                           Bandeja de Misiones
+                        <button onClick={() => setCurrentPage('list')} className="bg-white border-2 border-slate-100 text-slate-700 px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm flex items-center justify-center gap-3">
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                           Mis Solicitudes
                         </button>
                         </>
                     ) : userRole === 'LIDER' ? (
+                        <>
                         <button onClick={() => setCurrentPage('missions')} className="bg-indigo-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
                            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                           Gestionar Misiones
+                           Gestionar Ordenes de Trabajo
                         </button>
+                        <button onClick={() => setCurrentPage('mission-inbox')} className="bg-blue-900 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 3-3 3 3 3-3 3 3 3-3 3 3" /></svg>
+                           Bandeja de Ordenes de Trabajo
+                        </button>
+                        </>
                     ) : (
+                        <>
                         <button onClick={() => setCurrentPage('cases')} className="bg-slate-800 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
-                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                            Apertura de Casos
                         </button>
+                        <button onClick={() => setCurrentPage('list')} className="bg-white border-2 border-slate-100 text-slate-700 px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm flex items-center justify-center gap-3">
+                           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                           Consultar Base
+                        </button>
+                        </>
                     )}
-                    <button onClick={() => setCurrentPage('list')} className="bg-white border-2 border-slate-100 text-slate-700 px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm flex items-center justify-center gap-3">
-                       <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                       {userRole === 'FISCAL' ? 'Mis Solicitudes' : 'Consultar Base'}
-                    </button>
                   </div>
                 </div>
              </div>
           )}
-          {currentPage === 'form' && <ProtectionFormPage initialData={editingRequest} isEditing={!!editingRequest} readOnly={isReadOnlyMode} onCancel={() => setCurrentPage('list')} onSaveSuccess={() => setCurrentPage('list')} />}
+          {currentPage === 'form' && <ProtectionFormPage initialData={editingRequest} isEditing={!!editingRequest} readOnly={isReadOnlyMode} onCancel={() => setCurrentPage('list')} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('list'); }} />}
           {currentPage === 'list' && <RequestsListPage onEdit={(id) => { setEditingRequest(MOCK_FULL_REQUESTS[id]); setIsReadOnlyMode(false); setCurrentPage('form'); }} onView={(id) => { setEditingRequest(MOCK_FULL_REQUESTS[id]); setIsReadOnlyMode(true); setCurrentPage('form'); }} userRole={userRole} />}
           {currentPage === 'cases' && userRole === 'GESTOR' && <ProtectionCasesPage />}
           {currentPage === 'saved-cases' && userRole === 'GESTOR' && <SavedCasesPage />}
           {currentPage === 'missions' && userRole === 'LIDER' && <GeneratedMissionsPage missions={allMissions} onSaveSuccess={(msg, updatedM) => { showToast(msg); handleUpdateMission(updatedM); }} />}
-          {currentPage === 'mission-inbox' && (userRole === 'LIDER' || userRole === 'FISCAL') && (
+          {currentPage === 'mission-inbox' && userRole === 'LIDER' && (
             <MissionInboxPage 
               missions={allMissions} 
               userRole={userRole}
@@ -302,7 +310,7 @@ const App: React.FC = () => {
           {currentPage === 'assigned-missions' && (userRole === 'LIDER' || userRole === 'FISCAL') && <AssignedMissionsPage missions={allMissions} onUpdateMission={handleUpdateMission} />}
           {currentPage === 'interview-form' && (userRole === 'LIDER' || userRole === 'FISCAL') && <InterviewFormPage mission={selectedMissionForInterview} onCancel={() => setCurrentPage('mission-inbox')} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('mission-inbox'); }} />}
           {currentPage === 'itvr-list' && (userRole === 'LIDER' || userRole === 'FISCAL') && <ITVRListPage onEdit={handleEditITVR} onView={handleViewITVR} />}
-          {currentPage === 'itvr-form' && (userRole === 'LIDER' || userRole === 'FISCAL') && <ITVRFormPage initialData={editingITVR} mission={selectedMissionForITVR} onCancel={() => { if(userRole === 'FISCAL') { setCurrentPage('mission-inbox') } else { setCurrentPage('itvr-list') } }} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('itvr-list'); }} readOnly={isReadOnlyMode} />}
+          {currentPage === 'itvr-form' && (userRole === 'LIDER' || userRole === 'FISCAL') && <ITVRFormPage initialData={editingITVR} mission={selectedMissionForITVR} onCancel={() => { if(userRole === 'FISCAL') { setCurrentPage('home') } else { setCurrentPage('itvr-list') } }} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('itvr-list'); }} readOnly={isReadOnlyMode} />}
           {currentPage === 'mission-doc' && selectedMissionForDoc && <MissionDocumentPage mission={selectedMissionForDoc} onCancel={() => setCurrentPage('mission-inbox')} />}
         </div>
       </main>

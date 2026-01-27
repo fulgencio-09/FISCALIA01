@@ -72,6 +72,7 @@ export interface ProtectionMission {
   creationDate: string;
   assignedOfficial?: string;
   regional?: string;
+  unidad?: string;
   reassignmentDate?: string;
   observations?: string;
 }

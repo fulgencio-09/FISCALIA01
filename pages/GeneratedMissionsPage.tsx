@@ -26,7 +26,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
     const casesMap = new Map(MOCK_SAVED_CASES.map(c => [c.radicado, c]));
     
     return missions
-      .filter(m => m.status === 'PENDIENTE') // REQUERIMIENTO: Se oculta al reasignar
+      .filter(m => m.status === 'PENDIENTE') 
       .map(m => {
         const caseData = casesMap.get(m.caseRadicado);
         return {
@@ -80,16 +80,16 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
     
     if (!selectedMission) return;
 
-    // Actualizamos el objeto misión
+    // Actualizamos el objeto misión: El estado inicial para regional es ACTIVA
     const updatedMission: ProtectionMission = {
         ...selectedMission,
-        status: 'ASIGNADA', // CAMBIO DE ESTADO
+        status: 'ACTIVA', 
         regional,
         reassignmentDate,
         observations
     };
 
-    const successMessage = `Se ha asignado la Orden de Trabajo a la Regional ${regional}`;
+    const successMessage = `Se ha enviado la Orden de Trabajo a la Regional ${regional} correctamente.`;
     
     if (onSaveSuccess) {
       onSaveSuccess(successMessage, updatedMission);
@@ -243,7 +243,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                     type="submit" 
                     className="px-14 py-3 bg-blue-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
                 >
-                    Confirmar Asignación
+                    Confirmar Reasignación
                 </button>
             </div>
         </form>
@@ -266,7 +266,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all"
           />
-          <svg className="absolute left-3.5 top-3.5 text-slate-400" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg className="absolute left-3.5 top-3.5 text-slate-400" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" cy="21" x2="16.65" y2="16.65"/></svg>
         </div>
       </div>
 
@@ -280,7 +280,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                 <th className="px-8 py-6">Asunto</th>
                 <th className="px-8 py-6">No. Radicado</th>
                 <th className="px-8 py-6">No. Caso</th>
-                <th className="px-8 py-6 text-center">Gestión</th>
+                <th className="px-8 py-6 text-center">Accion</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -309,7 +309,7 @@ const GeneratedMissionsPage: React.FC<GeneratedMissionsPageProps> = ({ missions,
                             onClick={() => handleReassignAction(m)}
                             className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 mx-auto"
                         >
-                            Asignar Orden
+                            reasignar Orden
                         </button>
                     </td>
                     </tr>

@@ -8,6 +8,23 @@ export const CONFIG = {
   ALLOWED_EXTENSIONS: ['.pdf', '.docx', '.jpg', '.jpeg'],
 };
 
+export const RELATIONSHIP_TYPES = [
+  "CÓNYUGE / COMPAÑERO(A)",
+  "HIJO(A)",
+  "PADRE / MADRE",
+  "HERMANO(A)",
+  "ABUELO(A)",
+  "NIETO(A)",
+  "TIO(A)",
+  "PRIMO(A)",
+  "SOBRINO(A)",
+  "SUEGRO(A)",
+  "CUÑADO(A)",
+  "HIJASTRO(A)",
+  "OTRO FAMILIAR",
+  "NO FAMILIAR / CONOCIDO"
+];
+
 export const CITIES = [
   "Bogotá D.C.", "Medellín", "Cali", "Barranquilla", "Cartagena", 
   "Cúcuta", "Bucaramanga", "Pereira", "Santa Marta", "Ibagué"

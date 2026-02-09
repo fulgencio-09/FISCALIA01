@@ -14,13 +14,18 @@ import {
   SECCIONES,
   ORIGINS,
   MOCK_MISSIONS,
-  MOCK_FAMILY_DATA
+  MOCK_FAMILY_DATA,
+  RELATIONSHIP_TYPES
 } from '../constants';
 import { FamilyMember, ProtectionMission, ProtectionCaseForm } from '../types';
 import { InputField, SelectField, TextAreaField, FileUpload } from '../components/FormComponents';
 
 const SavedCasesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [missionSearchTerm, setMissionSearchTerm] = useState('');
+  const [missionStartDateSearch, setMissionStartDateSearch] = useState('');
+  const [missionEndDateSearch, setMissionEndDateSearch] = useState('');
+  
   const [activeModal, setActiveModal] = useState<{ type: 'MISSION' | 'FAMILY' | 'LIST_FAMILY' | 'LIST_MISSIONS' | 'MISSION_DETAIL' | 'EDIT_MISSION' | 'TRANSFER_OWNER' | 'NONE', caseId: string }>({ type: 'NONE', caseId: '' });
   const [confirmDeactivate, setConfirmDeactivate] = useState<{ show: boolean, memberId: string, caseId: string } | null>(null);
   
@@ -59,6 +64,9 @@ const SavedCasesPage: React.FC = () => {
     setSelectedMission(null);
     setEditAttachments([]);
     setSelectedAssignedArea('');
+    setMissionSearchTerm('');
+    setMissionStartDateSearch('');
+    setMissionEndDateSearch('');
   };
 
   const handleToggleFamilyStatus = () => {
@@ -94,7 +102,7 @@ const SavedCasesPage: React.FC = () => {
         secondSurname: currentCase.secondSurname,
         docType: currentCase.docType,
         docNumber: currentCase.docNumber,
-        relationship: "PADRE/MADRE",
+        relationship: "PADRE / MADRE",
         birthDate: "1980-01-01",
         isActive: true,
         sex: "NO INFORMA",
@@ -207,8 +215,23 @@ const SavedCasesPage: React.FC = () => {
     if (!activeModal.caseId) return [];
     const currentCase = allSavedCases.find(c => c.caseId === activeModal.caseId);
     const radicado = currentCase?.radicado || activeModal.caseId;
-    return missionsList.filter(m => m.caseRadicado === radicado);
-  }, [activeModal.caseId, missionsList, allSavedCases]);
+    let list = missionsList.filter(m => m.caseRadicado === radicado);
+    
+    if (missionSearchTerm.trim()) {
+      const term = missionSearchTerm.toLowerCase();
+      list = list.filter(m => m.missionNo.toLowerCase().includes(term));
+    }
+
+    if (missionStartDateSearch) {
+      list = list.filter(m => m.creationDate >= missionStartDateSearch);
+    }
+
+    if (missionEndDateSearch) {
+      list = list.filter(m => m.creationDate <= missionEndDateSearch);
+    }
+    
+    return list;
+  }, [activeModal.caseId, missionsList, allSavedCases, missionSearchTerm, missionStartDateSearch, missionEndDateSearch]);
 
   const associatedCase = useMemo(() => {
     if (!activeModal.caseId) return null;
@@ -269,7 +292,7 @@ const SavedCasesPage: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-blue-500/10 transition-all"
           />
-          <svg className="absolute left-3.5 top-3.5 text-slate-400" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg className="absolute left-3.5 top-3.5 text-slate-400" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" cy="21" x2="16.65" y2="16.65"/></svg>
         </div>
       </div>
 
@@ -414,7 +437,7 @@ const SavedCasesPage: React.FC = () => {
                  <InputField label="Segundo Apellido" name="secondSurname" defaultValue={editingMember?.secondSurname} />
                  <SelectField label="Tipo Doc" name="docType" options={DOC_TYPES} defaultValue={editingMember?.docType} required />
                  <InputField label="No. Documento" name="docNumber" defaultValue={editingMember?.docNumber} required />
-                 <InputField label="Parentesco" name="relationship" defaultValue={editingMember?.relationship} required placeholder="Hijo/a, Esposo/a, etc." />
+                 <SelectField label="Parentesco" name="relationship" options={RELATIONSHIP_TYPES} defaultValue={editingMember?.relationship} required />
                  <InputField label="Fecha Nacimiento" name="birthDate" type="date" defaultValue={editingMember?.birthDate} required />
                  <SelectField label="Sexo" name="sex" options={['MASCULINO', 'FEMENINO', 'OTRO', 'NO INFORMA']} defaultValue={editingMember?.sex} required />
                  <InputField label="Lugar Residencia" name="residencePlace" defaultValue={editingMember?.residencePlace} required />
@@ -433,12 +456,61 @@ const SavedCasesPage: React.FC = () => {
       {activeModal.type === 'LIST_MISSIONS' && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
            <div className="bg-white rounded-[2.5rem] shadow-2xl max-w-5xl w-full overflow-hidden animate-in zoom-in-95">
-              <div className="p-8 border-b border-slate-100 flex justify-between items-center">
-                 <div>
+              <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                 <div className="flex-1">
                    <h3 className="text-2xl font-black uppercase tracking-tight text-slate-900">Bandeja de Órdenes - Expediente {associatedCase?.caseId}</h3>
                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Radicado Principal: {associatedCase?.radicado}</p>
                  </div>
-                 <button onClick={closeModal} className="text-slate-300 hover:text-slate-900 transition-colors"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                 <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                    {/* Filtro por Número de Orden */}
+                    <div className="relative flex-1 md:w-40">
+                       <input 
+                          type="text" 
+                          placeholder="No. Orden..." 
+                          value={missionSearchTerm}
+                          onChange={(e) => setMissionSearchTerm(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                       />
+                       <svg className="absolute left-3 top-2.5 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" cy="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
+
+                    {/* Filtro por Fecha de Inicio */}
+                    <div className="relative flex-1 md:w-44">
+                       <label className="absolute -top-4 left-1 text-[8px] font-black uppercase text-slate-400">Fecha Inicio</label>
+                       <input 
+                          type="date" 
+                          value={missionStartDateSearch}
+                          onChange={(e) => setMissionStartDateSearch(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                       />
+                       <svg className="absolute left-3 top-2.5 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </div>
+
+                    {/* Filtro por Fecha Final */}
+                    <div className="relative flex-1 md:w-44">
+                       <label className="absolute -top-4 left-1 text-[8px] font-black uppercase text-slate-400">Fecha Final</label>
+                       <input 
+                          type="date" 
+                          value={missionEndDateSearch}
+                          onChange={(e) => setMissionEndDateSearch(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                       />
+                       <svg className="absolute left-3 top-2.5 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </div>
+
+                    {/* Botón para restablecer filtros del modal */}
+                    {(missionSearchTerm || missionStartDateSearch || missionEndDateSearch) && (
+                        <button 
+                            onClick={() => { setMissionSearchTerm(''); setMissionStartDateSearch(''); setMissionEndDateSearch(''); }}
+                            className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                            title="Limpiar Filtros"
+                        >
+                            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        </button>
+                    )}
+
+                    <button onClick={closeModal} className="text-slate-300 hover:text-slate-900 transition-colors p-1"><svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                 </div>
               </div>
               <div className="p-8">
                  <div className="overflow-hidden border border-slate-100 rounded-2xl">
@@ -446,31 +518,39 @@ const SavedCasesPage: React.FC = () => {
                        <thead className="bg-slate-50 text-slate-400 font-black uppercase">
                           <tr>
                              <th className="px-6 py-4">No. Orden</th>
-                             <th className="px-6 py-4">Fecha Gen</th>
+                             <th className="px-6 py-4">Fecha Inicio / Gen</th>
                              <th className="px-6 py-4">Tipo de Misión</th>
                              <th className="px-6 py-4 text-center">Estado</th>
                              <th className="px-6 py-4 text-center">Acciones</th>
                           </tr>
                        </thead>
                        <tbody className="divide-y divide-slate-50">
-                          {relatedMissions.map(m => (
-                             <tr key={m.id} className="hover:bg-slate-50/50">
-                                <td className="px-6 py-4 font-mono font-black text-indigo-700">{m.missionNo}</td>
-                                <td className="px-6 py-4 font-bold">{m.creationDate}</td>
-                                <td className="px-6 py-4 font-black uppercase text-slate-700">{m.type}</td>
-                                <td className="px-6 py-4 text-center">
-                                   <span className="px-2 py-0.5 rounded-full font-black text-[8px] uppercase tracking-widest bg-blue-900 text-white">
-                                      {m.status}
-                                   </span>
-                                </td>
-                                <td className="px-6 py-4 text-center">
-                                   <div className="flex items-center justify-center gap-2">
-                                      <button onClick={() => { setSelectedMission(m); setActiveModal({ type: 'MISSION_DETAIL', caseId: activeModal.caseId }); }} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Vista Previa Documento"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                                      <button onClick={() => handleOpenEditMission(m)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all" title="Editar Expediente y Orden"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                                   </div>
-                                </td>
-                             </tr>
-                          ))}
+                          {relatedMissions.length > 0 ? (
+                            relatedMissions.map(m => (
+                               <tr key={m.id} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="px-6 py-4 font-mono font-black text-indigo-700">{m.missionNo}</td>
+                                  <td className="px-6 py-4 font-bold">{m.creationDate}</td>
+                                  <td className="px-6 py-4 font-black uppercase text-slate-700">{m.type}</td>
+                                  <td className="px-6 py-4 text-center">
+                                     <span className="px-2 py-0.5 rounded-full font-black text-[8px] uppercase tracking-widest bg-blue-900 text-white">
+                                        {m.status}
+                                     </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-center">
+                                     <div className="flex items-center justify-center gap-2">
+                                        <button onClick={() => { setSelectedMission(m); setActiveModal({ type: 'MISSION_DETAIL', caseId: activeModal.caseId }); }} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Vista Previa Documento"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                        <button onClick={() => handleOpenEditMission(m)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all" title="Editar Expediente y Orden"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                     </div>
+                                  </td>
+                               </tr>
+                            ))
+                          ) : (
+                            <tr>
+                               <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic font-medium">
+                                  No se encontraron órdenes que coincidan con los criterios de búsqueda.
+                               </td>
+                            </tr>
+                          )}
                        </tbody>
                     </table>
                  </div>

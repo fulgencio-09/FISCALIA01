@@ -27,7 +27,7 @@ export enum LegalSystem {
   LEY_906 = 'Ley 906 de 2004'
 }
 
-export type UserRole = 'FISCAL' | 'GESTOR' | 'LIDER';
+export type UserRole = 'FISCAL' | 'GESTOR' | 'LIDER' | 'LIDER_REGIONAL' | 'USUARIO';
 
 export interface FamilyMember {
   id: string;
@@ -67,7 +67,7 @@ export interface ProtectionMission {
   petitionerName: string;
   petitionerDoc: string;
   assignedArea: string;
-  status: 'PENDIENTE' | 'ASIGNADA' | 'ACTIVA' | 'FINALIZADA' | 'ANULADA';
+  status: 'PENDIENTE' | 'ASIGNADA' | 'ACTIVA' | 'FINALIZADA' | 'ANULADA' | 'DEVUELTA';
   dueDate: string;
   creationDate: string;
   assignedOfficial?: string;
@@ -75,18 +75,19 @@ export interface ProtectionMission {
   unidad?: string;
   reassignmentDate?: string;
   observations?: string;
+  returnReason?: string;
+  // Campos de prórroga
+  extensionRequested?: boolean;
+  extensionReason?: string;
 }
 
 export interface ITVRForm {
-  // Datos Misión
-  evaluationNo: string; // Nuevo: Numero de evaluación
-  evaluationDate: string; // Nuevo: Fecha de evaluación
+  evaluationNo: string;
+  evaluationDate: string;
   missionNo: string;
   caseNo: string;
   radicado: string;
   evaluator: string;
-  
-  // 1. Amenaza
   realidadAmenaza: string;
   obs1: string;
   individualidadAmenaza: string;
@@ -103,8 +104,6 @@ export interface ITVRForm {
   obs7: string;
   inminenciaAmenaza: string;
   obs8: string;
-
-  // 2. Riesgo Específico
   especificoIndividualizable: string;
   obs9: string;
   concreto: string;
@@ -123,8 +122,6 @@ export interface ITVRForm {
   obs16: string;
   graveInminente: string;
   obs17: string;
-
-  // 3. Vulnerabilidad
   conductasComportamientos: string;
   obs18: string;
   permanenciaZona: string;

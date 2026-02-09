@@ -17,6 +17,7 @@ const RequestsListPage: React.FC<RequestsListPageProps> = ({ onEdit, onView, use
   const [requests, setRequests] = useState<ProtectionRequestSummary[]>(MOCK_REQUESTS);
   
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [confirmRadicarId, setConfirmRadicarId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ show: boolean; message: string; subMessage?: string }>({ show: false, message: '' });
   const [sortField, setSortField] = useState<keyof ProtectionRequestSummary>('requestDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -25,6 +26,7 @@ const RequestsListPage: React.FC<RequestsListPageProps> = ({ onEdit, onView, use
 
   const handleRadicar = (id: string) => {
     if (userRole !== 'GESTOR') return;
+    setConfirmRadicarId(null);
     setProcessingId(id);
 
     const fullDetails = MOCK_FULL_REQUESTS[id];
@@ -111,8 +113,55 @@ const RequestsListPage: React.FC<RequestsListPageProps> = ({ onEdit, onView, use
       : <span className="text-blue-600 ml-1">↓</span>;
   };
 
+  const selectedRequestForRadication = useMemo(() => {
+    return requests.find(r => r.id === confirmRadicarId);
+  }, [confirmRadicarId, requests]);
+
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8">
+      {/* Modal de Confirmación de Radicación */}
+      {confirmRadicarId && selectedRequestForRadication && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 bg-blue-50 border-b border-blue-100 flex items-center gap-4">
+              <div className="p-3 bg-blue-100 rounded-full text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <h3 className="text-lg font-bold text-blue-900 uppercase tracking-tight">Confirmar Radicación</h3>
+            </div>
+            <div className="p-8">
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                ¿Está seguro de que desea radicar oficialmente esta solicitud? Esta acción generará un número de radicado institucional y notificará al fiscal de conocimiento.
+              </p>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[10px] font-black text-slate-400 uppercase">Solicitante:</span>
+                  <span className="text-xs font-bold text-slate-800 uppercase">{selectedRequestForRadication.firstName} {selectedRequestForRadication.firstSurname}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black text-slate-400 uppercase">NUNC:</span>
+                  <span className="text-xs font-mono font-bold text-slate-800">{selectedRequestForRadication.nunc}</span>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+              <button 
+                onClick={() => setConfirmRadicarId(null)}
+                className="flex-1 py-3 bg-white text-slate-600 font-black border border-slate-300 rounded-xl hover:bg-slate-100 transition-all uppercase tracking-widest text-[10px]"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={() => handleRadicar(confirmRadicarId)}
+                className="flex-1 py-3 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 uppercase tracking-widest text-[10px]"
+              >
+                Confirmar y Radicar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toast.show && (
         <div className="fixed top-5 right-5 z-50 animate-[slideIn_0.3s_ease-out]">
             <div className="bg-green-600 text-white px-5 py-4 rounded-lg shadow-2xl flex items-center gap-4 max-w-xl border-l-4 border-green-800">
@@ -260,7 +309,7 @@ const RequestsListPage: React.FC<RequestsListPageProps> = ({ onEdit, onView, use
                            )}
 
                            {userRole === 'GESTOR' && (
-                            <button onClick={() => canRadicate && !isProcessing && handleRadicar(item.id)} disabled={!canRadicate || isProcessing} className={`p-1.5 rounded transition-colors border ${!canRadicate ? 'hidden' : 'bg-green-50 text-green-600 border-green-100 hover:bg-green-100'}`} title="Radicar Solicitud">
+                            <button onClick={() => canRadicate && !isProcessing && setConfirmRadicarId(item.id)} disabled={!canRadicate || isProcessing} className={`p-1.5 rounded transition-colors border ${!canRadicate ? 'hidden' : 'bg-green-50 text-green-600 border-green-100 hover:bg-green-100'}`} title="Radicar Solicitud">
                                 {isProcessing ? (
                                     <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 ) : (
@@ -277,7 +326,7 @@ const RequestsListPage: React.FC<RequestsListPageProps> = ({ onEdit, onView, use
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-slate-500">
                     <div className="flex flex-col items-center justify-center">
-                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300 mb-2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300 mb-2"><circle cx="11" cy="11" r="8"/><line x1="21" cy="21" x2="16.65" y2="16.65"/></svg>
                        <p className="font-medium">No se encontraron resultados</p>
                     </div>
                   </td>

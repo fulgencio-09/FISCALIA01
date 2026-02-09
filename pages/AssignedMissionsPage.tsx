@@ -73,15 +73,26 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
 
   const StatusBadge = ({ status }: { status: ProtectionMission['status'] }) => {
     const styles = {
-        'ACTIVA': 'bg-blue-50 text-blue-700 border-blue-200',
-        'ASIGNADA': 'bg-indigo-50 text-indigo-700 border-indigo-200',
-        'FINALIZADA': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        'ANULADA': 'bg-slate-100 text-slate-500 border-slate-300',
-        'PENDIENTE': 'bg-amber-50 text-amber-700 border-amber-200'
+        'ACTIVA': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'ASIGNADA': 'bg-blue-50 text-blue-700 border-blue-200',
+        'FINALIZADA': 'bg-slate-900 text-white border-slate-900',
+        'ANULADA': 'bg-rose-50 text-rose-700 border-rose-200',
+        'DEVUELTA': 'bg-amber-50 text-amber-700 border-amber-200',
+        'PENDIENTE': 'bg-slate-100 text-slate-500 border-slate-300'
     };
+
+    const labels: Record<string, string> = {
+      'ACTIVA': 'ACTIVA',
+      'ASIGNADA': 'ASIGNADA',
+      'FINALIZADA': 'TERMINADA',
+      'ANULADA': 'ANULADA',
+      'DEVUELTA': 'DEVUELTA',
+      'PENDIENTE': 'PENDIENTE'
+    };
+
     return (
-        <span className={`px-3 py-1 rounded-full text-[9px] font-black border uppercase tracking-widest ${styles[status]}`}>
-            {status}
+        <span className={`px-2 py-0.5 rounded-full text-[8px] font-black border uppercase tracking-widest ${styles[status]}`}>
+            {labels[status] || status}
         </span>
     );
   };
@@ -89,7 +100,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
   if (view === 'DETAIL' && selectedMission && associatedCase) {
     return (
       <div className="max-w-5xl mx-auto p-4 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-300 print:max-w-none print:p-0">
-        <div className="mb-6 flex justify-between items-center print:hidden">
+        <div className="mb-6 flex justify-between items-center print:hidden px-4 md:px-0">
             <button 
                 onClick={() => setView('LIST')}
                 className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-colors"
@@ -106,7 +117,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
             {/* Header Oficial SIDPA */}
             <div className="border border-slate-900 grid grid-cols-[1fr,2fr,1.2fr] mb-10">
                 <div className="border-r border-slate-900 p-4 flex items-center justify-center bg-white">
-                    <img src="https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg" alt="FGN" className="h-14" />
+                    <img src="https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg" alt="FGN" className="h-14 w-auto" />
                 </div>
                 <div className="border-r border-slate-900 flex flex-col text-center divide-y divide-slate-900">
                     <div className="p-2 text-[10px] font-bold uppercase flex-1 flex items-center justify-center">SUBPROCESO PROTECCIÓN Y ASISTENCIA</div>
@@ -139,10 +150,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                     <span className="font-bold">CASO NÚMERO:</span>
                     <span>{associatedCase.caseId || "N/A"}</span>
                 </div>
-                <div className="grid grid-cols-[200px,1fr] gap-x-4">
-                    <span className="font-bold">ASIGNADO A:</span>
-                    <span className="uppercase">{selectedMission.assignedOfficial || "POR DEFINIR"}</span>
-                </div>
+               
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
                     <span className="font-bold">A SOLICITUD DE:</span>
                     <span className="uppercase">{associatedCase.remittingEntity || "TITULAR DEL CASO"}</span>
@@ -174,6 +182,10 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
                     <span className="font-bold uppercase leading-tight">DOCUMENTO DE IDENTIDAD No.:</span>
                     <span className="font-bold">{associatedCase.docNumber}</span>
+                </div>
+                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
+                    <span className="font-bold">ASIGNADO A:</span>
+                    <span className="uppercase">{selectedMission.assignedOfficial || "POR DEFINIR"}</span>
                 </div>
                 <div className="grid grid-cols-[200px,1fr] gap-x-4">
                     <span className="font-bold">REGIONAL ASIGNADA:</span>
@@ -231,7 +243,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
     <div className="max-w-7xl mx-auto p-4 md:p-10">
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Visualizar Ordenes de Trabajo</h1>
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Consultar ordenes de trabajo</h1>
           <p className="text-slate-500 font-medium italic">Consulta de órdenes de trabajo en ejecución y finalizadas.</p>
         </div>
         <button onClick={() => {setSearchTerm(''); setStartDate(''); setEndDate(''); setRegionalFilter(''); setCaseSearch(''); setStatusFilter(''); setSortOrder('asc');}} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-800 flex items-center gap-2">
@@ -245,7 +257,7 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
           <div className="md:col-span-2 lg:col-span-1"><InputField label="Búsqueda General" placeholder="No. Orden, Radicado..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
           <InputField label="Número de Caso" placeholder="EJ: CASE-2024-001" value={caseSearch} onChange={(e) => setCaseSearch(e.target.value)} />
           <SelectField label="Regional" options={REGIONAL_UNITS} value={regionalFilter} onChange={(e) => setRegionalFilter(e.target.value)} />
-          <SelectField label="Estado" options={['ACTIVA', 'ASIGNADA', 'FINALIZADA', 'ANULADA']} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} />
+          <SelectField label="Estado" options={['ACTIVA', 'ASIGNADA', 'FINALIZADA', 'ANULADA', 'DEVUELTA']} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} />
           <InputField label="Desde" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           <InputField label="Hasta" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           <SelectField label="Orden Cronológico" options={['Desde la más antigua', 'Desde la más reciente']} value={sortOrder === 'asc' ? 'Desde la más antigua' : 'Desde la más reciente'} onChange={(e) => setSortOrder(e.target.value === 'Desde la más antigua' ? 'asc' : 'desc')} />
@@ -255,34 +267,50 @@ const AssignedMissionsPage: React.FC<AssignedMissionsPageProps> = ({ missions })
       <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50/50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            <thead className="bg-slate-50/50 border-b border-slate-200 text-[9px] font-black text-slate-400 uppercase tracking-widest">
               <tr>
-                <th className="px-8 py-6">Fecha Generación</th>
-                <th className="px-8 py-6">Número Orden</th>
-                <th className="px-8 py-6">Asunto</th>
-                <th className="px-8 py-6">Radicado</th>
-                <th className="px-8 py-6 text-center">Estado</th>
-                <th className="px-8 py-6 text-center">Acciones</th>
+                <th className="px-6 py-6">Número Orden</th>
+                <th className="px-6 py-6">Número Caso</th>
+                <th className="px-6 py-6">Tipo Orden</th>
+                <th className="px-6 py-6">Regional</th>
+                <th className="px-6 py-6">Fecha Gen.</th>
+                <th className="px-6 py-6 text-center">Fecha Asig.</th>
+                <th className="px-6 py-6">Funcionario</th>
+                <th className="px-6 py-6 text-center">Estado</th>
+                <th className="px-6 py-6 text-center">Acción</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredMissions.map((m) => (
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-8 py-6 text-xs font-bold text-slate-500">{m.creationDate}</td>
-                    <td className="px-8 py-6 font-mono font-black text-blue-700 text-sm">{m.missionNo}</td>
-                    <td className="px-8 py-6 text-[11px] font-black text-slate-900 uppercase leading-tight max-w-[180px]">{m.subject}</td>
-                    <td className="px-8 py-6 font-mono text-xs font-bold text-slate-500">{m.caseRadicado}</td>
-                    <td className="px-8 py-6 text-center"><StatusBadge status={m.status} /></td>
-                    <td className="px-8 py-6">
+                    <td className="px-6 py-6 font-mono font-black text-blue-700 text-xs">{m.missionNo}</td>
+                    <td className="px-6 py-6 font-mono text-[10px] font-black text-indigo-600 uppercase">{m.caseId}</td>
+                    <td className="px-6 py-6 text-[10px] font-black text-slate-800 uppercase leading-tight max-w-[150px]">{m.type}</td>
+                    <td className="px-6 py-6 font-black text-[9px] uppercase text-indigo-500">{m.regional || '-'}</td>
+                    <td className="px-6 py-6 text-[10px] font-bold text-slate-500">{m.creationDate}</td>
+                    <td className="px-6 py-6 text-[10px] font-bold text-slate-500 text-center">{m.reassignmentDate || <span className="text-slate-300 italic">-</span>}</td>
+                    <td className="px-6 py-6 text-[10px] font-black text-slate-700 uppercase">{m.assignedOfficial || <span className="text-slate-300 italic">PENDIENTE</span>}</td>
+                    <td className="px-6 py-6 text-center"><StatusBadge status={m.status} /></td>
+                    <td className="px-6 py-6">
                         <div className="flex items-center justify-center">
-                             <button onClick={() => handleView(m)} className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-blue-600 hover:text-white transition-all border border-blue-100 shadow-sm">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                Visualizar
+                             <button onClick={() => handleView(m)} className="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-black uppercase text-[8px] tracking-widest hover:bg-blue-600 hover:text-white transition-all border border-blue-100 shadow-sm">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                Ver Detalle
                              </button>
                         </div>
                     </td>
                   </tr>
                 ))}
+                {filteredMissions.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className="px-6 py-20 text-center">
+                      <div className="opacity-30 flex flex-col items-center">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        <p className="mt-4 font-black uppercase text-[10px] tracking-widest">No se encontraron órdenes registradas</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
             </tbody>
           </table>
         </div>

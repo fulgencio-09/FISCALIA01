@@ -220,7 +220,7 @@ const InterviewDocumentPage: React.FC<InterviewDocumentPageProps> = ({ interview
                 </div>
                 <div className="space-y-4">
                     <div className="border border-black p-3">
-                        <p className="text-[10px] font-bold mb-2">¿Tiene alguna enfermedad física?</p>
+                        <p className="text-[10px] font-bold mb-2">Indique las condiciones de salud física y mental que pueda incidir en la implementación de la medida de protección (incluir familiares):  </p>
                         <div className="flex gap-6 mb-2">
                             <span className="font-black border-b border-black w-20 text-center uppercase">{interview.physicalIllness}</span>
                             <span className="text-[9px] font-bold">¿Qué enfermedad?</span>

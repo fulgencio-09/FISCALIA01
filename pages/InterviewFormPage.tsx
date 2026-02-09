@@ -379,7 +379,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         setFormData(prev => {
             const factors = { ...prev.differentialFactors };
             const current = factors[factor] || { titular: false, familiar: false };
-            
+
             let nextTitular = current.titular;
             let nextFamiliar = current.familiar;
 
@@ -419,8 +419,8 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                     </h1>
                     <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest border-t border-slate-100 pt-4">
                         <div className="flex items-center gap-2">
-                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                             <span>SISTEMA SIDPA 3.0</span>
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>SISTEMA SIDPA 3.0</span>
                         </div>
                         <span className="hidden md:inline">•</span>
                         <span>PÁGINA {currentStep + 1} / 8</span>
@@ -518,7 +518,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                 <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
                                 Datos Complementarios (Candidatos A PROTECCIÓN)
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">                              
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                                 <SelectField
                                     label="Depto Nacimiento"
                                     options={departments}
@@ -816,47 +816,11 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 6. Antecedentes Médicos o Clínicos</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <SelectField label="¿Tiene alguna enfermedad física?" options={['SI', 'NO']} value={formData.physicalIllness} onChange={e => updateField('physicalIllness', e.target.value)} disabled={readOnly} />
-                                {formData.physicalIllness === 'SI' && (
-                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-4 rounded-xl">
-                                        <InputField label="¿Qué enfermedad física?" value={formData.physicalIllnessDetails} onChange={e => updateField('physicalIllnessDetails', e.target.value)} disabled={readOnly} />
-                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.hospitalizedPhysical} onChange={e => updateField('hospitalizedPhysical', e.target.value)} disabled={readOnly} />
-                                    </div>
-                                )}
-                                <SelectField label="¿Otro miembro de su familia tiene alguna enfermedad física?" options={['SI', 'NO']} value={formData.familyPhysicalIllness} onChange={e => updateField('familyPhysicalIllness', e.target.value)} disabled={readOnly} />
-                                {formData.familyPhysicalIllness === 'SI' && (
-                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-4 rounded-xl">
-                                        <InputField label="¿Quién?" value={formData.familyPhysicalWho} onChange={e => updateField('familyPhysicalWho', e.target.value)} disabled={readOnly} />
-                                        <InputField label="¿Qué enfermedad?" value={formData.familyPhysicalIllnessDetails} onChange={e => updateField('familyPhysicalIllnessDetails', e.target.value)} disabled={readOnly} />
-                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyPhysicalHospitalized} onChange={e => updateField('familyPhysicalHospitalized', e.target.value)} disabled={readOnly} />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <SelectField label="¿Tiene alguna enfermedad mental?" options={['SI', 'NO']} value={formData.mentalIllness} onChange={e => updateField('mentalIllness', e.target.value)} disabled={readOnly} />
-                                {formData.mentalIllness === 'SI' && (
-                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-4 rounded-xl">
-                                        <InputField label="¿Qué enfermedad mental?" value={formData.mentalIllnessDetails} onChange={e => updateField('mentalIllnessDetails', e.target.value)} disabled={readOnly} />
-                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.hospitalizedMental} onChange={e => updateField('hospitalizedMental', e.target.value)} disabled={readOnly} />
-                                    </div>
-                                )}
-                                <SelectField label="¿Otro miembro de su familia padece enfermedad mental?" options={['SI', 'NO']} value={formData.familyMentalIllness} onChange={e => updateField('familyMentalIllness', e.target.value)} disabled={readOnly} />
-                                {formData.familyMentalIllness === 'SI' && (
-                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-4 rounded-xl">
-                                        <InputField label="¿Quién?" value={formData.familyMentalWho} onChange={e => updateField('familyMentalWho', e.target.value)} disabled={readOnly} />
-                                        <InputField label="¿Qué enfermedad mental?" value={formData.familyMentalIllnessDetails} onChange={e => updateField('familyMentalIllnessDetails', e.target.value)} disabled={readOnly} />
-                                        <SelectField label="¿Ha estado hospitalizado?" options={['SI', 'NO']} value={formData.familyMentalHospitalized} onChange={e => updateField('familyMentalHospitalized', e.target.value)} disabled={readOnly} />
-                                    </div>
-                                )}
-                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <TextAreaField label="Medicamentos de tratamiento que no pueda suspender" value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} disabled={readOnly} />
-                                <SelectField label="¿Quién está en tratamiento?" options={['Usted','Otro miembro de su núcleo familiar']} value={formData.whoInTreatment} onChange={e => updateField('whoInTreatment', e.target.value)} disabled={readOnly} />
-                                {formData.whoInTreatment === 'Otro miembro de su núcleo familiar' && (
-                                    <InputField label="Especifique quién" value={formData.whoInTreatmentDetail} onChange={e => updateField('whoInTreatmentDetail', e.target.value)} disabled={readOnly} />
-                                )}
+                                <TextAreaField label="Indique las condiciones de salud física y mental que pueda incidir en la implementación de la medida de protección (incluir familiares): " value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Medicamentos de tratamiento esencial (incluir familiares): " value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} disabled={readOnly} />
                             </div>
+
                         </section>
 
                         <section className="bg-slate-50/50 p-6 rounded-3xl border border-slate-200">
@@ -864,67 +828,32 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                 <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
                                 Consumo de sustancias psicoactivas
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-x-10 gap-y-8">
                                 {/* Pregunta 1: Titular Consume */}
                                 <div className="space-y-4">
-                                    <SelectField 
-                                        label="¿Consume sustancias psicoactivas?" 
-                                        options={['SI', 'NO']} 
-                                        value={formData.consumesSubstances} 
-                                        onChange={e => updateField('consumesSubstances', e.target.value)} 
+                                    <SelectField
+                                        label="Usted o un familiar consume o ha consumido sustancias psicoactivas?"
+                                        options={['SI', 'NO']}
+                                        value={formData.consumesSubstances}
+                                        onChange={e => updateField('consumesSubstances', e.target.value)}
                                         disabled={readOnly}
                                     />
                                     {formData.consumesSubstances === 'SI' && (
-                                        <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm animate-in zoom-in-95 duration-200">
-                                            <InputField label="¿Qué sustancias?" value={formData.substancesDetails} onChange={e => updateField('substancesDetails', e.target.value)} disabled={readOnly} />
-                                            <InputField label="Tiempo de consumo" value={formData.consumptionTime} onChange={e => updateField('consumptionTime', e.target.value)} disabled={readOnly} />
+                                        <div className="space-y-8">
+                                          
+                                            <TextAreaField label="Indique que sustancias, tiempo de consumo, si ha estado en tratamiento y que familiar." value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={readOnly} />
+                                          
                                         </div>
+
                                     )}
                                 </div>
 
                                 {/* Pregunta 2: Tratamiento Titular */}
-                                <div className="space-y-4">
-                                    <SelectField 
-                                        label="¿Ha estado en tratamiento por consumo de sustancias psicoactivas?" 
-                                        options={['SI', 'NO']} 
-                                        value={formData.inTreatmentSubstances} 
-                                        onChange={e => updateField('inTreatmentSubstances', e.target.value)} 
-                                        disabled={readOnly}
-                                    />
-                                </div>
 
                                 {/* Pregunta 3: Familia Consume */}
-                                <div className="space-y-4">
-                                    <SelectField 
-                                        label="¿Algún miembro de su familia consume?" 
-                                        options={['SI', 'NO']} 
-                                        value={formData.familyConsumesSubstances} 
-                                        onChange={e => updateField('familyConsumesSubstances', e.target.value)} 
-                                        disabled={readOnly}
-                                    />
-                                    {formData.familyConsumesSubstances === 'SI' && (
-                                        <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm animate-in zoom-in-95 duration-200">
-                                            <InputField label="¿Quién?" value={formData.familyConsumesWho} onChange={e => updateField('familyConsumesWho', e.target.value)} disabled={readOnly} />
-                                            <InputField label="Detalle sustancias" value={formData.familySubstancesDetails} onChange={e => updateField('familySubstancesDetails', e.target.value)} disabled={readOnly} />
-                                        </div>
-                                    )}
-                                </div>
 
-                                {/* Pregunta 4: Tratamiento Familia */}
-                                <div className="space-y-4">
-                                    <SelectField 
-                                        label="¿Otro miembro de su grupo familiar ha estado en tratamiento por consumo de sustancias?" 
-                                        options={['SI', 'NO']} 
-                                        value={formData.familyInTreatmentSubstances} 
-                                        onChange={e => updateField('familyInTreatmentSubstances', e.target.value)} 
-                                        disabled={readOnly}
-                                    />
-                                    {formData.familyInTreatmentSubstances === 'SI' && (
-                                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm animate-in zoom-in-95 duration-200">
-                                            <InputField label="¿Quién está en tratamiento?" value={formData.familyInTreatmentWho} onChange={e => updateField('familyInTreatmentWho', e.target.value)} disabled={readOnly} />
-                                        </div>
-                                    )}
-                                </div>
+
+
                             </div>
                         </section>
                     </div>
@@ -936,8 +865,8 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                         <section>
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 7. Vulnerabilidades y Factores de Riesgo</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <TextAreaField label="Intervención Procesal" value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Amenazas Recibidas" value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Intervención Procesal que pueda generar amenaza y riesgo al evaluado" value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Amenazas recibidas por el evaluado o su familia y riesgos identificados " value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} disabled={readOnly} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                                 <SelectField label="¿Tiene antecedentes penales?" options={['SI', 'NO']} value={formData.hasConvictions} onChange={e => updateField('hasConvictions', e.target.value)} disabled={readOnly} />
@@ -959,9 +888,9 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                 <SelectField label="¿Hay apoyo policial cercano?" options={['SI', 'NO']} value={formData.policeSupportNearby} onChange={e => updateField('policeSupportNearby', e.target.value)} disabled={readOnly} />
                             </div>
                             <div className="space-y-8">
-                                <TextAreaField label="Descripción física de la vivienda" value={formData.housePhysicalDescription} onChange={e => updateField('housePhysicalDescription', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Vulnerabilidad en el entorno laboral" value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Vulnerabilidad en desplazamientos diarios" value={formData.dailyMobilityVulnerability} onChange={e => updateField('dailyMobilityVulnerability', e.target.value)} disabled={readOnly} />
+                               <TextAreaField label="Descripción de características físicas de la vivienda que puedan generar vulnerabilidad " value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Vulnerabilidad asociada al entorno en donde el evaluado desarrolla actividades de trabajo" value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Vulnerabilidad en los desplazamientos cotidianos" value={formData.dailyMobilityVulnerability} onChange={e => updateField('dailyMobilityVulnerability', e.target.value)} disabled={readOnly} />
                             </div>
                         </section>
                     </div>
@@ -986,20 +915,20 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                             <tr key={factor} className="hover:bg-slate-50 transition-colors">
                                                 <td className="p-3 border-r border-slate-100 text-[10px] font-bold uppercase">{factor}</td>
                                                 <td className="p-3 border-r border-slate-100 text-center">
-                                                    <input 
-                                                        type="checkbox" 
+                                                    <input
+                                                        type="checkbox"
                                                         className="w-4 h-4 accent-indigo-600"
-                                                        checked={formData.differentialFactors[factor]?.titular || false} 
-                                                        onChange={() => toggleDifferential(factor, 'titular')} 
+                                                        checked={formData.differentialFactors[factor]?.titular || false}
+                                                        onChange={() => toggleDifferential(factor, 'titular')}
                                                         disabled={readOnly}
                                                     />
                                                 </td>
                                                 <td className="p-3 text-center">
-                                                    <input 
-                                                        type="checkbox" 
+                                                    <input
+                                                        type="checkbox"
                                                         className="w-4 h-4 accent-indigo-600"
-                                                        checked={formData.differentialFactors[factor]?.familiar || false} 
-                                                        onChange={() => toggleDifferential(factor, 'familiar')} 
+                                                        checked={formData.differentialFactors[factor]?.familiar || false}
+                                                        onChange={() => toggleDifferential(factor, 'familiar')}
                                                         disabled={readOnly}
                                                     />
                                                 </td>
@@ -1015,13 +944,13 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                 <TextAreaField label="Vulnerabilidad Entorno Familiar" value={formData.vulnerabilityFamilyEnvironment} onChange={e => updateField('vulnerabilityFamilyEnvironment', e.target.value)} disabled={readOnly} />
                             </div>
                         </section>
-                        
+
                         <div className="pt-10 flex flex-col items-center gap-6">
                             <div className="w-full h-px bg-slate-200"></div>
                             {!readOnly && (
                                 <>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Al presionar "Guardar Entrevista" los datos serán formalizados en el expediente SIDPA</p>
-                                    <button 
+                                    <button
                                         type="submit"
                                         className="bg-indigo-600 text-white px-16 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-200 active:scale-95"
                                     >

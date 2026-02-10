@@ -66,43 +66,55 @@ export const COLOMBIA_GEO: Record<string, string[]> = {
   "VICHADA": ["Puerto Carreño"]
 };
 
-// Mock para el Web Service de la Registraduría
-// Se incluye birthDate para calcular la mayoría/minoría de 14 años
-export const REGISTRY_WS_DB: Record<string, any> = {
-  "79123456": {
-    firstName: "PEDRO",
-    secondName: "PABLO",
-    firstSurname: "PÉREZ",
-    secondSurname: "GARCÍA",
-    petitionerDocType: DocType.CC,
-    petitionerDocNumber: "79123456",
-    petitionerExpeditionDate: "2010-05-20",
-    petitionerExpeditionPlace: "Bogotá D.C.",
-    birthDate: "1990-05-20" // Mayor de 14 -> Bloqueado
+export const DIFFERENTIAL_FACTORS_STRUCTURE = [
+  {
+    category: "Enfoque Diferencial",
+    criteria: [
+      {
+        name: "Etario",
+        options: ["Adulto Mayor - Personas ≥ 60 años", "Niño", "Niña", "Adolescente Mujer", "Adolescente Hombre"]
+      },
+      {
+        name: "Étnico",
+        options: ["Afrodescendiente", "Afrodescendiente Palenquero", "Afrodescendiente Raizal", "Comunidad RROM o Gitano", "Indígena (Desplegable)"]
+      },
+      {
+        name: "Discapacidad",
+        options: ["Física", "Mental", "Intelectual", "Sensorial", "Psicosocial", "Múltiple"]
+      },
+      {
+        name: "Contexto (Condición Social y de Vulnerabilidad)",
+        options: ["Campesino / rural", "Migrante", "Víctima del Conflicto Armado", "Madre Cabeza de Familia", "Padre Cabeza de Familia"]
+      }
+    ]
   },
-  "52987654": {
-    firstName: "JUANITA",
-    secondName: "ESTELLA",
-    firstSurname: "CASTRO",
-    secondSurname: "LOPEZ",
-    petitionerDocType: DocType.CC,
-    petitionerDocNumber: "52987654",
-    petitionerExpeditionDate: "2015-11-12",
-    petitionerExpeditionPlace: "Medellín",
-    birthDate: "2000-11-12" // Mayor de 14 -> Bloqueado
+  {
+    category: "Enfoque de Género",
+    criteria: [
+      {
+        name: "Identidad de Género (OSIG)",
+        options: ["Hombre Transgénero", "Mujer Transgénero", "No Binario"]
+      },
+      {
+        name: "Orientación Sexual (OSIG)",
+        options: ["Bisexual", "Asexual", "Homosexual", "Lesbiana", "Otra diversa"]
+      }
+    ]
   },
-  "1105123456": {
-    firstName: "SANTIAGO",
-    secondName: "",
-    firstSurname: "GÓMEZ",
-    secondSurname: "RUIZ",
-    petitionerDocType: DocType.TI,
-    petitionerDocNumber: "1105123456",
-    petitionerExpeditionDate: "2023-01-10",
-    petitionerExpeditionPlace: "Cali",
-    birthDate: "2015-08-20" // Menor de 14 -> Editable
+  {
+    category: "Delitos EDG",
+    criteria: [
+      {
+        name: "Calidad de Víctima",
+        options: ["Mujer Víctima en Proceso Penal", "Mujer Víctima Conflicto Armado", "NNA interviniente en el proceso penal"]
+      },
+      {
+        name: "Tipo de Delito",
+        options: ["Víctima Violencia Intrafamiliar", "Víctima Violencia Sexual", "Víctima Tortura", "Víctima de Feminicidio", "Víctima de Tentativa de feminicidio", "Víctima Trata de Personas", "Víctima Delitos Título II Código Penal (Desplegable)"]
+      }
+    ]
   }
-};
+];
 
 export const REGIONAL_UNITS = [
   "Unidad Regional Centro Sur",
@@ -504,6 +516,32 @@ export const SPOA_SEARCH_DB: Record<string, any> = {
       }
     }
   ]
+};
+
+// --- FIX: Add missing REGISTRY_WS_DB export ---
+export const REGISTRY_WS_DB: Record<string, any> = {
+  "79123456": {
+    firstName: "PEDRO",
+    secondName: "PABLO",
+    firstSurname: "PÉREZ",
+    secondSurname: "GARCÍA",
+    petitionerDocType: "Cédula de Ciudadanía",
+    petitionerDocNumber: "79123456",
+    petitionerExpeditionDate: "1990-05-20",
+    petitionerExpeditionPlace: "Bogotá D.C.",
+    birthDate: "1972-03-15"
+  },
+  "52987654": {
+    firstName: "JUANITA",
+    secondName: "ESTELLA",
+    firstSurname: "CASTRO",
+    secondSurname: "LOPEZ",
+    petitionerDocType: "Cédula de Ciudadanía",
+    petitionerDocNumber: "52987654",
+    petitionerExpeditionDate: "2000-11-12",
+    petitionerExpeditionPlace: "Medellín",
+    birthDate: "1982-08-20"
+  }
 };
 
 export const MOCK_FULL_REQUESTS: Record<string, ProtectionRequestForm> = {

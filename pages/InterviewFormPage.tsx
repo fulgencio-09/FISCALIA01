@@ -2,15 +2,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ProtectionMission, TechnicalInterviewForm, FamilyMember, Pet } from '../types';
 import { InputField, SelectField, TextAreaField } from '../components/FormComponents';
-import { COLOMBIA_GEO, MOCK_FULL_REQUESTS, MOCK_SAVED_CASES, REGIONAL_UNITS, DOC_TYPES, PROFESSIONS, MOCK_FAMILY_DATA } from '../constants';
+import { COLOMBIA_GEO, MOCK_FULL_REQUESTS, MOCK_SAVED_CASES, REGIONAL_UNITS, DOC_TYPES, PROFESSIONS, MOCK_FAMILY_DATA, DIFFERENTIAL_FACTORS_STRUCTURE } from '../constants';
 
 interface InterviewFormPageProps {
     mission?: ProtectionMission;
-    // Added missing initialData prop
     initialData?: TechnicalInterviewForm;
     onCancel: () => void;
     onSaveSuccess: (msg: string) => void;
-    // Added missing readOnly prop
     readOnly?: boolean;
 }
 
@@ -25,38 +23,11 @@ const STEPS = [
     '8. DIFERENCIAL / CIERRE'
 ];
 
-const ENFOQUES_DIFERENCIALES = [
-    'MADRE CABEZA DE FAMILIA',
-    'PADRE CABEZA DE FAMILIA',
-    'PERSONA MAYOR (60 AÑOS O MAS)',
-    'NIÑO, NIÑA. ADOLESCENTE (VICTIMA, TESTIGO INTERVINIENTE)',
-    'INDIGENA',
-    'PALENQUERO, NEGRO, MULATO, AFROCOLOMBIANO, RAIZAL',
-    'GITANO ROM',
-    'CAMPESINO',
-    'DISCAPACITADO',
-    'MIGRANTE',
-    'VICTIMA DEL CONFLICTO ARMADO',
-    'VICTIMA DE VIOLENCIA SEXUAL EN EL MARCO DEL CONFLICTO ARMADO',
-    'VICTIMA DE VIOLENCIA INTRAFAMILIAR'
-];
-
-const ENFOQUES_GENERO = [
-    'LGBTI',
-    'MUJER VÍCTIMA INTERVINIENTE EN EL PROCESO PENAL',
-    'MUJER VICTIMA DE CONFLICTO ARMADO',
-    'MUJER VÍCTIMA DE VIOLENCIA INTRAFAMILIAR',
-    'MUJER VICTIMA DE VIOLENCIA SEXUAL'
-];
-
-// Added initialData and readOnly to destructured props
 const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialData, onCancel, onSaveSuccess, readOnly = false }) => {
     const [currentStep, setCurrentStep] = useState(0);
 
-    // URL del Logo Institucional
-    const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Fiscalia_General_de_la_Nacion_Colombia_Logo.png/800px-Fiscalia_General_de_la_Nacion_Colombia_Logo.png";
+    const LOGO_URL = "https://www.fiscalia.gov.co/colombia/wp-content/uploads/LogoFiscalia.jpg";
 
-    // Función para calcular la edad exacta
     const calculateAge = (birthDateString: string): string => {
         if (!birthDateString) return '';
         const today = new Date();
@@ -71,31 +42,24 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         return age >= 0 ? age.toString() : '0';
     };
 
-    // Obtener datos extendidos del caso para auto-llenado
     const extendedData = useMemo(() => {
         if (!mission) return null;
         const caseInfo = MOCK_SAVED_CASES.find(c => c.radicado === mission.caseRadicado);
-        // Buscar la solicitud original que dio origen al radicado
         const requestInfo = Object.values(MOCK_FULL_REQUESTS).find(r => r.radicado === mission.caseRadicado);
         return { caseInfo, requestInfo };
     }, [mission]);
 
-    // Initialized formData with initialData if provided
     const [formData, setFormData] = useState<TechnicalInterviewForm>(initialData || {
-        // SECCIÓN 1: PRECARGADOS
         caseNumber: mission?.caseRadicado || 'N/A',
         missionNumber: mission?.missionNo || 'N/A',
         missionObject: mission?.type || 'EVALUACIÓN TÉCNICA DE RIESGO',
         assignedEvaluator: mission?.assignedOfficial || 'SISTEMA CENTRAL',
         regional: mission?.regional || '',
         interviewAuthorized: '',
-        // SECCIÓN 1: EVALUADOR
         place: '',
         date: new Date().toISOString().split('T')[0],
         startTime: '',
         endTime: '',
-
-        // SECCIÓN 2: PRECARGADOS (Carga inicial)
         name1: extendedData?.caseInfo?.firstName || '',
         name2: extendedData?.caseInfo?.secondName || '',
         surname1: extendedData?.caseInfo?.firstSurname || '',
@@ -104,8 +68,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         docNumber: mission?.petitionerDoc || '',
         expeditionDate: extendedData?.requestInfo?.petitionerExpeditionDate || '',
         expeditionPlace: extendedData?.requestInfo?.petitionerExpeditionPlace || '',
-
-        // SECCIÓN 2: EVALUADOR
         birthPlace: '',
         birthDepartment: '',
         birthMunicipality: '',
@@ -125,8 +87,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         zone: '',
         ruvRegistered: '',
         rumvRegistered: '',
-
-        // SECCIÓN 3: CARACTERIZACIÓN
         personQuality: extendedData?.requestInfo?.personQuality || '',
         civilStatus: extendedData?.requestInfo?.civilStatus || '',
         dependentsCount: '',
@@ -135,11 +95,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         profession: '',
         monthlyIncome: '',
         observationsGeneral: '',
-
-        // SECCIÓN 4: FAMILIA
         familyMembers: [],
-
-        // SECCIÓN 5: ANIMALES
         hasPets: '',
         petsCount: '',
         pets: [],
@@ -147,8 +103,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         isSpecialBreed: '',
         hasTravelResources: '',
         petObservations: '',
-
-        // SECCIÓN 6: SALUD
         physicalIllness: '',
         physicalIllnessDetails: '',
         hospitalizedPhysical: '',
@@ -166,7 +120,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         uninterruptibleMeds: '',
         whoInTreatment: '',
         whoInTreatmentDetail: '',
-        // CONSUMO
         consumesSubstances: '',
         substancesDetails: '',
         consumptionTime: '',
@@ -176,8 +129,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         inTreatmentSubstances: '',
         familyInTreatmentSubstances: '',
         familyInTreatmentWho: '',
-
-        // SECCIÓN 7: VULNERABILIDAD
         proceduralIntervention: extendedData?.requestInfo?.investigatedFacts || '',
         threatsReceived: extendedData?.requestInfo?.riskReview || '',
         hasConvictions: '',
@@ -196,8 +147,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         housePhysicalDescription: '',
         workEnvironmentVulnerability: '',
         dailyMobilityVulnerability: '',
-
-        // SECCIÓN 8: DIFERENCIAL
         differentialFactors: {},
         observationsDifferential: '',
         vulnerabilityDifferentialPop: '',
@@ -205,7 +154,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         vulnerabilityFamilyEnvironment: ''
     });
 
-    // Added Effect to sync initialData
     useEffect(() => {
         if (initialData) {
             setFormData(initialData);
@@ -213,7 +161,6 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         }
     }, [initialData]);
 
-    // EFECTO DE SINCRONIZACIÓN
     useEffect(() => {
         if (extendedData && !initialData) {
             const caseId = extendedData.caseInfo?.caseId || '';
@@ -241,174 +188,135 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                 caseNumber: mission?.caseRadicado || prev.caseNumber,
                 missionNumber: mission?.missionNo || prev.missionNumber,
                 assignedEvaluator: mission?.assignedOfficial || prev.assignedEvaluator,
-                // CARGA AUTOMÁTICA DEL NÚCLEO FAMILIAR
                 familyMembers: familyFromDb.length > 0 ? familyFromDb : prev.familyMembers
             }));
         }
     }, [extendedData, mission, initialData]);
 
     const updateField = (field: keyof TechnicalInterviewForm, value: any) => {
-        // Added check for readOnly
         if (readOnly) return;
         setFormData(prev => {
             const next = { ...prev, [field]: value };
-
-            // Cálculo automático de edad
             if (field === 'birthDate') {
                 next.age = calculateAge(value);
             }
-
-            // --- LÓGICA DE LIMPIEZA PARA SALUD ---
-            if (field === 'physicalIllness' && value === 'NO') {
-                next.physicalIllnessDetails = '';
-                next.hospitalizedPhysical = '';
-            }
-            if (field === 'familyPhysicalIllness' && value === 'NO') {
-                next.familyPhysicalWho = '';
-                next.familyPhysicalIllnessDetails = '';
-                next.familyPhysicalHospitalized = '';
-            }
-            if (field === 'mentalIllness' && value === 'NO') {
-                next.mentalIllnessDetails = '';
-                next.hospitalizedMental = '';
-            }
-            if (field === 'familyMentalIllness' && value === 'NO') {
-                next.familyMentalWho = '';
-                next.familyMentalIllnessDetails = '';
-                next.familyMentalHospitalized = '';
-            }
-            if (field === 'whoInTreatment' && value !== 'OTRO MIEMBRO DE SU NÚCLEO FAMILIAR') {
-                next.whoInTreatmentDetail = '';
-            }
-
-            // --- LÓGICA DE LIMPIEZA PARA CONSUMO DE SUSTANCIAS ---
-            if (field === 'consumesSubstances' && value === 'NO') {
-                next.substancesDetails = '';
-                next.consumptionTime = '';
-            }
-            if (field === 'familyConsumesSubstances' && value === 'NO') {
-                next.familyConsumesWho = '';
-                next.familySubstancesDetails = '';
-            }
-            if (field === 'familyInTreatmentSubstances' && value === 'NO') {
-                next.familyInTreatmentWho = '';
-            }
-
-            // --- LÓGICA DE LIMPIEZA PARA ANTECEDENTES (SECCIÓN 7) ---
-            if (field === 'hasConvictions' && value === 'NO') {
-                next.hasConvictionsDetails = '';
-            }
-            if (field === 'isSubstituteBeneficiary' && value === 'NO') {
-                next.isSubstituteBeneficiaryDetails = '';
-            }
-            if (field === 'previouslyEvaluated' && value === 'NO') {
-                next.previouslyEvaluatedWhich = '';
-            }
-            if (field === 'hasCurrentMeasures' && value === 'NO') {
-                next.currentMeasuresWho = '';
-            }
-
             return next;
         });
     };
 
     const addFamilyMember = () => {
-        // Added check for readOnly
         if (readOnly) return;
         const newMember: FamilyMember = {
             id: Date.now().toString(),
-            firstName: '',
-            secondName: '',
-            firstSurname: '',
-            secondSurname: '',
-            docType: '',
-            docNumber: '',
-            relationship: '',
-            birthDate: '',
-            age: '',
-            isActive: true,
-            residencePlace: '',
-            sex: ''
+            firstName: '', secondName: '', firstSurname: '', secondSurname: '',
+            docType: '', docNumber: '', relationship: '', birthDate: '', age: '',
+            isActive: true, residencePlace: '', sex: ''
         };
         setFormData(prev => ({ ...prev, familyMembers: [...prev.familyMembers, newMember] }));
     };
 
     const updateFamilyMember = (id: string, field: keyof FamilyMember, value: any) => {
-        // Added check for readOnly
         if (readOnly) return;
-        setFormData(prev => {
-            const updatedMembers = prev.familyMembers.map(member => {
-                if (member.id === id) {
-                    const updated = { ...member, [field]: value };
-                    if (field === 'birthDate') {
-                        updated.age = calculateAge(value);
-                    }
-                    return updated;
+        setFormData(prev => ({
+            ...prev,
+            familyMembers: prev.familyMembers.map(m => {
+                if (m.id === id) {
+                    const upd = { ...m, [field]: value };
+                    if (field === 'birthDate') upd.age = calculateAge(value);
+                    return upd;
                 }
-                return member;
-            });
-            return { ...prev, familyMembers: updatedMembers };
-        });
+                return m;
+            })
+        }));
     };
 
     const addPet = () => {
-        // Added check for readOnly
         if (readOnly) return;
         const newPet: Pet = {
-            id: Date.now().toString(),
-            species: 'CANINO',
-            name: '',
-            breed: '',
-            sex: '',
-            age: '',
-            weight: '',
-            isSterilized: false,
-            isVaccinated: false,
-            isDewormed: false
+            id: Date.now().toString(), species: 'CANINO', name: '', breed: '', sex: '',
+            age: '', weight: '', isSterilized: false, isVaccinated: false, isDewormed: false
         };
         setFormData(prev => ({ ...prev, pets: [...prev.pets, newPet] }));
     };
 
-    /**
-     * Lógica de Factores Diferenciales: 
-     * Solo permite seleccionar uno (Titular o Familiar) por fila.
-     */
-    const toggleDifferential = (factor: string, target: 'titular' | 'familiar') => {
-        // Added check for readOnly
+    const toggleDifferential = (option: string, target: 'titular' | 'familiar') => {
         if (readOnly) return;
         setFormData(prev => {
             const factors = { ...prev.differentialFactors };
-            const current = factors[factor] || { titular: false, familiar: false };
-
-            let nextTitular = current.titular;
-            let nextFamiliar = current.familiar;
-
-            if (target === 'titular') {
-                // Alternar titular
-                nextTitular = !current.titular;
-                // Si ahora es verdadero, el otro debe ser falso
-                if (nextTitular) nextFamiliar = false;
-            } else {
-                // Alternar familiar
-                nextFamiliar = !current.familiar;
-                // Si ahora es verdadero, el otro debe ser falso
-                if (nextFamiliar) nextTitular = false;
-            }
-
-            factors[factor] = { titular: nextTitular, familiar: nextFamiliar };
+            const current = factors[option] || { titular: false, familiar: false };
+            factors[option] = { ...current, [target]: !current[target] };
             return { ...prev, differentialFactors: factors };
         });
+    };
+
+    const renderDifferentialTableRows = () => {
+        const rows: React.ReactNode[] = [];
+        DIFFERENTIAL_FACTORS_STRUCTURE.forEach((catGroup) => {
+            const totalRowsInCategory = catGroup.criteria.reduce((sum, crit) => sum + crit.options.length, 0);
+            catGroup.criteria.forEach((criterion, critIdx) => {
+                const rowsInCriterion = criterion.options.length;
+                criterion.options.forEach((option, optIdx) => {
+                    rows.push(
+                        <tr key={`${catGroup.category}-${criterion.name}-${option}`} className="border-b border-black">
+                            {critIdx === 0 && optIdx === 0 && (
+                                <td rowSpan={totalRowsInCategory} className="border-r border-black p-2 bg-slate-50 text-[10px] font-black uppercase text-center align-middle w-24">
+                                   <div className="vertical-text">{catGroup.category}</div>
+                                </td>
+                            )}
+                            {optIdx === 0 && (
+                                <td rowSpan={rowsInCriterion} className="border-r border-black p-2 bg-white text-[9px] font-bold uppercase text-center align-middle w-32 leading-tight">
+                                    {criterion.name}
+                                </td>
+                            )}
+                            <td className="border-r border-black p-2 text-[9px] font-medium uppercase text-slate-800">
+                                {option}
+                                {option.includes("(Desplegable)") && (
+                                    <input 
+                                        type="text" 
+                                        placeholder="Especifique aquí..." 
+                                        className="block mt-1 w-full border-b border-black outline-none text-[8px] italic uppercase"
+                                        disabled={readOnly || !(formData.differentialFactors[option]?.titular || formData.differentialFactors[option]?.familiar)}
+                                    />
+                                )}
+                            </td>
+                            <td className="border-r border-black p-1 text-center w-16 align-middle">
+                                <input 
+                                    type="checkbox" 
+                                    className="w-4 h-4 accent-black cursor-pointer"
+                                    checked={formData.differentialFactors[option]?.titular || false}
+                                    onChange={() => toggleDifferential(option, 'titular')}
+                                    disabled={readOnly}
+                                />
+                            </td>
+                            <td className="p-1 text-center w-16 align-middle">
+                                <input 
+                                    type="checkbox" 
+                                    className="w-4 h-4 accent-black cursor-pointer"
+                                    checked={formData.differentialFactors[option]?.familiar || false}
+                                    onChange={() => toggleDifferential(option, 'familiar')}
+                                    disabled={readOnly}
+                                />
+                            </td>
+                        </tr>
+                    );
+                });
+            });
+        });
+        return rows;
     };
 
     const departments = useMemo(() => Object.keys(COLOMBIA_GEO), []);
 
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-10 animate-in fade-in duration-500">
+            <style>{`
+                .vertical-text { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+                @media (max-width: 768px) { .vertical-text { writing-mode: horizontal-tb; transform: none; } }
+            `}</style>
 
-            {/* Header Oficial SIDPA con Logo FGN */}
             <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl mb-10 border border-slate-100 flex flex-col md:flex-row items-center gap-10 print:shadow-none print:border-slate-300 print:rounded-none">
                 <div className="flex-shrink-0 bg-slate-50 p-4 rounded-3xl border border-slate-200 shadow-inner">
-                    <img src={LOGO_URL} alt="Fiscalía General de la Nación" className="h-20 md:h-24 drop-shadow-md" />
+                    <img src={LOGO_URL} alt="FGN" className="h-20 md:h-24 drop-shadow-md" />
                 </div>
                 <div className="flex-1 text-center md:text-left">
                     <div className="mb-2">
@@ -424,13 +332,10 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                         </div>
                         <span className="hidden md:inline">•</span>
                         <span>PÁGINA {currentStep + 1} / 8</span>
-                        <span className="hidden md:inline">•</span>
-                        <span className="text-slate-600">EVALUADOR: {formData.assignedEvaluator}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Navegación por pasos */}
             <div className="mb-10 flex gap-1 overflow-x-auto pb-4 scrollbar-hide print:hidden">
                 {STEPS.map((step, idx) => (
                     <button
@@ -445,9 +350,8 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
 
             <form onSubmit={(e) => { e.preventDefault(); onSaveSuccess("Entrevista guardada exitosamente."); }} className="bg-white rounded-[3rem] shadow-2xl p-8 md:p-14 mb-20 border border-slate-100 print:border-none print:shadow-none">
 
-                {/* PASO 1: DATOS GENERALES Y CONTROL */}
                 {currentStep === 0 && (
-                    <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
+                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
                                 <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
@@ -456,53 +360,22 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                                 <InputField label="Número de Caso" value={formData.caseNumber} disabled className="bg-slate-50 font-mono" />
                                 <InputField label="Misión de Trabajo No." value={formData.missionNumber} disabled className="bg-slate-50 font-mono" />
-                                <SelectField
-                                    label="Regional"
-                                    options={REGIONAL_UNITS}
-                                    value={formData.regional}
-                                    disabled
-                                    className="bg-slate-50 font-bold"
-                                />
+                                <SelectField label="Regional" options={REGIONAL_UNITS} value={formData.regional} disabled className="bg-slate-50 font-bold" />
                             </div>
                             <TextAreaField label="Objeto de la misión" value={formData.missionObject} disabled className="bg-slate-50" />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
                                 <InputField label="Evaluador asignado" value={formData.assignedEvaluator} disabled className="bg-slate-50 uppercase font-black" />
-                                <SelectField
-                                    label="¿Autorizo la entrevista?"
-                                    options={['SI', 'NO', 'NO APLICA']}
-                                    value={formData.interviewAuthorized}
-                                    onChange={e => updateField('interviewAuthorized', e.target.value)}
-                                    required
-                                    disabled={readOnly}
-                                />
-                            </div>
-                        </section>
-                        <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
-                                <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                                Control de la Entrevista (Evaluador)
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                                <div className="md:col-span-1">
-                                    <InputField label="Lugar" value={formData.place} onChange={e => updateField('place', e.target.value)} required disabled={readOnly} />
-                                </div>
-                                <InputField label="Fecha Entrevista" type="date" value={formData.date} onChange={e => updateField('date', e.target.value)} required disabled={readOnly} />
-                                <InputField label="Hora Inicio" type="time" value={formData.startTime} onChange={e => updateField('startTime', e.target.value)} required disabled={readOnly} />
-                                <InputField label="Hora Finalización" type="time" value={formData.endTime} onChange={e => updateField('endTime', e.target.value)} required disabled={readOnly} />
+                                <SelectField label="¿Autorizo la entrevista?" options={['SI', 'NO', 'NO APLICA']} value={formData.interviewAuthorized} onChange={e => updateField('interviewAuthorized', e.target.value)} required disabled={readOnly} />
                             </div>
                         </section>
                     </div>
                 )}
 
-                {/* PASO 2: INFORMACIÓN DEL CANDIDATO */}
                 {currentStep === 1 && (
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                INFORMACIÓN DEL CANDIDATO A PROTECCIÓN
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 2. Información del Candidato</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100 mb-10">
                                 <InputField label="Primer Nombre" value={formData.name1} disabled />
                                 <InputField label="Segundo Nombre" value={formData.name2} disabled />
                                 <InputField label="Primer Apellido" value={formData.surname1} disabled />
@@ -512,118 +385,41 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                 <InputField label="Lugar Expedición" value={formData.expeditionPlace} disabled />
                                 <InputField label="Fecha Expedición" value={formData.expeditionDate} disabled />
                             </div>
-                        </section>
-                        <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
-                                <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                                Datos Complementarios (Candidatos A PROTECCIÓN)
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                                <SelectField
-                                    label="Depto Nacimiento"
-                                    options={departments}
-                                    value={formData.birthDepartment}
-                                    onChange={e => {
-                                        updateField('birthDepartment', e.target.value);
-                                        updateField('birthMunicipality', '');
-                                    }}
-                                    disabled={readOnly}
-                                />
-                                <SelectField
-                                    label="Munc Nacimiento"
-                                    options={COLOMBIA_GEO[formData.birthDepartment] || []}
-                                    value={formData.birthMunicipality}
-                                    onChange={e => updateField('birthMunicipality', e.target.value)}
-                                    disabled={!formData.birthDepartment || readOnly}
-                                />
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                                <SelectField label="Depto Nacimiento" options={departments} value={formData.birthDepartment} onChange={e => updateField('birthDepartment', e.target.value)} disabled={readOnly} />
+                                <SelectField label="Munc Nacimiento" options={COLOMBIA_GEO[formData.birthDepartment] || []} value={formData.birthMunicipality} onChange={e => updateField('birthMunicipality', e.target.value)} disabled={!formData.birthDepartment || readOnly} />
                                 <InputField label="Fecha Nacimiento" type="date" value={formData.birthDate} onChange={e => updateField('birthDate', e.target.value)} disabled={readOnly} />
-                                <InputField label="Edad (Cálculo Automático)" type="number" value={formData.age} disabled className="bg-blue-50 font-black text-blue-700" />
-                                <SelectField label="Sexo" options={['Masculino', 'Femenino', 'Otro']} value={formData.sex} onChange={e => updateField('sex', e.target.value)} disabled={readOnly} />
-                                <SelectField label="Zona" options={['URBANA', 'RURAL']} value={formData.zone} onChange={e => updateField('zone', e.target.value)} disabled={readOnly} />
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                                <div className="md:col-span-4">
-                                    <SelectField
-                                        label="¿Se ha registrado en el Registro Único de Migrantes Venezolanos - RUMV? Sólo en el caso de migrantes venezolanos"
-                                        options={['SI', 'NO']}
-                                        value={formData.ruvRegistered}
-                                        onChange={e => updateField('ruvRegistered', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <InputField label="Edad" value={formData.age} disabled className="bg-blue-50 font-black text-blue-700" />
+                                <SelectField label="Sexo" options={['MASCULINO', 'FEMENINO', 'OTRO']} value={formData.sex} onChange={e => updateField('sex', e.target.value)} disabled={readOnly} />
                                 <InputField label="Dirección Residencia" value={formData.residenceAddress} onChange={e => updateField('residenceAddress', e.target.value)} disabled={readOnly} />
-                                <SelectField
-                                    label="Depto Residencia"
-                                    options={departments}
-                                    value={formData.residenceDepartment}
-                                    onChange={e => {
-                                        updateField('residenceDepartment', e.target.value);
-                                        updateField('residenceMunicipality', '');
-                                    }}
-                                    disabled={readOnly}
-                                />
-                                <SelectField
-                                    label="Municipio Residencia"
-                                    options={COLOMBIA_GEO[formData.residenceDepartment] || []}
-                                    value={formData.residenceMunicipality}
-                                    onChange={e => updateField('residenceMunicipality', e.target.value)}
-                                    disabled={!formData.residenceDepartment || readOnly}
-                                />
-                                <InputField label="Dirección Correspondencia" value={formData.correspondenceAddress} onChange={e => updateField('correspondenceAddress', e.target.value)} disabled={readOnly} />
-                                <SelectField
-                                    label="Depto Correspondencia"
-                                    options={departments}
-                                    value={formData.correspondenceDepartment}
-                                    onChange={e => {
-                                        updateField('correspondenceDepartment', e.target.value);
-                                        updateField('correspondenceMunicipality', '');
-                                    }}
-                                    disabled={readOnly}
-                                />
-                                <SelectField
-                                    label="Municipio Correspondencia"
-                                    options={COLOMBIA_GEO[formData.correspondenceDepartment] || []}
-                                    value={formData.correspondenceMunicipality}
-                                    onChange={e => updateField('correspondenceMunicipality', e.target.value)}
-                                    disabled={!formData.correspondenceDepartment || readOnly}
-                                />
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
-                                <InputField label="Correo Electrónico" type="email" value={formData.email} onChange={e => updateField('email', e.target.value)} disabled={readOnly} />
-                                <InputField label="Teléfono Fijo" value={formData.phoneLandline} onChange={e => updateField('phoneLandline', e.target.value)} disabled={readOnly} />
+                                <InputField label="Email" type="email" value={formData.email} onChange={e => updateField('email', e.target.value)} disabled={readOnly} />
                                 <InputField label="Teléfono Móvil" value={formData.phoneMobile} onChange={e => updateField('phoneMobile', e.target.value)} disabled={readOnly} />
-                                <InputField label="Otro Teléfono" value={formData.phoneOther} onChange={e => updateField('phoneOther', e.target.value)} disabled={readOnly} />
                             </div>
                         </section>
                     </div>
                 )}
 
-                {/* PASO 3: CARACTERIZACIÓN PERSONAL */}
                 {currentStep === 2 && (
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 3. Caracterización Personal</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                                <SelectField label="Calidad de la persona dentro de la investigación" options={['Victima', 'Testigo', 'Perito', 'Fiscal', 'Empleado FGN', 'Otro', 'Ninguna']} value={formData.personQuality} onChange={e => updateField('personQuality', e.target.value)} disabled={readOnly} />
-                                <SelectField label="Estado Civil" options={['Soltero/a', 'Casado/a', 'Unión de hecho', 'Divorciado/a', 'Viudo/a']} value={formData.civilStatus} onChange={e => updateField('civilStatus', e.target.value)} disabled={readOnly} />
+                                <SelectField label="Calidad en la investigación" options={['VICTIMA', 'TESTIGO', 'PERITO', 'FISCAL', 'EMPLEADO FGN', 'OTRO']} value={formData.personQuality} onChange={e => updateField('personQuality', e.target.value)} disabled={readOnly} />
+                                <SelectField label="Estado Civil" options={['SOLTERO/A', 'CASADO/A', 'UNIÓN DE HECHO', 'DIVORCIADO/A', 'VIUDO/A']} value={formData.civilStatus} onChange={e => updateField('civilStatus', e.target.value)} disabled={readOnly} />
                                 <InputField label="Personas a Cargo" type="number" value={formData.dependentsCount} onChange={e => updateField('dependentsCount', e.target.value)} disabled={readOnly} />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                                <SelectField label="Nivel Educativo" options={['Primaria', 'Secundaria', 'Técnico', 'Profesional', 'Postgrado']} value={formData.educationLevel} onChange={e => updateField('educationLevel', e.target.value)} disabled={readOnly} />
-                                <InputField label="Ocupación" value={formData.occupation} onChange={e => updateField('occupation', e.target.value)} disabled={readOnly} />
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <SelectField label="Profesión" options={PROFESSIONS} value={formData.profession} onChange={e => updateField('profession', e.target.value)} disabled={readOnly} />
+                                <InputField label="Ocupación" value={formData.occupation} onChange={e => updateField('occupation', e.target.value)} disabled={readOnly} />
                                 <InputField label="Ingresos Mensuales" value={formData.monthlyIncome} onChange={e => updateField('monthlyIncome', e.target.value)} disabled={readOnly} />
                             </div>
-                            <TextAreaField label="Observaciones Caracterización" value={formData.observationsGeneral} onChange={e => updateField('observationsGeneral', e.target.value)} className="h-32" disabled={readOnly} />
+                            <TextAreaField label="Observaciones Caracterización" value={formData.observationsGeneral} onChange={e => updateField('observationsGeneral', e.target.value)} className="mt-8 h-32" disabled={readOnly} />
                         </section>
                     </div>
                 )}
 
-                {/* PASO 4: COMPOSICIÓN NÚCLEO FAMILIAR */}
                 {currentStep === 3 && (
-                    <div className="space-y-8 animate-in slide-in-from-right-8 duration-300">
+                   <div className="space-y-8 animate-in slide-in-from-right-8 duration-300">
                         <div className="flex justify-between items-center border-b-2 border-slate-900 pb-4">
                             <h3 className="text-[11px] font-black uppercase text-slate-900 tracking-tight flex items-center gap-2">
                                 <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
@@ -714,278 +510,145 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                     </div>
                 )}
 
-                {/* PASO 5: ANIMALES DE COMPAÑÍA */}
                 {currentStep === 4 && (
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
                             <div className="flex justify-between items-center border-b-2 border-slate-900 pb-4 mb-8">
-                                <h3 className="text-[11px] font-black uppercase text-slate-900 tracking-tight flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                                    Sección 5. Animales de Compañía
-                                </h3>
+                                <h3 className="text-[11px] font-black uppercase text-slate-900">Sección 5. Animales de Compañía</h3>
                                 <div className="flex items-center gap-6">
                                     <label className="text-[10px] font-black uppercase">¿Tiene animales?</label>
-                                    <div className="flex gap-4">
-                                        <button type="button" disabled={readOnly} onClick={() => updateField('hasPets', 'SI')} className={`px-4 py-1 text-[9px] font-black border transition-all ${formData.hasPets === 'SI' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 border-slate-200'} ${readOnly ? 'opacity-50' : ''}`}>SI</button>
-                                        <button type="button" disabled={readOnly} onClick={() => updateField('hasPets', 'NO')} className={`px-4 py-1 text-[9px] font-black border transition-all ${formData.hasPets === 'NO' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 border-slate-200'} ${readOnly ? 'opacity-50' : ''}`}>NO</button>
-                                    </div>
-                                    {formData.hasPets === 'SI' && <InputField label="¿Cuántos?" type="number" className="w-20" value={formData.petsCount} onChange={e => updateField('petsCount', e.target.value)} disabled={readOnly} />}
+                                    <SelectField label="" options={['SI', 'NO']} value={formData.hasPets} onChange={e => updateField('hasPets', e.target.value)} className="w-24" disabled={readOnly} />
+                                    {formData.hasPets === 'SI' && <InputField label="¿Cuántos?" type="number" value={formData.petsCount} onChange={e => updateField('petsCount', e.target.value)} className="w-20" disabled={readOnly} />}
                                 </div>
                             </div>
                             {formData.hasPets === 'SI' && (
                                 <>
-                                    <div className="overflow-x-auto border-2 border-slate-900 rounded-2xl bg-white shadow-inner mb-8">
-                                        <table className="w-full text-[9px] text-left min-w-[900px]">
-                                            <thead className="bg-slate-900 text-white font-black uppercase tracking-tighter">
+                                    <div className="overflow-x-auto border-2 border-slate-900 rounded-2xl bg-white mb-6">
+                                        <table className="w-full text-[9px] text-left">
+                                            <thead className="bg-slate-900 text-white font-black uppercase">
                                                 <tr>
-                                                    <th className="p-3 border-r border-slate-700">Especie</th>
-                                                    <th className="p-3 border-r border-slate-700">Nombre</th>
-                                                    <th className="p-3 border-r border-slate-700">Raza</th>
-                                                    <th className="p-3 border-r border-slate-700">Sexo</th>
-                                                    <th className="p-3 border-r border-slate-700">Edad</th>
-                                                    <th className="p-3 border-r border-slate-700">Peso</th>
-                                                    <th className="p-3 border-r border-slate-700">Esterelizado?</th>
-                                                    <th className="p-3 border-r border-slate-700">Vacunado?</th>
-                                                    <th className="p-3 border-r border-slate-700 text-center">Desparacitado?</th>
+                                                    <th className="p-3">Especie</th>
+                                                    <th className="p-3">Nombre</th>
+                                                    <th className="p-3">Raza</th>
+                                                    <th className="p-3">Peso</th>
+                                                    <th className="p-3 text-center">Vacunado?</th>
                                                     <th className="p-3 text-center">Acción</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-200">
                                                 {formData.pets.map(p => (
-                                                    <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                                                        <td className="p-2 border-r border-slate-100">
-                                                            <input className="w-full bg-transparent outline-none uppercase font-bold border-b border-transparent focus:border-indigo-400" value={p.species} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, species: e.target.value.toUpperCase() } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100">
-                                                            <input className="w-full bg-transparent outline-none uppercase border-b border-transparent focus:border-indigo-400" value={p.name} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, name: e.target.value.toUpperCase() } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100">
-                                                            <input className="w-full bg-transparent outline-none uppercase border-b border-transparent focus:border-indigo-400" value={p.breed} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, breed: e.target.value.toUpperCase() } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100">
-                                                            <select className="w-full bg-transparent outline-none uppercase font-bold cursor-pointer" value={p.sex} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, sex: e.target.value } : item))} disabled={readOnly}>
-                                                                <option value="">-</option>
-                                                                <option value="MACHO">MACHO</option>
-                                                                <option value="HEMBRA">HEMBRA</option>
-                                                            </select>
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100">
-                                                            <input className="w-full bg-transparent outline-none border-b border-transparent focus:border-indigo-400" placeholder="EJ: 2 AÑOS" value={p.age} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, age: e.target.value.toUpperCase() } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100">
-                                                            <input className="w-full bg-transparent outline-none border-b border-transparent focus:border-indigo-400" placeholder="EJ: 15 KG" value={p.weight} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, weight: e.target.value.toUpperCase() } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100 text-center">
-                                                            <input type="checkbox" checked={p.isSterilized} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isSterilized: e.target.checked } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100 text-center">
-                                                            <input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isVaccinated: e.target.checked } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 border-r border-slate-100 text-center">
-                                                            <input type="checkbox" checked={p.isDewormed} onChange={e => updateField('pets', formData.pets.map(item => item.id === p.id ? { ...item, isDewormed: e.target.checked } : item))} disabled={readOnly} />
-                                                        </td>
-                                                        <td className="p-2 text-center">
-                                                            {!readOnly && (
-                                                                <button type="button" onClick={() => updateField('pets', formData.pets.filter(item => item.id !== p.id))} className="text-red-500 hover:scale-110 transition-transform"><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
-                                                            )}
-                                                        </td>
+                                                    <tr key={p.id}>
+                                                        <td className="p-2"><input className="w-full bg-transparent outline-none uppercase font-bold" value={p.species} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, species: e.target.value.toUpperCase() } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2"><input className="w-full bg-transparent outline-none uppercase" value={p.name} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, name: e.target.value.toUpperCase() } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2"><input className="w-full bg-transparent outline-none uppercase" value={p.breed} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, breed: e.target.value.toUpperCase() } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2"><input className="w-full bg-transparent outline-none" value={p.weight} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, weight: e.target.value } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2 text-center">{!readOnly && <button type="button" onClick={() => updateField('pets', formData.pets.filter(i => i.id !== p.id))} className="text-red-500">×</button>}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </table>
                                     </div>
-                                    {!readOnly && (
-                                        <div className="flex justify-end mb-8">
-                                            <button type="button" onClick={addPet} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all">+ Registrar Mascota</button>
-                                        </div>
-                                    )}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                        <SelectField label="Condición de salud del animal" options={['BUENA', 'REGULAR', 'MALA']} value={formData.petHealthCondition} onChange={e => updateField('petHealthCondition', e.target.value)} disabled={readOnly} />
-                                        <SelectField label="¿Es raza de manejo especial?" options={['SI', 'NO']} value={formData.isSpecialBreed} onChange={e => updateField('isSpecialBreed', e.target.value)} disabled={readOnly} />
-                                        <SelectField label="¿Cuenta con recursos para transporte/traslado?" options={['SI', 'NO']} value={formData.hasTravelResources} onChange={e => updateField('hasTravelResources', e.target.value)} disabled={readOnly} />
-                                        <InputField label="Observaciones Mascotas" value={formData.petObservations} onChange={e => updateField('petObservations', e.target.value)} disabled={readOnly} />
-                                    </div>
+                                    {!readOnly && <button type="button" onClick={addPet} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase">+ Registrar Mascota</button>}
                                 </>
                             )}
                         </section>
                     </div>
                 )}
 
-                {/* PASO 6: SALUD Y CONSUMO */}
                 {currentStep === 5 && (
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 6. Antecedentes Médicos o Clínicos</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <TextAreaField label="Indique las condiciones de salud física y mental que pueda incidir en la implementación de la medida de protección (incluir familiares): " value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Medicamentos de tratamiento esencial (incluir familiares): " value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} disabled={readOnly} />
+                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 6. Antecedentes Médicos y Consumo</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                                <TextAreaField label="Condiciones de salud física/mental que incidan en protección (Titular/Familia)" value={formData.physicalIllnessDetails} onChange={e => updateField('physicalIllnessDetails', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Medicamentos de tratamiento esencial (Titular/Familia)" value={formData.uninterruptibleMeds} onChange={e => updateField('uninterruptibleMeds', e.target.value)} disabled={readOnly} />
                             </div>
-
-                        </section>
-
-                        <section className="bg-slate-50/50 p-6 rounded-3xl border border-slate-200">
-                            <h3 className="text-[11px] font-black uppercase text-indigo-700 mb-8 flex items-center gap-2">
-                                <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                                Consumo de sustancias psicoactivas
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-1 gap-x-10 gap-y-8">
-                                {/* Pregunta 1: Titular Consume */}
-                                <div className="space-y-4">
-                                    <SelectField
-                                        label="Usted o un familiar consume o ha consumido sustancias psicoactivas?"
-                                        options={['SI', 'NO']}
-                                        value={formData.consumesSubstances}
-                                        onChange={e => updateField('consumesSubstances', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                    {formData.consumesSubstances === 'SI' && (
-                                        <div className="space-y-8">
-                                          
-                                            <TextAreaField label="Indique que sustancias, tiempo de consumo, si ha estado en tratamiento y que familiar." value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={readOnly} />
-                                          
-                                        </div>
-
-                                    )}
-                                </div>
-
-                                {/* Pregunta 2: Tratamiento Titular */}
-
-                                {/* Pregunta 3: Familia Consume */}
-
-
-
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
+                                <h4 className="text-[11px] font-black uppercase text-indigo-700 mb-6 flex items-center gap-2"><div className="w-2 h-2 bg-indigo-600 rounded-full"></div> Consumo de sustancias psicoactivas</h4>
+                                <SelectField label="¿Usted o un familiar consume sustancias?" options={['SI', 'NO']} value={formData.consumesSubstances} onChange={e => updateField('consumesSubstances', e.target.value)} disabled={readOnly} />
+                                {formData.consumesSubstances === 'SI' && (
+                                    <TextAreaField label="Especifique sustancias, tiempo, si está en tratamiento y quién" value={formData.substancesDetails} onChange={e => updateField('substancesDetails', e.target.value)} className="mt-4" disabled={readOnly} />
+                                )}
                             </div>
                         </section>
                     </div>
                 )}
 
-                {/* PASO 7: VULNERABILIDAD Y SEGURIDAD */}
                 {currentStep === 6 && (
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
                             <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 7. Vulnerabilidades y Factores de Riesgo</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <TextAreaField label="Intervención Procesal que pueda generar amenaza y riesgo al evaluado" value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Amenazas recibidas por el evaluado o su familia y riesgos identificados " value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Intervención Procesal que genere riesgo" value={formData.proceduralIntervention} onChange={e => updateField('proceduralIntervention', e.target.value)} disabled={readOnly} />
+                                <TextAreaField label="Amenazas recibidas y riesgos identificados" value={formData.threatsReceived} onChange={e => updateField('threatsReceived', e.target.value)} disabled={readOnly} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                                 <SelectField label="¿Tiene antecedentes penales?" options={['SI', 'NO']} value={formData.hasConvictions} onChange={e => updateField('hasConvictions', e.target.value)} disabled={readOnly} />
-                                {formData.hasConvictions === 'SI' && <InputField label="Detalle antecedentes" value={formData.hasConvictionsDetails} onChange={e => updateField('hasConvictionsDetails', e.target.value)} disabled={readOnly} />}
-                                <SelectField label="¿Es beneficiario de sustitutiva?" options={['SI', 'NO']} value={formData.isSubstituteBeneficiary} onChange={e => updateField('isSubstituteBeneficiary', e.target.value)} disabled={readOnly} />
-                                {formData.isSubstituteBeneficiary === 'SI' && <InputField label="Detalle beneficio" value={formData.isSubstituteBeneficiaryDetails} onChange={e => updateField('isSubstituteBeneficiaryDetails', e.target.value)} disabled={readOnly} />}
+                                <SelectField label="¿Tiene medidas vigentes?" options={['SI', 'NO']} value={formData.hasCurrentMeasures} onChange={e => updateField('hasCurrentMeasures', e.target.value)} disabled={readOnly} />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <SelectField label="¿Ha sido evaluado previamente?" options={['SI', 'NO']} value={formData.previouslyEvaluated} onChange={e => updateField('previouslyEvaluated', e.target.value)} disabled={readOnly} />
-                                {formData.previouslyEvaluated === 'SI' && <InputField label="¿Por qué entidad?" value={formData.previouslyEvaluatedWhich} onChange={e => updateField('previouslyEvaluatedWhich', e.target.value)} disabled={readOnly} />}
-                                <SelectField label="¿Tiene medidas de protección vigentes?" options={['SI', 'NO']} value={formData.hasCurrentMeasures} onChange={e => updateField('hasCurrentMeasures', e.target.value)} disabled={readOnly} />
-                                {formData.hasCurrentMeasures === 'SI' && <InputField label="¿Quién las otorga?" value={formData.currentMeasuresWho} onChange={e => updateField('currentMeasuresWho', e.target.value)} disabled={readOnly} />}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <SelectField label="¿Aplica normas de seguridad?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.appliesSecurityNorms} onChange={e => updateField('appliesSecurityNorms', e.target.value)} disabled={readOnly} />
-                                <SelectField label="¿Permanece en zona de riesgo?" options={['SI', 'NO', 'ALGUNAS VECES']} value={formData.remainsInRiskZone} onChange={e => updateField('remainsInRiskZone', e.target.value)} disabled={readOnly} />
-                                <SelectField label="¿Hay grupos ilegales en su sector?" options={['SI', 'NO']} value={formData.illegalOrgsInSector} onChange={e => updateField('illegalOrgsInSector', e.target.value)} disabled={readOnly} />
-                                <SelectField label="¿Cuenta con medios técnicos de seguridad?" options={['SI', 'NO']} value={formData.techSecurityMeans} onChange={e => updateField('techSecurityMeans', e.target.value)} disabled={readOnly} />
-                                <SelectField label="¿Hay apoyo policial cercano?" options={['SI', 'NO']} value={formData.policeSupportNearby} onChange={e => updateField('policeSupportNearby', e.target.value)} disabled={readOnly} />
-                            </div>
-                            <div className="space-y-8">
-                               <TextAreaField label="Descripción de características físicas de la vivienda que puedan generar vulnerabilidad " value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Vulnerabilidad asociada al entorno en donde el evaluado desarrolla actividades de trabajo" value={formData.workEnvironmentVulnerability} onChange={e => updateField('workEnvironmentVulnerability', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Vulnerabilidad en los desplazamientos cotidianos" value={formData.dailyMobilityVulnerability} onChange={e => updateField('dailyMobilityVulnerability', e.target.value)} disabled={readOnly} />
+                                <SelectField label="¿Hay grupos ilegales en sector?" options={['SI', 'NO']} value={formData.illegalOrgsInSector} onChange={e => updateField('illegalOrgsInSector', e.target.value)} disabled={readOnly} />
+                                <SelectField label="¿Cuenta con medios técnicos?" options={['SI', 'NO']} value={formData.techSecurityMeans} onChange={e => updateField('techSecurityMeans', e.target.value)} disabled={readOnly} />
                             </div>
                         </section>
                     </div>
                 )}
 
-                {/* PASO 8: FACTORES DIFERENCIALES Y CIERRE */}
                 {currentStep === 7 && (
                     <div className="space-y-10 animate-in slide-in-from-right-8 duration-300">
                         <section>
-                            <h3 className="text-[11px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8">Sección 8. Factores Diferenciales</h3>
-                            <div className="overflow-x-auto border-2 border-slate-900 rounded-2xl bg-white shadow-inner mb-8">
-                                <table className="w-full text-left">
-                                    <thead className="bg-slate-900 text-white text-[9px] font-black uppercase tracking-tighter">
-                                        <tr>
-                                            <th className="p-4 border-r border-slate-700">Enfoque Diferencial</th>
-                                            <th className="p-4 border-r border-slate-700 text-center">Titular</th>
-                                            <th className="p-4 text-center">N. Familiar</th>
+                            <h3 className="text-[12px] font-black uppercase text-slate-900 border-b-2 border-slate-900 pb-2 mb-8 flex items-center gap-2">
+                                <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                                Sección 8. Factores Diferenciales
+                            </h3>
+                            <div className="overflow-x-auto border-2 border-black rounded-sm bg-white shadow-xl mb-12">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-slate-50 border-b-2 border-black">
+                                        <tr className="text-[10px] font-black uppercase text-slate-700">
+                                            <th className="p-3 border-r border-black">Categoria</th>
+                                            <th className="p-3 border-r border-black text-center">Categoría / Criterio</th>
+                                            <th className="p-3 border-r border-black">Subcategoría / Opción / Desplegable</th>
+                                            <th className="p-3 border-r border-black text-center w-24">Titular</th>
+                                            <th className="p-3 text-center w-24">Familiar</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-200">
-                                        {[...ENFOQUES_DIFERENCIALES, ...ENFOQUES_GENERO].map(factor => (
-                                            <tr key={factor} className="hover:bg-slate-50 transition-colors">
-                                                <td className="p-3 border-r border-slate-100 text-[10px] font-bold uppercase">{factor}</td>
-                                                <td className="p-3 border-r border-slate-100 text-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="w-4 h-4 accent-indigo-600"
-                                                        checked={formData.differentialFactors[factor]?.titular || false}
-                                                        onChange={() => toggleDifferential(factor, 'titular')}
-                                                        disabled={readOnly}
-                                                    />
-                                                </td>
-                                                <td className="p-3 text-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="w-4 h-4 accent-indigo-600"
-                                                        checked={formData.differentialFactors[factor]?.familiar || false}
-                                                        onChange={() => toggleDifferential(factor, 'familiar')}
-                                                        disabled={readOnly}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))}
+                                    <tbody>
+                                        {renderDifferentialTableRows()}
                                     </tbody>
                                 </table>
                             </div>
-                            <TextAreaField label="Observaciones Factores Diferenciales" value={formData.observationsDifferential} onChange={e => updateField('observationsDifferential', e.target.value)} className="mb-8" disabled={readOnly} />
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <TextAreaField label="Vulnerabilidad Población Diferencial" value={formData.vulnerabilityDifferentialPop} onChange={e => updateField('vulnerabilityDifferentialPop', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Vulnerabilidad por Género" value={formData.vulnerabilityGender} onChange={e => updateField('vulnerabilityGender', e.target.value)} disabled={readOnly} />
-                                <TextAreaField label="Vulnerabilidad Entorno Familiar" value={formData.vulnerabilityFamilyEnvironment} onChange={e => updateField('vulnerabilityFamilyEnvironment', e.target.value)} disabled={readOnly} />
+                            <div className="space-y-12">
+                                <TextAreaField label="Observaciones Factores Diferenciales" value={formData.observationsDifferential} onChange={e => updateField('observationsDifferential', e.target.value)} className="mb-8" disabled={readOnly} />
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <TextAreaField label="Vulnerabilidad Población Diferencial" value={formData.vulnerabilityDifferentialPop} onChange={e => updateField('vulnerabilityDifferentialPop', e.target.value)} disabled={readOnly} />
+                                    <TextAreaField label="Vulnerabilidad por Género" value={formData.vulnerabilityGender} onChange={e => updateField('vulnerabilityGender', e.target.value)} disabled={readOnly} />
+                                    <TextAreaField label="Vulnerabilidad Entorno Familiar" value={formData.vulnerabilityFamilyEnvironment} onChange={e => updateField('vulnerabilityFamilyEnvironment', e.target.value)} disabled={readOnly} />
+                                </div>
                             </div>
                         </section>
-
                         <div className="pt-10 flex flex-col items-center gap-6">
                             <div className="w-full h-px bg-slate-200"></div>
                             {!readOnly && (
-                                <>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Al presionar "Guardar Entrevista" los datos serán formalizados en el expediente SIDPA</p>
-                                    <button
-                                        type="submit"
-                                        className="bg-indigo-600 text-white px-16 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-200 active:scale-95"
-                                    >
-                                        Guardar Entrevista Técnica
-                                    </button>
-                                </>
+                                <button type="submit" className="bg-indigo-600 text-white px-20 py-5 rounded-3xl font-black uppercase text-sm tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl active:scale-95 flex items-center gap-3">
+                                    Guardar Entrevista Técnica
+                                </button>
                             )}
                         </div>
                     </div>
                 )}
 
-                {/* Footer de navegación del formulario */}
                 <div className="mt-14 pt-8 border-t border-slate-100 flex justify-between items-center print:hidden">
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                        className="px-8 py-3 bg-white text-slate-400 font-black rounded-xl uppercase text-[10px] tracking-widest hover:text-slate-900 transition-all"
-                    >
+                    <button type="button" onClick={onCancel} className="px-8 py-3 bg-white text-slate-400 font-black rounded-xl uppercase text-[10px] tracking-widest hover:text-slate-900 transition-all">
                         {readOnly ? "Volver" : "Cancelar Proceso"}
                     </button>
                     <div className="flex gap-4">
-                        <button
-                            type="button"
-                            onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
-                            disabled={currentStep === 0}
-                            className={`px-8 py-3 font-black rounded-xl uppercase text-[10px] tracking-widest transition-all ${currentStep === 0 ? 'text-slate-200 cursor-not-allowed' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
-                        >
+                        <button type="button" onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))} disabled={currentStep === 0} className={`px-8 py-3 font-black rounded-xl uppercase text-[10px] tracking-widest transition-all ${currentStep === 0 ? 'text-slate-200 cursor-not-allowed' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>
                             Anterior
                         </button>
                         {currentStep < 7 && (
-                            <button
-                                type="button"
-                                onClick={() => setCurrentStep(prev => Math.min(7, prev + 1))}
-                                className="px-10 py-3 bg-indigo-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
-                            >
+                            <button type="button" onClick={() => setCurrentStep(prev => Math.min(7, prev + 1))} className="px-10 py-3 bg-indigo-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100">
                                 Siguiente
                             </button>
                         )}

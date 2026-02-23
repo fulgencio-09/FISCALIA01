@@ -8,16 +8,18 @@ import GeneratedMissionsPage from './pages/GeneratedMissionsPage';
 import AssignedMissionsPage from './pages/AssignedMissionsPage';
 import MissionInboxPage from './pages/MissionInboxPage';
 import InterviewFormPage from './pages/InterviewFormPage';
+import DirectivoInterviewFormPage from './pages/DirectivoInterviewFormPage';
 import InterviewListPage from './pages/InterviewListPage';
 import ITVRFormPage from './pages/ITVRFormPage';
 import ITVRListPage from './pages/ITVRListPage'; 
 import MissionDocumentPage from './pages/MissionDocumentPage';
 import InterviewDocumentPage from './pages/InterviewDocumentPage';
-import { ProtectionRequestForm, UserRole, ProtectionMission, ITVRForm, TechnicalInterviewForm } from './types';
+import DirectivoInterviewDocumentPage from './pages/DirectivoInterviewDocumentPage';
+import { ProtectionRequestForm, UserRole, ProtectionMission, ITVRForm, TechnicalInterviewForm, DirectivoInterviewForm } from './types';
 import { MOCK_FULL_REQUESTS, MOCK_REQUESTS, MOCK_MISSIONS } from './constants';
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions' | 'assigned-missions' | 'mission-inbox' | 'mission-pending-regional' | 'mission-canceled' | 'mission-returned' | 'interview-form' | 'interview-list' | 'itvr-form' | 'itvr-list' | 'mission-doc' | 'interview-doc'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'form' | 'list' | 'cases' | 'saved-cases' | 'missions' | 'assigned-missions' | 'mission-inbox' | 'mission-pending-regional' | 'mission-pending-national' | 'mission-canceled' | 'mission-returned' | 'interview-form' | 'directivo-interview-form' | 'interview-list' | 'itvr-form' | 'itvr-list' | 'mission-doc' | 'interview-doc' | 'directivo-interview-doc'>('home');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isEvaluacionesOpen, setIsEvaluacionesOpen] = useState(true);
   const [isProcesosOpen, setIsProcesosOpen] = useState(true);
@@ -29,7 +31,7 @@ const App: React.FC = () => {
   const [selectedMissionForITVR, setSelectedMissionForITVR] = useState<ProtectionMission | undefined>(undefined);
   const [selectedMissionForDoc, setSelectedMissionForDoc] = useState<ProtectionMission | undefined>(undefined);
   const [editingITVR, setEditingITVR] = useState<ITVRForm | undefined>(undefined);
-  const [editingInterview, setEditingInterview] = useState<TechnicalInterviewForm | undefined>(undefined);
+  const [editingInterview, setEditingInterview] = useState<TechnicalInterviewForm | DirectivoInterviewForm | undefined>(undefined);
   const [isReadOnlyMode, setIsReadOnlyMode] = useState(false);
 
   const [allMissions, setAllMissions] = useState<ProtectionMission[]>(MOCK_MISSIONS);
@@ -84,13 +86,23 @@ const App: React.FC = () => {
     setSelectedMissionForInterview(mission);
     setEditingInterview(undefined);
     setIsReadOnlyMode(false);
-    setCurrentPage('interview-form');
+    
+    // DETECCIÓN AUTOMÁTICA DE FORMULARIO DIRECTIVO
+    if (mission.type === 'Estudio de riesgo') {
+      setCurrentPage('directivo-interview-form');
+    } else {
+      setCurrentPage('interview-form');
+    }
   };
 
-  const handleViewInterview = (interview: TechnicalInterviewForm) => {
+  const handleViewInterview = (interview: any) => {
     setEditingInterview(interview);
     setIsReadOnlyMode(true);
-    setCurrentPage('interview-doc');
+    if (interview.isDirectivo) {
+        setCurrentPage('directivo-interview-doc');
+    } else {
+        setCurrentPage('interview-doc');
+    }
   };
 
   const handleStartITVR = (mission: ProtectionMission) => {
@@ -197,7 +209,9 @@ const App: React.FC = () => {
                 )}
                 {(userRole === 'LIDER' || userRole === 'LIDER_REGIONAL' || userRole === 'USUARIO') && (
                     <>
-                    {userRole === 'LIDER' && <SidebarItem indent page="missions" label="Ordenes de Trabajo Pendientes" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} />}
+                    {userRole === 'LIDER' && (
+                      <SidebarItem indent page="mission-pending-national" label="Bandeja de Ordenes de Trabajo (Pendientes)" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>} />
+                    )}
                     
                     {userRole === 'LIDER_REGIONAL' && (
                       <SidebarItem indent page="mission-pending-regional" label="Bandejas de Trabajos Pendiente" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>} />
@@ -205,7 +219,6 @@ const App: React.FC = () => {
 
                     <SidebarItem indent page="mission-inbox" label="Bandeja de Ordenes de Trabajo" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m3 16 3-3 3 3 3-3 3 3 3-3 3 3" /></svg>} />
                     
-                    {/* NUEVAS BANDEJAS SOLICITADAS */}
                     <SidebarItem indent page="mission-returned" label="Bandeja de Ordenes Devueltas" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>} />
                     <SidebarItem indent page="mission-canceled" label="Bandeja de Ordenes Anuladas" icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>} />
 
@@ -296,7 +309,7 @@ const App: React.FC = () => {
                     ) : (userRole === 'LIDER' || userRole === 'LIDER_REGIONAL' || userRole === 'USUARIO') ? (
                         <>
                         {userRole === 'LIDER' && (
-                          <button onClick={() => setCurrentPage('missions')} className="bg-indigo-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
+                          <button onClick={() => setCurrentPage('mission-pending-national')} className="bg-indigo-600 text-white px-8 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
                             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                             Gestionar Ordenes
                           </button>
@@ -326,8 +339,18 @@ const App: React.FC = () => {
           {currentPage === 'list' && <RequestsListPage onEdit={(id) => { setEditingRequest(MOCK_FULL_REQUESTS[id]); setIsReadOnlyMode(false); setCurrentPage('form'); }} onView={(id) => { setEditingRequest(MOCK_FULL_REQUESTS[id]); setIsReadOnlyMode(true); setCurrentPage('form'); }} userRole={userRole} />}
           {currentPage === 'cases' && userRole === 'GESTOR' && <ProtectionCasesPage />}
           {currentPage === 'saved-cases' && userRole === 'GESTOR' && <SavedCasesPage />}
-          {currentPage === 'missions' && userRole === 'LIDER' && <GeneratedMissionsPage missions={allMissions} onSaveSuccess={(msg, updatedM) => { showToast(msg); handleUpdateMission(updatedM); }} />}
           
+          {/* Se unifica la lógica de misiones pendientes para Líder Nacional para usar GeneratedMissionsPage */}
+          {currentPage === 'mission-pending-national' && userRole === 'LIDER' && (
+            <GeneratedMissionsPage 
+              missions={allMissions} 
+              onSaveSuccess={(msg, updatedM) => { 
+                showToast(msg); 
+                handleUpdateMission(updatedM); 
+              }} 
+            />
+          )}
+
           {(currentPage === 'mission-inbox' || currentPage === 'mission-pending-regional' || currentPage === 'mission-returned' || currentPage === 'mission-canceled') && (userRole === 'LIDER' || userRole === 'LIDER_REGIONAL' || userRole === 'USUARIO') && (
             <MissionInboxPage 
               missions={allMissions} 
@@ -347,7 +370,8 @@ const App: React.FC = () => {
           )}
 
           {currentPage === 'assigned-missions' && (userRole !== 'GESTOR') && <AssignedMissionsPage missions={allMissions} onUpdateMission={handleUpdateMission} />}
-          {currentPage === 'interview-form' && (userRole === 'USUARIO' || userRole === 'FISCAL') && <InterviewFormPage mission={selectedMissionForInterview} initialData={editingInterview} onCancel={() => { if(userRole === 'FISCAL') { setCurrentPage('home') } else { setCurrentPage('interview-list') } }} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('interview-list'); }} readOnly={isReadOnlyMode} />}
+          {currentPage === 'interview-form' && (userRole === 'USUARIO' || userRole === 'FISCAL') && <InterviewFormPage mission={selectedMissionForInterview} initialData={editingInterview as TechnicalInterviewForm} onCancel={() => { if(userRole === 'FISCAL') { setCurrentPage('home') } else { setCurrentPage('interview-list') } }} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('interview-list'); }} readOnly={isReadOnlyMode} />}
+          {currentPage === 'directivo-interview-form' && (userRole === 'USUARIO' || userRole === 'FISCAL') && <DirectivoInterviewFormPage mission={selectedMissionForInterview} initialData={editingInterview as DirectivoInterviewForm} onCancel={() => { if(userRole === 'FISCAL') { setCurrentPage('home') } else { setCurrentPage('interview-list') } }} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('interview-list'); }} readOnly={isReadOnlyMode} />}
           {currentPage === 'interview-list' && (userRole !== 'GESTOR') && <InterviewListPage onView={handleViewInterview} />}
           {currentPage === 'itvr-list' && (userRole !== 'GESTOR') && <ITVRListPage onEdit={handleEditITVR} onView={handleViewITVR} />}
           {currentPage === 'itvr-form' && (userRole !== 'GESTOR') && <ITVRFormPage initialData={editingITVR} mission={selectedMissionForITVR} onCancel={() => { if(userRole === 'FISCAL') { setCurrentPage('home') } else { setCurrentPage('itvr-list') } }} onSaveSuccess={(msg) => { showToast(msg); setCurrentPage('itvr-list'); }} readOnly={isReadOnlyMode} />}
@@ -362,7 +386,8 @@ const App: React.FC = () => {
                 setCurrentPage('mission-inbox');
               }
           }} />}
-          {currentPage === 'interview-doc' && editingInterview && <InterviewDocumentPage interview={editingInterview} onCancel={() => setCurrentPage('interview-list')} />}
+          {currentPage === 'interview-doc' && editingInterview && <InterviewDocumentPage interview={editingInterview as TechnicalInterviewForm} onCancel={() => setCurrentPage('interview-list')} />}
+          {currentPage === 'directivo-interview-doc' && editingInterview && <DirectivoInterviewDocumentPage interview={editingInterview as DirectivoInterviewForm} onCancel={() => setCurrentPage('interview-list')} />}
         </div>
       </main>
     </div>

@@ -35,6 +35,7 @@ export interface FamilyMember {
   secondName?: string;
   firstSurname: string;
   secondSurname?: string;
+  fullName?: string; // Para el formato Directivo
   docType: string;
   docNumber: string;
   relationship: string;
@@ -245,6 +246,23 @@ export interface TechnicalInterviewForm {
   vulnerabilityDifferentialPop: string;
   vulnerabilityGender: string;
   vulnerabilityFamilyEnvironment: string;
+}
+
+export interface DirectivoInterviewForm extends TechnicalInterviewForm {
+  bloodGroup: string;
+  currentPosition: string;
+  workAddress: string;
+  consentProtection: 'SI' | 'NO' | '';
+  fgnEntryDate: string;
+  fgnServiceType: string; // Nuevo campo "Tipo de servicio"
+  fgnServiceTime: string;
+  positionsHeld: string;
+  activityLocations: string;
+  fgnGlobalExperience: string; // Nuevo campo "Experiencia en la FGN" (4500 chars)
+  evaluationHistory: string;
+  mediaExposure: string;
+  policeMeasuresAuthorized: 'SI' | 'NO' | '';
+  isDirectivo: boolean;
 }
 
 export interface ProtectionCaseForm {

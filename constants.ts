@@ -8,6 +8,13 @@ export const CONFIG = {
   ALLOWED_EXTENSIONS: ['.pdf', '.docx', '.jpg', '.jpeg'],
 };
 
+// Generación de fecha para prueba de prórroga (Hoy + 2 días)
+const getTestDueDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    return d.toISOString().split('T')[0];
+};
+
 export const RELATIONSHIP_TYPES = [
   "CÓNYUGE / COMPAÑERO(A)",
   "HIJO(A)",
@@ -42,6 +49,7 @@ export const COLOMBIA_GEO: Record<string, string[]> = {
   "CASANARE": ["Yopal", "Aguazul", "Villanueva", "Paz de Ariporo"],
   "CAUCA": ["Popayán", "Santander de Quilichao", "Puerto Tejada"],
   "CESAR": ["Valledupar", "Aguachica", "Agustín Codazzi"],
+  // Fixed error in file constants.ts on line 53: Removed duplicate "CHOCÓ" key
   "CHOCÓ": ["Quibdó", "Istmina", "Condoto"],
   "CÓRDOBA": ["Montería", "Cereté", "Sahagún", "Lorica"],
   "CUNDINAMARCA": ["Bogotá D.C.", "Soacha", "Fusagasugá", "Facatativá", "Chía", "Girardot"],
@@ -125,6 +133,7 @@ export const REGIONAL_UNITS = [
   "Unidad Regional Noroccidente",
   "Nivel Central",
   "Unidad Regional Eje cafetero",
+  "Sección satelital Boyacá",
   "Sección satelital Boyacá",
   "Sección satelital Cucuta"
 ];
@@ -286,6 +295,21 @@ export const MOCK_FAMILY_DATA: Record<string, FamilyMember[]> = {
         sex: "MASCULINO",
         residencePlace: "MEDELLÍN"
     }
+  ],
+  "CASE-2025-500": [
+    {
+        id: "fam-dir-1",
+        firstName: "CARLOS",
+        firstSurname: "GAVIRIA",
+        docType: "Cédula de Ciudadanía",
+        docNumber: "80123456",
+        relationship: "HIJO/A",
+        birthDate: "1995-10-10",
+        isActive: true,
+        age: "29",
+        sex: "MASCULINO",
+        residencePlace: "BOGOTÁ D.C."
+    }
   ]
 };
 
@@ -366,6 +390,34 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     caseId: "CASE-2024-001"
   },
   {
+    radicado: "FGN-2025-DIR-001",
+    radicationDate: "2025-01-10",
+    destinationUnit: "Nivel Central",
+    remittingEntity: "FISCALÍA GENERAL DE LA NACIÓN",
+    candidateClassification: "SERVIDOR",
+    origin: "BOGOTÁ",
+    remitterName: "DESPACHO FISCAL GENERAL",
+    requestDepartment: "BOGOTÁ D.C.",
+    requestCity: "Bogotá D.C.",
+    docType: "Cédula de Ciudadanía",
+    docNumber: "10102020",
+    firstName: "FRANCISCO",
+    secondName: "JAVIER",
+    firstSurname: "BARBOSA",
+    secondSurname: "DELGADO",
+    applicantRole: "TITULAR",
+    subject: "ESTUDIO DE RIESGO RESOLUCIÓN 0-0286",
+    assignedArea: "Sección de Investigaciones y evaluaciones",
+    missionStartDate: "2025-01-15",
+    missionType: "Estudio de riesgo",
+    dueDate: "2025-02-15",
+    observations: "Evaluación de riesgo para Nivel Directivo.",
+    folios: "20",
+    generateMission: true,
+    attachments: [],
+    caseId: "CASE-2025-500"
+  },
+  {
     radicado: "FGN-2024-112233",
     radicationDate: "2024-07-20",
     destinationUnit: "Unidad Regional Pácifico",
@@ -392,63 +444,6 @@ export const MOCK_SAVED_CASES: ProtectionCaseForm[] = [
     generateMission: true,
     attachments: [],
     caseId: "CASE-2024-085"
-  },
-  {
-    radicado: "FGN-2024-998877",
-    radicationDate: "2024-08-02",
-    destinationUnit: "Nivel Central",
-    remittingEntity: "DEFENSORÍA DEL PUEBLO",
-    candidateClassification: "INTERVINIENTE",
-    origin: "MEDELLÍN",
-    remitterName: "LUISA FERNANDA",
-    requestDepartment: "ANTIOQUIA",
-    requestCity: "Medellín",
-    docType: "Cédula de Ciudadanía",
-    docNumber: "43555222",
-    firstName: "ELENA",
-    secondName: "",
-    firstSurname: "MARIN",
-    secondSurname: "OSPINA",
-    applicantRole: "REPRESENTANTE LEGAL",
-    subject: "REVALUACIÓN DE RIESGO",
-    assignedArea: "Sección de Justicia transicional",
-    missionStartDate: "2024-08-05",
-    missionType: "Evaluación técnica de amenaza y riesgo",
-    dueDate: "2024-08-15",
-    observations: "Representante legal de su hijo menor de edad vinculado al núcleo familiar.",
-    folios: "89",
-    generateMission: false,
-    attachments: [],
-    caseId: "CASE-2024-102"
-  },
-  {
-    radicado: "FGN-2024-774411",
-    radicationDate: "2024-08-10",
-    destinationUnit: "Unidad Regional Centro Sur",
-    remittingEntity: "FISCALÍA GENERAL DE LA NACIÓN",
-    candidateClassification: "VICTIMA",
-    origin: "BOGOTÁ",
-    remitterName: "ROBERTO MARTINEZ",
-    requestDepartment: "BOGOTÁ D.C.",
-    requestCity: "Bogotá D.C.",
-    docType: "Cédula de Ciudadanía",
-    docNumber: "10203040",
-    firstName: "MARIA",
-    secondName: "ISABEL",
-    firstSurname: "PEREZ",
-    secondSurname: "RODRIGUEZ",
-    applicantRole: "FAMILIAR",
-    subject: "SOLICITUD EVALUACIÓN DE RIESGO",
-    assignedArea: "Sección de Investigaciones y evaluaciones",
-    missionStartDate: "2024-08-12",
-    missionType: "Evaluación técnica de amenaza y riesgo",
-    dueDate: "2024-08-25",
-    observations: "Núcleo familiar del señor Pedro Pablo Pérez.",
-    folios: "5",
-    generateMission: true,
-    attachments: [],
-    caseId: "CASE-2024-115",
-    linkedCaseId: "CASE-2024-001"
   }
 ];
 
@@ -461,9 +456,52 @@ export const MOCK_MISSIONS: ProtectionMission[] = [
     petitionerName: "PEDRO PABLO PÉREZ GARCÍA",
     petitionerDoc: "79123456",
     assignedArea: "Sección de Investigaciones y evaluaciones",
-    status: 'PENDIENTE',
+    status: 'ASIGNADA',
+    assignedOfficial: "CARLOS ANDRÉS RUIZ",
     dueDate: "2024-06-15",
-    creationDate: "2024-06-01"
+    creationDate: "2024-06-01",
+    regional: "Unidad Regional Centro Sur"
+  },
+  {
+    id: "MT-2",
+    missionNo: "MT-2025-001",
+    caseRadicado: "FGN-2025-DIR-001",
+    type: "Estudio de riesgo",
+    petitionerName: "FRANCISCO JAVIER BARBOSA DELGADO",
+    petitionerDoc: "10102020",
+    assignedArea: "Sección de Investigaciones y evaluaciones",
+    status: 'ASIGNADA',
+    assignedOfficial: "USUARIO PRUEBAS JAIR",
+    dueDate: "2025-02-15",
+    creationDate: "2025-01-15",
+    regional: "Nivel Central"
+  },
+  {
+    id: "MT-999",
+    missionNo: "MT-2025-X001",
+    caseRadicado: "FGN-2024-112233",
+    type: "VERIFICACIÓN",
+    petitionerName: "MARCO AURELIO CASAS MORALES",
+    petitionerDoc: "1110555888",
+    assignedArea: "Sección de Operaciones",
+    status: 'PENDIENTE',
+    dueDate: "2025-04-30",
+    creationDate: "2025-03-01",
+    regional: ""
+  },
+  {
+    id: "MT-PRORROGA-DEMO",
+    missionNo: "MT-2024-PRORROGA",
+    caseRadicado: "FGN-2024-582910",
+    type: "Evaluación técnica de amenaza y riesgo",
+    petitionerName: "JULIAN ESTEBAN GÓMEZ",
+    petitionerDoc: "80123456",
+    assignedArea: "Sección de Investigaciones y evaluaciones",
+    status: 'ACTIVA',
+    dueDate: getTestDueDate(),
+    creationDate: new Date().toISOString().split('T')[0],
+    regional: "Unidad Regional Centro Sur",
+    extensionRequested: false
   }
 ];
 
@@ -491,34 +529,9 @@ export const SPOA_SEARCH_DB: Record<string, any> = {
         assistantCell: "3201234567"
       }
     }
-  ],
-  "050016000000202400123": [
-    {
-      label: "PROCESO CONCIERTO PARA DELINQUIR - CTI MEDELLÍN",
-      data: {
-        investigatedFacts: "Testigo presencial de hechos ocurridos en la Comuna 13 relacionados con Grupos Armados Organizados...",
-        legalSystem: LegalSystem.LEY_906,
-        investigatedCrimes: "Concierto para Delinquir",
-        investigationStage: "Juicio",
-        fiscalName: "Angela María Holguín",
-        fiscalRole: "Fiscal Local",
-        fiscalUnit: "Unidad de Estructura de Apoyo",
-        fiscalCorrespondenceAddress: "Carrera 52 # 42-73",
-        fiscalCell: "3145556677",
-        fiscalInstitutionalEmail: "angela.holguin@fiscalia.gov.co",
-        policeName: "Subteniente Carlos Ruiz",
-        policeEntity: "CTI Medellín",
-        policeCell: "3128889900",
-        policeEmail: "carlos.ruiz@fiscalia.gov.co",
-        assistantName: "Jorge Isaacs",
-        assistantEmail: "jorge.isaacs@fiscalia.gov.co",
-        assistantCell: "3114445566"
-      }
-    }
   ]
 };
 
-// --- FIX: Add missing REGISTRY_WS_DB export ---
 export const REGISTRY_WS_DB: Record<string, any> = {
   "79123456": {
     firstName: "PEDRO",
@@ -531,16 +544,16 @@ export const REGISTRY_WS_DB: Record<string, any> = {
     petitionerExpeditionPlace: "Bogotá D.C.",
     birthDate: "1972-03-15"
   },
-  "52987654": {
-    firstName: "JUANITA",
-    secondName: "ESTELLA",
-    firstSurname: "CASTRO",
-    secondSurname: "LOPEZ",
+  "10102020": {
+    firstName: "FRANCISCO",
+    secondName: "JAVIER",
+    firstSurname: "BARBOSA",
+    secondSurname: "DELGADO",
     petitionerDocType: "Cédula de Ciudadanía",
-    petitionerDocNumber: "52987654",
-    petitionerExpeditionDate: "2000-11-12",
-    petitionerExpeditionPlace: "Medellín",
-    birthDate: "1982-08-20"
+    petitionerDocNumber: "10102020",
+    petitionerExpeditionDate: "1998-01-20",
+    petitionerExpeditionPlace: "Bogotá D.C.",
+    birthDate: "1980-01-20"
   }
 };
 
@@ -588,45 +601,46 @@ export const MOCK_FULL_REQUESTS: Record<string, ProtectionRequestForm> = {
     policeEmail: "andres.lopez@policia.gov.co",
     attachments: []
   },
-  "2": {
-    city: "Medellín",
-    requestDate: "2024-05-18",
-    nunc: "050016000000202400123",
-    firstName: "JUANITA",
-    secondName: "ESTELLA",
-    firstSurname: "CASTRO",
-    secondSurname: "LOPEZ",
+  "500": {
+    city: "Bogotá D.C.",
+    requestDate: "2025-01-10",
+    nunc: "110016000000202500500",
+    radicado: "FGN-2025-DIR-001",
+    firstName: "FRANCISCO",
+    secondName: "JAVIER",
+    firstSurname: "BARBOSA",
+    secondSurname: "DELGADO",
     petitionerDocType: DocType.CC,
-    petitionerDocNumber: "52987654",
-    petitionerExpeditionPlace: "Medellín",
-    petitionerExpeditionDate: "2000-11-12",
-    residenceAddress: "Carrera 45 # 10-20",
-    locationAddress: "Calle 50 # 25-30",
-    email: "juanita.castro@example.com",
+    petitionerDocNumber: "10102020",
+    petitionerExpeditionPlace: "Bogotá D.C.",
+    petitionerExpeditionDate: "1998-01-20",
+    residenceAddress: "RESERVADA",
+    locationAddress: "RESERVADA",
+    email: "francisco.barbosa@fiscalia.gov.co",
     landline: "",
-    mobile: "3145551234",
-    civilStatus: CivilStatus.SINGLE,
-    personQuality: PersonQuality.WITNESS,
-    investigatedFacts: "Testigo presencial de hechos ocurridos en la Comuna 13 relacionados con Grupos Armados Organizados.",
+    mobile: "3102223344",
+    civilStatus: "Casado/a",
+    personQuality: "Servidor FGN",
+    investigatedFacts: "Hechos relacionados con su labor como directivo de la entidad.",
     legalSystem: LegalSystem.LEY_906,
-    investigatedCrimes: "Concierto para Delinquir",
+    investigatedCrimes: "Amenazas contra servidor público",
     investigationStage: "Juicio",
-    proceduralMeasures: "Se requiere protección durante las audiencias.",
-    riskReview: "Vigilancia sospechosa en su lugar de residencia tras testimonio inicial.",
-    additionalInfo: "Teme por la seguridad de sus hijos.",
-    fiscalName: "Angela María Holguín",
-    fiscalRole: "Fiscal Local",
-    fiscalUnit: "Unidad de Estructura de Apoyo",
-    fiscalCorrespondenceAddress: "Carrera 52 # 42-73",
+    proceduralMeasures: "Esquema de seguridad vigente",
+    riskReview: "Amenazas directas por decisiones institucionales.",
+    additionalInfo: "Estudio por Resolución 0-0286.",
+    fiscalName: "Luis Camilo Osorio",
+    fiscalRole: "Fiscal ante la Corte",
+    fiscalUnit: "Despacho FGN",
+    fiscalCorrespondenceAddress: "Bunker FGN",
     fiscalPhone: "",
-    fiscalCell: "3145556677",
-    fiscalInstitutionalEmail: "angela.holguin@fiscalia.gov.co",
+    fiscalCell: "3118887766",
+    fiscalInstitutionalEmail: "luis.osorio@fiscalia.gov.co",
     fiscalOptionalEmail: "",
-    policeName: "Subteniente Carlos Ruiz",
-    policeEntity: "CTI Medellín",
+    policeName: "Coronel Juan Pérez",
+    policeEntity: "DIPRO",
     policePhone: "",
-    policeCell: "3128889900",
-    policeEmail: "carlos.ruiz@fiscalia.gov.co",
+    policeCell: "3154445566",
+    policeEmail: "juan.perez@policia.gov.co",
     attachments: []
   }
 };

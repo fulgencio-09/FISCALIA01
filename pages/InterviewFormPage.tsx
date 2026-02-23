@@ -531,7 +531,12 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                                     <th className="p-3">Nombre</th>
                                                     <th className="p-3">Raza</th>
                                                     <th className="p-3">Peso</th>
+                                                    <th className="p-3">Edad</th>
                                                     <th className="p-3 text-center">Vacunado?</th>
+                                                    <th className="p-3 text-center">Esterilizado?</th>
+                                                      <th className="p-3 text-center">Con vacuna anual?</th>
+                                                        <th className="p-3 text-center">Es raza de manejo especial?</th>
+                                                          
                                                     <th className="p-3 text-center">Acción</th>
                                                 </tr>
                                             </thead>
@@ -542,7 +547,11 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                                         <td className="p-2"><input className="w-full bg-transparent outline-none uppercase" value={p.name} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, name: e.target.value.toUpperCase() } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2"><input className="w-full bg-transparent outline-none uppercase" value={p.breed} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, breed: e.target.value.toUpperCase() } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2"><input className="w-full bg-transparent outline-none" value={p.weight} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, weight: e.target.value } : i))} disabled={readOnly} /></td>
+                                                          <td className="p-2"><input className="w-full bg-transparent outline-none" value={p.weight} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, weight: e.target.value } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
+                                                          <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2 text-center">{!readOnly && <button type="button" onClick={() => updateField('pets', formData.pets.filter(i => i.id !== p.id))} className="text-red-500">×</button>}</td>
                                                     </tr>
                                                 ))}
@@ -551,8 +560,12 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                     </div>
                                     {!readOnly && <button type="button" onClick={addPet} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase">+ Registrar Mascota</button>}
                                 </>
+                                
                             )}
+
                         </section>
+                              <TextAreaField label="Condición de salud / visitas al veterinario" value={formData.observationsGeneral} onChange={e => updateField('observationsGeneral', e.target.value)} className="mt-8 h-32" disabled={readOnly} />
+                          <SelectField label="Tiene recursos para adquirir el guacal y los costos de transporte aéreo?" options={['SI', 'NO']} value={formData.civilStatus} onChange={e => updateField('civilStatus', e.target.value)} disabled={readOnly} />
                     </div>
                 )}
 

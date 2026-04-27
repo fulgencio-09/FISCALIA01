@@ -1,8 +1,20 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Use process.env.API_KEY directly for initialization as per guidelines
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+const getAiInstance = () => {
+  if (!aiInstance) {
+    // These exact strings will be replaced by Vite during build/dev
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || '';
+      
+    if (!apiKey) {
+      throw new Error("Gemini API key is not set. Please ensure GEMINI_API_KEY is configured in your environment.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+};
 
 export const analyzeRiskLevel = async (
   riskDescription: string,
@@ -13,6 +25,7 @@ export const analyzeRiskLevel = async (
   }
 
   try {
+    const ai = getAiInstance();
     const prompt = `
       Actúa como un experto analista de seguridad y riesgos para la Fiscalía General.
       Analiza la siguiente información de una solicitud de protección:
@@ -32,6 +45,9 @@ export const analyzeRiskLevel = async (
     return response.text || "No se pudo generar el análisis.";
   } catch (error) {
     console.error("Error calling Gemini:", error);
+    if (error instanceof Error && error.message.includes("API key")) {
+      return "Error: La clave de API de Gemini no está configurada correctamente.";
+    }
     return "Error al conectar con el servicio de análisis de riesgo.";
   }
 };

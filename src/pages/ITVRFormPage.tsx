@@ -59,7 +59,7 @@ const ITVRFormPage: React.FC<ITVRFormPageProps> = ({ initialData, mission, onCan
 
     const [formData, setFormData] = useState<ITVRForm>(initialData || {
         evaluationNo: initialData?.evaluationNo || `EV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-        evaluationDate: initialData?.evaluationDate || new Date().toISOString().split('T')[0],
+        evaluationDate: initialData?.evaluationDate || '2026-02-22',
         missionNo: initialData?.missionNo || mission?.missionNo || '124974',
         caseNo: initialData?.caseNo || extendedData?.caseInfo?.caseId || '08136E',
         radicado: initialData?.radicado || mission?.caseRadicado || '20181100050765',

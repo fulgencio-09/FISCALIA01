@@ -57,7 +57,7 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
         regional: mission?.regional || '',
         interviewAuthorized: '',
         place: '',
-        date: new Date().toISOString().split('T')[0],
+        date: '2026-02-22',
         startTime: '',
         endTime: '',
         name1: extendedData?.caseInfo?.firstName || '',
@@ -547,10 +547,10 @@ const InterviewFormPage: React.FC<InterviewFormPageProps> = ({ mission, initialD
                                                         <td className="p-2"><input className="w-full bg-transparent outline-none uppercase" value={p.name} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, name: e.target.value.toUpperCase() } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2"><input className="w-full bg-transparent outline-none uppercase" value={p.breed} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, breed: e.target.value.toUpperCase() } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2"><input className="w-full bg-transparent outline-none" value={p.weight} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, weight: e.target.value } : i))} disabled={readOnly} /></td>
-                                                          <td className="p-2"><input className="w-full bg-transparent outline-none" value={p.weight} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, weight: e.target.value } : i))} disabled={readOnly} /></td>
+                                                          <td className="p-2"><input className="w-full bg-transparent outline-none" value={p.age} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, age: e.target.value } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
-                                                        <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
-                                                        <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2 text-center"><input type="checkbox" checked={p.isSterilized} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isSterilized: e.target.checked } : i))} disabled={readOnly} /></td>
+                                                        <td className="p-2 text-center"><input type="checkbox" checked={p.isDewormed} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isDewormed: e.target.checked } : i))} disabled={readOnly} /></td>
                                                           <td className="p-2 text-center"><input type="checkbox" checked={p.isVaccinated} onChange={e => updateField('pets', formData.pets.map(i => i.id === p.id ? { ...i, isVaccinated: e.target.checked } : i))} disabled={readOnly} /></td>
                                                         <td className="p-2 text-center">{!readOnly && <button type="button" onClick={() => updateField('pets', formData.pets.filter(i => i.id !== p.id))} className="text-red-500">×</button>}</td>
                                                     </tr>

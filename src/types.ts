@@ -27,7 +27,7 @@ export enum LegalSystem {
   LEY_906 = 'Ley 906 de 2004'
 }
 
-export type UserRole = 'FISCAL' | 'GESTOR' | 'LIDER' | 'LIDER_REGIONAL' | 'USUARIO';
+export type UserRole = 'FISCAL' | 'GESTOR' | 'LIDER' | 'LIDER_REGIONAL' | 'USUARIO' | 'SERVIDOR' | 'SECRETARIA_TECNICA' | 'JURIDICA';
 
 export interface FamilyMember {
   id: string;
@@ -68,7 +68,7 @@ export interface ProtectionMission {
   petitionerName: string;
   petitionerDoc: string;
   assignedArea: string;
-  status: 'PENDIENTE' | 'ASIGNADA' | 'ACTIVA' | 'FINALIZADA' | 'ANULADA' | 'DEVUELTA';
+  status: 'PENDIENTE' | 'ASIGNADA' | 'ACTIVA' | 'FINALIZADA' | 'ANULADA' | 'DEVUELTA' | 'Terminada';
   dueDate: string;
   creationDate: string;
   assignedOfficial?: string;
@@ -80,6 +80,7 @@ export interface ProtectionMission {
   // Campos de prórroga
   extensionRequested?: boolean;
   extensionReason?: string;
+  committeeDate?: string;
 }
 
 export interface ITVRForm {
@@ -294,6 +295,99 @@ export interface ProtectionCaseForm {
   attachments: File[];
   caseId?: string;
   linkedCaseId?: string;
+  committeeDate?: string;
+}
+
+export type ReportStatus = 'BORRADOR' | 'Pendiente Revisor 1' | 'Pendiente Revisor 2' | 'Pendiente Líder 1' | 'Pendiente Líder 2' | 'VoBo revisor' | 'Aprobado Líder' | 'Devuelto por Inconsistencias';
+
+export interface ETARCheckList {
+  id: string;
+  reportId: string;
+  evaluatorRole: UserRole;
+  evaluatorName: string;
+  date: string;
+  isConforme: boolean;
+  observations: string;
+  items: {
+    item: string;
+    cumple: boolean;
+    observacion: string;
+  }[];
+}
+
+export interface ETARReport {
+  id: string;
+  missionId: string;
+  status: ReportStatus;
+  createdAt: string;
+  updatedAt: string;
+  evaluations: ETARCheckList[];
+  sections: {
+    correspondencia: {
+      ciudad: string;
+      fechaAprobacionFirmaDescargue: string;
+      tratamiento: string;
+      dirigidoA: string;
+      cargo: string;
+      entidad: string;
+      direccion: string;
+      municipio: string;
+      caseNumber: string;
+      regional: string;
+      missionNumber: string;
+      assignmentDate: string;
+      evaluatedName: string;
+      idType: string;
+      idNumber: string;
+      sex: string;
+      genderIdentity: string;
+    };
+    concepto: {
+      tipoMision: string;
+      concepto: string;
+      tipoVinculacion: string;
+      medida: string;
+      causal: string;
+      calidadEvaluado: string;
+      nivelRiesgo: string;
+    };
+    dynamic: {
+      delitos: string[];
+      zonasRiesgo: { dept: string; muni: string }[];
+      enfoqueDiferencial: Record<string, { titular: boolean; familiar: boolean }>;
+    };
+    analisis: {
+      diligenciasPracticadas: string;
+      presentacionPrograma: string;
+      entrevistaEvaluado: string;
+      intervencionProcesalAmenaza: string;
+      amenazasSituaciones: string;
+      tiempoServicioDirectivos: string;
+      otrasActividadesDirectivos: string;
+      funcionesDirectivos: string;
+      solicitudAntecedentes: string;
+      intervencionProcesalNoDirectivos: string;
+      revisionProcesal: {
+        fechaRevision: string;
+        radicado: string;
+        sistemaPenal: string;
+        indiciados: string;
+        imputados: string;
+        acusados: string;
+        condenados: string;
+        victimaDenunciante: string;
+        delitos: string[];
+        etapaProcesal: string;
+      };
+      hechos: string;
+      conceptoFuncionarioConocimiento: string;
+      laboresInvestigacion: string;
+      vulnerabilidadDirectivos: string;
+      seguridadInstalaciones: string;
+      exposicionMedios: string;
+      exposicionOtrosEscenarios: string;
+    };
+  };
 }
 
 export interface ValidationErrors {

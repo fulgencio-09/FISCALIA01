@@ -10,7 +10,7 @@ export const CONFIG = {
 
 // Generación de fecha para prueba de prórroga (Hoy + 2 días)
 const getTestDueDate = () => {
-    const d = new Date();
+    const d = new Date('2026-02-22');
     d.setDate(d.getDate() + 2);
     return d.toISOString().split('T')[0];
 };
@@ -499,7 +499,7 @@ export const MOCK_MISSIONS: ProtectionMission[] = [
     assignedArea: "Sección de Investigaciones y evaluaciones",
     status: 'ACTIVA',
     dueDate: getTestDueDate(),
-    creationDate: new Date().toISOString().split('T')[0],
+    creationDate: "2026-02-22",
     regional: "Unidad Regional Centro Sur",
     extensionRequested: false
   }

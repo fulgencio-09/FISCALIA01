@@ -3,6 +3,7 @@ import path from 'path';
 import process from 'process';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(() => {
     return {
@@ -10,13 +11,20 @@ export default defineConfig(() => {
         port: 3000,
         host: '0.0.0.0',
       },
-      plugins: [react()],
+      plugins: [
+        react(),
+        tailwindcss()
+      ],
+      define: {
+        'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY),
+        'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
+      },
       // Removed define block for process.env.API_KEY as per Gemini API guidelines.
       // The API key is assumed to be pre-configured, valid, and accessible in the execution context.
       resolve: {
         alias: {
           /* Use process.cwd() instead of __dirname to avoid errors in ESM environments where __dirname is not defined */
-          '@': path.resolve(process.cwd(), '.'),
+          '@': path.resolve(process.cwd(), 'src'),
         }
       }
     };

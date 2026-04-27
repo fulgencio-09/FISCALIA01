@@ -10,6 +10,7 @@ interface MissionInboxPageProps {
   filterMode?: 'PENDING' | 'WORK' | 'CANCELED' | 'RETURNED';
   onStartInterview: (mission: ProtectionMission) => void;
   onStartITVR: (mission: ProtectionMission) => void;
+  onStartETAR: (mission: ProtectionMission) => void;
   onViewMission: (mission: ProtectionMission) => void;
   onAcceptMission: (mission: ProtectionMission) => void;
   onRejectMission: (mission: ProtectionMission) => void;
@@ -29,6 +30,7 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
   filterMode = 'WORK',
   onStartInterview, 
   onStartITVR,
+  onStartETAR,
   onViewMission,
   onAcceptMission,
   onRejectMission,
@@ -441,6 +443,13 @@ const MissionInboxPage: React.FC<MissionInboxPageProps> = ({
                                   >
                                     <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                     ITVR
+                                  </button>
+                                  <button 
+                                    onClick={() => onStartETAR(m)}
+                                    className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-black uppercase text-[8px] tracking-widest hover:bg-emerald-700 transition-all shadow-sm flex items-center gap-1"
+                                  >
+                                    <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                    ETAR
                                   </button>
                                 </div>
                               )}

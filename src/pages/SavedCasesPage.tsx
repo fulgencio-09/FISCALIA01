@@ -408,7 +408,7 @@ const SavedCasesPage: React.FC = () => {
                                         className={`p-2 rounded-lg transition-all ${m.isActive ? 'text-slate-400 hover:text-red-600 hover:bg-red-50' : 'text-emerald-500 hover:bg-emerald-50'}`}
                                         title={m.isActive ? "Desvincular Integrante" : "Vincular Integrante"}
                                       >
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">{m.isActive ? <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/> : <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>}</svg>
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">{m.isActive ? <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/> : <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>}</svg>
                                       </button>
                                    </div>
                                 </td>

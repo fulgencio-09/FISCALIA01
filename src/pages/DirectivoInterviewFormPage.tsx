@@ -49,7 +49,7 @@ const DirectivoInterviewFormPage: React.FC<DirectivoInterviewFormPageProps> = ({
         regional: mission?.regional || '',
         interviewAuthorized: '',
         place: '',
-        date: new Date().toISOString().split('T')[0],
+        date: '2026-02-22',
         startTime: '',
         endTime: '',
         name1: extendedData?.caseInfo?.firstName || '',
@@ -205,8 +205,8 @@ const DirectivoInterviewFormPage: React.FC<DirectivoInterviewFormPageProps> = ({
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                                 <InputField label="Caso número" value={formData.caseNumber} disabled maxLength={20} />
                                 <InputField label="Misión de trabajo" value={formData.missionNumber} disabled maxLength={20} />
-                                <InputField label="fecha entrevista" value={`${formData.place} - ${formData.date}`} type="date" onChange={e => updateField('place', e.target.value)} required  />
-                                <InputField label="Lugar de la entrevista" value={formData.birthDate} type="text" onChange={e => updateField('birthDate', e.target.value)} required />
+                                <InputField label="Lugar de la entrevista" value={formData.place} onChange={e => updateField('place', e.target.value)} required />
+                                <InputField label="Fecha de la entrevista" value={formData.date} type="date" onChange={e => updateField('date', e.target.value)} required />
                                 <InputField label="Evaluador" value={formData.assignedEvaluator} disabled />
                                 <div className="md:col-span-2">
                                     <TextAreaField label="Objeto de la Misión" value={formData.missionObject} onChange={e => updateField('missionObject', e.target.value)} required maxLength={500} />
@@ -217,7 +217,7 @@ const DirectivoInterviewFormPage: React.FC<DirectivoInterviewFormPageProps> = ({
                                 <InputField label="Apellidos" value={formData.surname1 + ' ' + (formData.surname2 || '')} disabled maxLength={150} />
                                 <InputField label="Número Documento de identidad" value={formData.docNumber} disabled maxLength={20} />
                                 <InputField label="Fecha de nacimiento" value={formData.birthDate} type="date" onChange={e => updateField('birthDate', e.target.value)} required />
-                                 <InputField label="Lugar de nacimiento" value={formData.birthDate} type="text" onChange={e => updateField('birthDate', e.target.value)} required />
+                                 <InputField label="Lugar de nacimiento" value={formData.birthPlace} onChange={e => updateField('birthPlace', e.target.value)} required />
                                 <InputField label="Edad" value={formData.age} disabled className="bg-blue-50" />
                                 <SelectField label="Grupo Sanguíneo y RH" options={['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']} value={formData.bloodGroup} onChange={e => updateField('bloodGroup', e.target.value)} required />
                                 <SelectField label="Estado civil" options={['SOLTERO/A', 'CASADO/A', 'DIVORCIADO/A', 'VIUDO/A', 'UNIÓN LIBRE']} value={formData.civilStatus} onChange={e => updateField('civilStatus', e.target.value)} required />
